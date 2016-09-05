@@ -98,6 +98,9 @@ public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends 
         @EventType
         final int type = itemModel.getEventType();
         switch (type) {
+            case EventType.NONE:
+                // do nothing
+                break;
             case EventType.ADDED: {
                 items.add(itemModel);
                 notifyPropertyChanged(BR.empty);

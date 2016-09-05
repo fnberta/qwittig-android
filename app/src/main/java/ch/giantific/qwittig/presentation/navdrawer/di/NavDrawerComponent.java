@@ -7,6 +7,8 @@ package ch.giantific.qwittig.presentation.navdrawer.di;
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
+import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.assignments.list.di.AssignmentsSubcomponent;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidViewModelModule;
@@ -22,10 +24,8 @@ import ch.giantific.qwittig.presentation.purchases.list.di.PurchasesListViewMode
 import ch.giantific.qwittig.presentation.stats.di.StatsLoaderModule;
 import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 import ch.giantific.qwittig.presentation.stats.di.StatsViewModelModule;
-import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsSubcomponent;
-import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsViewModelModule;
-import ch.giantific.qwittig.presentation.tasks.list.di.TasksListSubcomponent;
-import ch.giantific.qwittig.presentation.tasks.list.di.TasksListViewModelModule;
+import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsViewModelModule;
+import ch.giantific.qwittig.presentation.assignments.list.di.AssignmentsViewModelModule;
 import dagger.Component;
 
 /**
@@ -47,9 +47,9 @@ public interface NavDrawerComponent {
 
     PurchaseDetailsSubcomponent plus(PurchaseDetailsViewModelModule purchaseDetailsViewModelModule);
 
-    TasksListSubcomponent plus(TasksListViewModelModule tasksListViewModelModule);
+    AssignmentsSubcomponent plus(AssignmentsViewModelModule assignmentsViewModelModule);
 
-    TaskDetailsSubcomponent plus(TaskDetailsViewModelModule taskDetailsViewModelModule);
+    AssignmentDetailsSubcomponent plus(AssignmentDetailsViewModelModule assignmentDetailsViewModelModule);
 
     StatsSubcomponent plus(StatsViewModelModule statsViewModelModule,
                            StatsLoaderModule statsLoaderModule);

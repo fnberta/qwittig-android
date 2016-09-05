@@ -1,0 +1,134 @@
+/*
+ * Copyright (c) 2016 Fabio Berta
+ */
+
+package ch.giantific.qwittig.presentation.assignments.details;
+
+import android.app.Activity;
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+
+import java.util.List;
+
+import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.databinding.FragmentAssignmentDetailsBinding;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsSubcomponent;
+
+/**
+ * Shows the details of a task. Most of the information gets displayed in the
+ * {@link Toolbar} of the hosting {@link Activity}. The fragment itself shows a list of users that
+ * have previously finished the task.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
+ */
+public class AssignmentDetailsFragment extends BaseRecyclerViewFragment<AssignmentDetailsSubcomponent, AssignmentDetailsViewModel, BaseFragment.ActivityListener<AssignmentDetailsSubcomponent>>
+        implements AssignmentDetailsViewModel.ViewListener {
+
+    private FragmentAssignmentDetailsBinding binding;
+
+    public AssignmentDetailsFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentAssignmentDetailsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        viewModel.attachView(this);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
+    }
+
+    @Override
+    protected void injectDependencies(@NonNull AssignmentDetailsSubcomponent component) {
+        component.inject(this);
+    }
+
+    @Override
+    protected RecyclerView getRecyclerView() {
+        return binding.rvAssignmentDetailsHistory;
+    }
+
+    @Override
+    protected BaseRecyclerAdapter getRecyclerAdapter() {
+        return new AssignmentHistoryRecyclerAdapter(viewModel);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.menu_assignment_details, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+        switch (id) {
+            case R.id.action_assignment_delete:
+                viewModel.onDeleteAssignmentMenuClick();
+                return true;
+            case R.id.action_assignment_edit:
+                viewModel.onEditAssignmentMenuClick();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void startPostponedEnterTransition() {
+        ActivityCompat.startPostponedEnterTransition(getActivity());
+    }
+
+    @NonNull
+    @Override
+    public SpannableStringBuilder buildIdentitiesString(@NonNull List<Identity> identities) {
+        final SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
+        final int size = identities.size();
+        final Identity responsible = identities.get(0);
+        stringBuilder.append(responsible.getNickname());
+
+        if (size > 1) {
+            final int spanEnd = stringBuilder.length();
+            stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spanEnd,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            for (int i = 1; i < size; i++) {
+                final Identity identity = identities.get(i);
+                stringBuilder.append(" - ").append(identity.getNickname());
+            }
+        }
+
+        return stringBuilder;
+    }
+}

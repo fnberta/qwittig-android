@@ -323,7 +323,7 @@ public class BindingAdapters {
     }
 
     @BindingAdapter({"timeFrame"})
-    public static void setTaskTimeFrame(TextView view, int timeFrameRes) {
+    public static void setAssignmentTimeFrame(TextView view, int timeFrameRes) {
         if (timeFrameRes > 0) {
             view.setText(timeFrameRes);
         }

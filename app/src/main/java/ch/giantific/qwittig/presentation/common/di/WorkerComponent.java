@@ -12,7 +12,6 @@ import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.login.LoginWorker;
 import ch.giantific.qwittig.presentation.purchases.addedit.RatesWorker;
-import ch.giantific.qwittig.presentation.tasks.list.TaskRemindWorker;
 import dagger.Component;
 
 /**
@@ -24,8 +23,6 @@ import dagger.Component;
 public interface WorkerComponent {
 
     void inject(RatesWorker ratesWorker);
-
-    void inject(TaskRemindWorker taskRemindWorker);
 
     void inject(LoginWorker loginWorker);
 

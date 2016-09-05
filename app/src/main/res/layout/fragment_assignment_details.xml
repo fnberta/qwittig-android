@@ -1,0 +1,53 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsViewModel"
+            />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.assignments.details.AssignmentDetailsFragment"
+        >
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_assignment_details_history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/small_space"
+            android:scrollbars="vertical"
+            android:visibility="@{viewModel.loading ? View.GONE : viewModel.empty ? View.GONE : View.VISIBLE}"
+            />
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
+            android:text="@string/no_assignment_history"
+            android:visibility="@{!viewModel.empty ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
+            />
+
+        <include
+            layout="@layout/include_progress"
+            app:viewModel="@{viewModel}"
+            />
+
+    </FrameLayout>
+</layout>

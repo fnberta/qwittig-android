@@ -29,6 +29,7 @@ public abstract class BaseRecyclerViewFragment<U, T extends ViewModel, S extends
     protected BaseRecyclerAdapter recyclerAdapter;
 
     public BaseRecyclerViewFragment() {
+        // required empty constructor
     }
 
     @Override

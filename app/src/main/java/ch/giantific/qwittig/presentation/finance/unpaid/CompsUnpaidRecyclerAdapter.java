@@ -13,8 +13,8 @@ import ch.giantific.qwittig.databinding.RowCompUnpaidCreditBinding;
 import ch.giantific.qwittig.databinding.RowCompUnpaidDebtBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel;
-import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel.ViewType;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompUnpaidItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompUnpaidItemModel.ViewType;
 
 
 /**
@@ -60,7 +60,7 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        final CompsUnpaidItemModel itemModel = viewModel.getItemAtPosition(position);
+        final CompUnpaidItemModel itemModel = viewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case ViewType.CREDIT: {

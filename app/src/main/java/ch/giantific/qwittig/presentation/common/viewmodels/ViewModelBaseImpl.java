@@ -46,6 +46,7 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
         this.eventBus = eventBus;
         this.userRepo = userRepo;
 
+        //noinspection SimplifiableIfStatement
         if (savedState != null) {
             loading = savedState.getBoolean(STATE_LOADING, false);
         } else {

@@ -22,14 +22,15 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.CompensationRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel;
-import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel.ViewType;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompUnpaidItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompUnpaidItemModel.ViewType;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.SingleSubscriber;
@@ -40,7 +41,7 @@ import timber.log.Timber;
 /**
  * Provides an implementation of the {@link CompsUnpaidViewModel}.
  */
-public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidItemModel, CompsUnpaidViewModel.ViewListener>
+public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompUnpaidItemModel, CompsUnpaidViewModel.ViewListener>
         implements CompsUnpaidViewModel {
 
     private static final String STATE_COMP_CHANGE_AMOUNT = "STATE_COMP_CHANGE_AMOUNT";
@@ -65,12 +66,12 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
     }
 
     @Override
-    protected Class<CompsUnpaidItemModel> getItemModelClass() {
-        return CompsUnpaidItemModel.class;
+    protected Class<CompUnpaidItemModel> getItemModelClass() {
+        return CompUnpaidItemModel.class;
     }
 
     @Override
-    protected int compareItemModels(CompsUnpaidItemModel o1, CompsUnpaidItemModel o2) {
+    protected int compareItemModels(CompUnpaidItemModel o1, CompUnpaidItemModel o2) {
         return o1.compareTo(o2);
     }
 
@@ -122,9 +123,9 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
                         return initialDataLoaded;
                     }
                 })
-                .flatMap(new Func1<RxChildEvent<Compensation>, Observable<CompsUnpaidItemModel>>() {
+                .flatMap(new Func1<RxChildEvent<Compensation>, Observable<CompUnpaidItemModel>>() {
                     @Override
-                    public Observable<CompsUnpaidItemModel> call(final RxChildEvent<Compensation> event) {
+                    public Observable<CompUnpaidItemModel> call(final RxChildEvent<Compensation> event) {
                         return getItemModel(event.getValue(), event.getEventType(), identityId);
                     }
                 })
@@ -134,14 +135,14 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
 
     private void loadInitialData(@NonNull final String identityId) {
         getSubscriptions().add(compsRepo.getCompensations(currentGroupId, identityId, false)
-                .flatMap(new Func1<Compensation, Observable<CompsUnpaidItemModel>>() {
+                .flatMap(new Func1<Compensation, Observable<CompUnpaidItemModel>>() {
                     @Override
-                    public Observable<CompsUnpaidItemModel> call(Compensation compensation) {
-                        return getItemModel(compensation, -1, identityId);
+                    public Observable<CompUnpaidItemModel> call(Compensation compensation) {
+                        return getItemModel(compensation, EventType.NONE, identityId);
                     }
                 })
                 .toList()
-                .subscribe(new Subscriber<List<CompsUnpaidItemModel>>() {
+                .subscribe(new Subscriber<List<CompUnpaidItemModel>>() {
                     @Override
                     public void onCompleted() {
                         initialDataLoaded = true;
@@ -154,24 +155,24 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
                     }
 
                     @Override
-                    public void onNext(List<CompsUnpaidItemModel> compsUnpaidItemModels) {
-                        items.addAll(compsUnpaidItemModels);
+                    public void onNext(List<CompUnpaidItemModel> compUnpaidItemModels) {
+                        items.addAll(compUnpaidItemModels);
                     }
                 })
         );
     }
 
     @NonNull
-    private Observable<CompsUnpaidItemModel> getItemModel(@NonNull final Compensation compensation,
-                                                          final int eventType,
-                                                          @NonNull String identityId) {
+    private Observable<CompUnpaidItemModel> getItemModel(@NonNull final Compensation compensation,
+                                                         final int eventType,
+                                                         @NonNull String identityId) {
         final String creditorId = compensation.getCreditor();
         final boolean isCredit = Objects.equals(creditorId, identityId);
         return userRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
-                .map(new Func1<Identity, CompsUnpaidItemModel>() {
+                .map(new Func1<Identity, CompUnpaidItemModel>() {
                     @Override
-                    public CompsUnpaidItemModel call(Identity identity) {
-                        return new CompsUnpaidItemModel(eventType, compensation, identity,
+                    public CompUnpaidItemModel call(Identity identity) {
+                        return new CompUnpaidItemModel(eventType, compensation, identity,
                                 moneyFormatter, isCredit);
                     }
                 })
@@ -186,7 +187,7 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
     }
 
     @Override
-    public void onConfirmButtonClick(@NonNull CompsUnpaidItemModel itemModel) {
+    public void onConfirmButtonClick(@NonNull CompUnpaidItemModel itemModel) {
         final BigFraction amount = itemModel.getAmountFraction();
         compConfirmingId = itemModel.getId();
         view.showCompensationAmountConfirmDialog(amount, itemModel.getNickname(), groupCurrency);
@@ -195,7 +196,7 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
     @Override
     public void onAmountConfirmed(double confirmedAmount) {
         for (int i = 0, itemsSize = items.size(); i < itemsSize; i++) {
-            final CompsUnpaidItemModel itemModel = items.get(i);
+            final CompUnpaidItemModel itemModel = items.get(i);
             if (itemModel.getViewType() != ViewType.CREDIT || !Objects.equals(itemModel.getId(), compConfirmingId)) {
                 continue;
             }
@@ -211,7 +212,7 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
         }
     }
 
-    private void confirmCompensation(@NonNull CompsUnpaidItemModel itemModel,
+    private void confirmCompensation(@NonNull CompUnpaidItemModel itemModel,
                                      @NonNull BigFraction amount, final boolean amountChanged) {
         getSubscriptions().add(compsRepo.confirmAmountAndAccept(itemModel.getId(), amount, amountChanged)
                 .subscribe(new SingleSubscriber<Compensation>() {
@@ -234,8 +235,13 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
     }
 
     @Override
-    public void onRemindButtonClick(@NonNull CompsUnpaidItemModel itemModel) {
-        compsRepo.remindDebtor(itemModel.getId());
-        view.showMessage(R.string.toast_compensation_reminded_user, itemModel.getNickname());
+    public void onRemindButtonClick(@NonNull CompUnpaidItemModel itemModel) {
+        final String nickname = itemModel.getNickname();
+        if (itemModel.isPending()) {
+            view.showMessage(R.string.toast_remind_pending, nickname);
+        } else {
+            compsRepo.remindDebtor(itemModel.getId());
+            view.showMessage(R.string.toast_compensation_reminded_user, nickname);
+        }
     }
 }

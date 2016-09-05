@@ -7,14 +7,14 @@ package ch.giantific.qwittig.presentation.purchases.list.purchases;
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
-import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchasesItemModel;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchaseItemModel;
 
 /**
  * Defines an observable view model for list of purchases screen.
  */
-public interface PurchasesViewModel extends ListViewModel<PurchasesItemModel, PurchasesViewModel.ViewListener> {
+public interface PurchasesViewModel extends ListViewModel<PurchaseItemModel, PurchasesViewModel.ViewListener> {
 
-    void onPurchaseRowItemClick(@NonNull PurchasesItemModel itemModel);
+    void onPurchaseRowItemClick(@NonNull PurchaseItemModel itemModel);
 
     void onPurchaseDeleted(@NonNull String purchaseId);
 

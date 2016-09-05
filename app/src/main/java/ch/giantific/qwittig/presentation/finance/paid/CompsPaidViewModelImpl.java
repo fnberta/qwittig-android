@@ -20,13 +20,14 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.CompensationRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompsPaidItemModel;
+import ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompPaidItemModel;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.Subscriber;
@@ -36,7 +37,7 @@ import rx.functions.Func1;
 /**
  * Provides an implementation of the {@link CompsPaidViewModel}.
  */
-public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemModel, CompsPaidViewModel.ViewListener>
+public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompPaidItemModel, CompsPaidViewModel.ViewListener>
         implements CompsPaidViewModel {
 
     private final CompensationRepository compsRepo;
@@ -57,12 +58,12 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
     }
 
     @Override
-    protected Class<CompsPaidItemModel> getItemModelClass() {
-        return CompsPaidItemModel.class;
+    protected Class<CompPaidItemModel> getItemModelClass() {
+        return CompPaidItemModel.class;
     }
 
     @Override
-    protected int compareItemModels(CompsPaidItemModel o1, CompsPaidItemModel o2) {
+    protected int compareItemModels(CompPaidItemModel o1, CompPaidItemModel o2) {
         return o1.compareTo(o2);
     }
 
@@ -132,9 +133,9 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
                         return initialDataLoaded;
                     }
                 })
-                .flatMap(new Func1<RxChildEvent<Compensation>, Observable<CompsPaidItemModel>>() {
+                .flatMap(new Func1<RxChildEvent<Compensation>, Observable<CompPaidItemModel>>() {
                     @Override
-                    public Observable<CompsPaidItemModel> call(final RxChildEvent<Compensation> event) {
+                    public Observable<CompPaidItemModel> call(final RxChildEvent<Compensation> event) {
                         return getItemModel(event.getValue(), event.getEventType(),
                                 identityId);
                     }
@@ -145,14 +146,14 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
 
     private void loadInitialData(@NonNull final String identityId) {
         setInitialDataSub(compsRepo.getCompensations(currentGroupId, identityId, true)
-                .flatMap(new Func1<Compensation, Observable<CompsPaidItemModel>>() {
+                .flatMap(new Func1<Compensation, Observable<CompPaidItemModel>>() {
                     @Override
-                    public Observable<CompsPaidItemModel> call(Compensation compensation) {
-                        return getItemModel(compensation, -1, identityId);
+                    public Observable<CompPaidItemModel> call(Compensation compensation) {
+                        return getItemModel(compensation, EventType.NONE, identityId);
                     }
                 })
                 .toList()
-                .subscribe(new Subscriber<List<CompsPaidItemModel>>() {
+                .subscribe(new Subscriber<List<CompPaidItemModel>>() {
                     @Override
                     public void onCompleted() {
                         initialDataLoaded = true;
@@ -165,24 +166,24 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
                     }
 
                     @Override
-                    public void onNext(List<CompsPaidItemModel> compsPaidItemModels) {
-                        items.addAll(compsPaidItemModels);
+                    public void onNext(List<CompPaidItemModel> compPaidItemModels) {
+                        items.addAll(compPaidItemModels);
                     }
                 })
         );
     }
 
     @NonNull
-    private Observable<CompsPaidItemModel> getItemModel(@NonNull final Compensation compensation,
-                                                        final int eventType,
-                                                        @NonNull String identityId) {
+    private Observable<CompPaidItemModel> getItemModel(@NonNull final Compensation compensation,
+                                                       final int eventType,
+                                                       @NonNull String identityId) {
         final String creditorId = compensation.getCreditor();
         final boolean isCredit = Objects.equals(creditorId, identityId);
         return userRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
-                .map(new Func1<Identity, CompsPaidItemModel>() {
+                .map(new Func1<Identity, CompPaidItemModel>() {
                     @Override
-                    public CompsPaidItemModel call(Identity identity) {
-                        return new CompsPaidItemModel(eventType, compensation, identity, isCredit,
+                    public CompPaidItemModel call(Identity identity) {
+                        return new CompPaidItemModel(eventType, compensation, identity, isCredit,
                                 moneyFormatter
                         );
                     }

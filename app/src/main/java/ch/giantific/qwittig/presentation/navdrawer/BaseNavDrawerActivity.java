@@ -140,8 +140,8 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
                 navigator.startFinance();
                 finish();
                 break;
-            case R.id.nav_tasks:
-                navigator.startTasks();
+            case R.id.nav_assignments:
+                navigator.startAssignments();
                 finish();
                 break;
             case R.id.nav_stats:

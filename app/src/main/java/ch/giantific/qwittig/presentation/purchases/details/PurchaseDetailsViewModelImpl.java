@@ -213,13 +213,13 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
                 .doOnNext(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        final String currentIdentityId = user.getCurrentIdentity();
-                        if (!TextUtils.isEmpty(PurchaseDetailsViewModelImpl.this.currentIdentityId)
-                                && !Objects.equals(PurchaseDetailsViewModelImpl.this.currentIdentityId, currentIdentityId)) {
+                        final String identityId = user.getCurrentIdentity();
+                        if (!TextUtils.isEmpty(currentIdentityId)
+                                && !Objects.equals(currentIdentityId, identityId)) {
                             navigator.finish();
                         }
 
-                        PurchaseDetailsViewModelImpl.this.currentIdentityId = currentIdentityId;
+                        currentIdentityId = identityId;
                     }
                 })
                 .flatMap(new Func1<User, Observable<Identity>>() {

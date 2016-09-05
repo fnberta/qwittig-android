@@ -21,13 +21,14 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchasesItemModel;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchaseItemModel;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
@@ -37,7 +38,7 @@ import rx.functions.Func1;
 /**
  * Provides an implementation of the {@link PurchasesViewModel}.
  */
-public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchasesItemModel, PurchasesViewModel.ViewListener>
+public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchaseItemModel, PurchasesViewModel.ViewListener>
         implements PurchasesViewModel {
 
     private final PurchaseRepository purchaseRepo;
@@ -56,12 +57,12 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchasesItemM
     }
 
     @Override
-    protected Class<PurchasesItemModel> getItemModelClass() {
-        return PurchasesItemModel.class;
+    protected Class<PurchaseItemModel> getItemModelClass() {
+        return PurchaseItemModel.class;
     }
 
     @Override
-    protected int compareItemModels(PurchasesItemModel o1, PurchasesItemModel o2) {
+    protected int compareItemModels(PurchaseItemModel o1, PurchaseItemModel o2) {
         return o1.compareTo(o2);
     }
 
@@ -105,9 +106,9 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchasesItemM
                         return initialDataLoaded;
                     }
                 })
-                .flatMap(new Func1<RxChildEvent<Purchase>, Observable<PurchasesItemModel>>() {
+                .flatMap(new Func1<RxChildEvent<Purchase>, Observable<PurchaseItemModel>>() {
                     @Override
-                    public Observable<PurchasesItemModel> call(final RxChildEvent<Purchase> event) {
+                    public Observable<PurchaseItemModel> call(final RxChildEvent<Purchase> event) {
                         return getItemModel(event.getValue(), event.getEventType(), identityId);
                     }
                 })
@@ -117,14 +118,14 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchasesItemM
 
     private void loadInitialData(@NonNull final String identityId) {
         setInitialDataSub(purchaseRepo.getPurchases(currentGroupId, identityId, false)
-                .flatMap(new Func1<Purchase, Observable<PurchasesItemModel>>() {
+                .flatMap(new Func1<Purchase, Observable<PurchaseItemModel>>() {
                     @Override
-                    public Observable<PurchasesItemModel> call(final Purchase purchase) {
-                        return getItemModel(purchase, -1, identityId);
+                    public Observable<PurchaseItemModel> call(final Purchase purchase) {
+                        return getItemModel(purchase, EventType.NONE, identityId);
                     }
                 })
                 .toList()
-                .subscribe(new Subscriber<List<PurchasesItemModel>>() {
+                .subscribe(new Subscriber<List<PurchaseItemModel>>() {
                     @Override
                     public void onCompleted() {
                         initialDataLoaded = true;
@@ -137,22 +138,22 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchasesItemM
                     }
 
                     @Override
-                    public void onNext(List<PurchasesItemModel> purchasesItemModels) {
-                        items.addAll(purchasesItemModels);
+                    public void onNext(List<PurchaseItemModel> purchaseItemModels) {
+                        items.addAll(purchaseItemModels);
                     }
                 })
         );
     }
 
     @NonNull
-    private Observable<PurchasesItemModel> getItemModel(@NonNull final Purchase purchase,
-                                                        final int eventType,
-                                                        @NonNull final String currentIdentityId) {
+    private Observable<PurchaseItemModel> getItemModel(@NonNull final Purchase purchase,
+                                                       final int eventType,
+                                                       @NonNull final String currentIdentityId) {
         return userRepo.getIdentity(purchase.getBuyer())
-                .map(new Func1<Identity, PurchasesItemModel>() {
+                .map(new Func1<Identity, PurchaseItemModel>() {
                     @Override
-                    public PurchasesItemModel call(Identity buyer) {
-                        return new PurchasesItemModel(eventType, purchase, buyer, currentIdentityId,
+                    public PurchaseItemModel call(Identity buyer) {
+                        return new PurchaseItemModel(eventType, purchase, buyer, currentIdentityId,
                                 moneyFormatter, dateFormatter);
                     }
                 })
@@ -167,7 +168,7 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchasesItemM
     }
 
     @Override
-    public void onPurchaseRowItemClick(@NonNull PurchasesItemModel itemModel) {
+    public void onPurchaseRowItemClick(@NonNull PurchaseItemModel itemModel) {
         navigator.startPurchaseDetails(itemModel.getId());
     }
 

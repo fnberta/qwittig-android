@@ -14,7 +14,7 @@
 
         <variable
             name="itemModel"
-            type="ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompsPaidItemModel"
+            type="ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompPaidItemModel"
             />
     </data>
 

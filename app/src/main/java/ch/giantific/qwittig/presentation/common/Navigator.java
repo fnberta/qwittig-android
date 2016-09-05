@@ -10,6 +10,9 @@ import android.support.v4.app.FragmentActivity;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.presentation.about.AboutActivity;
+import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddActivity;
+import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentEditActivity;
+import ch.giantific.qwittig.presentation.assignments.list.AssignmentsActivity;
 import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
@@ -23,10 +26,7 @@ import ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingActivity;
 import ch.giantific.qwittig.presentation.settings.general.SettingsActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
 import ch.giantific.qwittig.presentation.stats.StatsActivity;
-import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddActivity;
-import ch.giantific.qwittig.presentation.tasks.addedit.TaskEditActivity;
-import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsActivity;
-import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
+import ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsActivity;
 
 /**
  * Created by fabio on 17.06.16.
@@ -36,7 +36,7 @@ public class Navigator {
 
     public static final String INTENT_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_PURCHASE_ID";
     public static final String INTENT_PURCHASE_EDIT_DRAFT = BuildConfig.APPLICATION_ID + ".intents.INTENT_PURCHASE_EDIT_DRAFT";
-    public static final String INTENT_TASK_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_TASK_ID";
+    public static final String INTENT_ASSIGNMENT_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_ASSIGNMENT_ID";
     public static final String INTENT_OCR_DATA_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_DATA_ID";
     public static final String INTENT_OCR_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_PURCHASE_ID";
     public static final String INTENT_OBJECT_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OBJECT_ID";
@@ -47,9 +47,9 @@ public class Navigator {
     public static final int INTENT_REQUEST_IMAGE_CAPTURE = 5;
     public static final int INTENT_REQUEST_SETTINGS_PROFILE = 6;
     public static final int INTENT_REQUEST_SETTINGS_ADD_GROUP = 7;
-    public static final int INTENT_REQUEST_TASK_NEW = 8;
-    public static final int INTENT_REQUEST_TASK_MODIFY = 9;
-    public static final int INTENT_REQUEST_TASK_DETAILS = 10;
+    public static final int INTENT_REQUEST_ASSIGNMENT_NEW = 8;
+    public static final int INTENT_REQUEST_ASSIGNMENT_MODIFY = 9;
+    public static final int INTENT_REQUEST_ASSIGNMENT_DETAILS = 10;
     public static final int INTENT_REQUEST_IMAGE_PICK = 11;
 
     private final FragmentActivity activity;
@@ -135,33 +135,33 @@ public class Navigator {
         activity.startActivity(intent);
     }
 
-    public void startTasks() {
-        final Intent intent = new Intent(activity, TasksActivity.class);
+    public void startAssignments() {
+        final Intent intent = new Intent(activity, AssignmentsActivity.class);
         activity.startActivity(intent);
     }
 
-    public void startTaskEdit(@NonNull String taskId) {
-        final Intent intent = new Intent(activity, TaskEditActivity.class);
-        intent.putExtra(Navigator.INTENT_TASK_ID, taskId);
+    public void startAssignmentEdit(@NonNull String assignmentId) {
+        final Intent intent = new Intent(activity, AssignmentEditActivity.class);
+        intent.putExtra(Navigator.INTENT_ASSIGNMENT_ID, assignmentId);
         final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_TASK_MODIFY,
+        activity.startActivityForResult(intent, INTENT_REQUEST_ASSIGNMENT_MODIFY,
                 options.toBundle());
     }
 
-    public void startTaskDetails(@NonNull String taskId) {
-        final Intent intent = new Intent(activity, TaskDetailsActivity.class);
-        intent.putExtra(INTENT_TASK_ID, taskId);
+    public void startAssignmentDetails(@NonNull String assignmentId) {
+        final Intent intent = new Intent(activity, AssignmentDetailsActivity.class);
+        intent.putExtra(INTENT_ASSIGNMENT_ID, assignmentId);
         final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_TASK_DETAILS, options.toBundle());
+        activity.startActivityForResult(intent, INTENT_REQUEST_ASSIGNMENT_DETAILS, options.toBundle());
     }
 
-    public void startTaskAdd() {
-        final Intent intent = new Intent(activity, TaskAddActivity.class);
+    public void startAssignmentAdd() {
+        final Intent intent = new Intent(activity, AssignmentAddActivity.class);
         final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_TASK_NEW, options.toBundle());
+        activity.startActivityForResult(intent, INTENT_REQUEST_ASSIGNMENT_NEW, options.toBundle());
     }
 
     public void startStats() {

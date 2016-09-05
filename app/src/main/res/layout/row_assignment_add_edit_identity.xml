@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.assignments.addedit.itemmodels.AssignmentAddEditIdentityItemModel"
+            />
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditViewModel"
+            />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_avatar_with_text"
+        android:background="?selectableItemBackground"
+        android:onClick="@{() -> viewModel.onIdentitiesRowItemClick(itemModel)}"
+        >
+
+        <ImageView
+            android:id="@+id/user_avatar"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:alpha="@{itemModel.alpha}"
+            android:contentDescription="@string/user_avatar"
+            app:avatar="@{itemModel.avatar}"
+            app:fallback="@{@drawable/ic_account_circle_black_40dp}"
+            tools:src="@drawable/ic_account_circle_black_40dp"
+            />
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Subhead.List"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@id/user_avatar"
+            android:layout_toStartOf="@+id/iv_reorder"
+            android:alpha="@{itemModel.alpha}"
+            android:gravity="center_vertical"
+            android:text="@{itemModel.nickname}"
+            tools:text="Vera"
+            />
+
+        <ImageView
+            android:id="@+id/iv_reorder"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:contentDescription="@string/hint_reorder"
+            android:src="@drawable/ic_reorder_black_24dp"
+            />
+
+    </RelativeLayout>
+</layout>

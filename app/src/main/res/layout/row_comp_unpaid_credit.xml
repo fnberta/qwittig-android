@@ -16,7 +16,7 @@
 
         <variable
             name="itemModel"
-            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompUnpaidItemModel"
             />
 
         <variable
@@ -79,7 +79,6 @@
                 android:layout_toEndOf="@id/bt_comp_unpaid_confirm"
                 android:onClick="@{() -> viewModel.onRemindButtonClick(itemModel)}"
                 android:text="@{@string/button_remind(itemModel.nickname)}"
-                android:visibility="@{itemModel.identityPending ? View.GONE : View.VISIBLE}"
                 tools:text="Remind Lexli to pay"
                 />
 

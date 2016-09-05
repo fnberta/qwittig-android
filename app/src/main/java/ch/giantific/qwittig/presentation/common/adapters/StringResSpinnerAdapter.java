@@ -131,7 +131,7 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
      */
     private static class TypeRow {
 
-        private final TextView mTextViewTitle;
+        private final TextView tvTitle;
 
         /**
          * Constructs a new {@link TypeRow}.
@@ -139,7 +139,7 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
          * @param view the inflated view
          */
         public TypeRow(@NonNull View view) {
-            mTextViewTitle = (TextView) view.findViewById(android.R.id.text1);
+            tvTitle = (TextView) view.findViewById(android.R.id.text1);
         }
 
         /**
@@ -148,7 +148,7 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
          * @param title the title text to set
          */
         public void setTitle(@NonNull String title) {
-            mTextViewTitle.setText(title);
+            tvTitle.setText(title);
         }
     }
 }

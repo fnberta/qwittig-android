@@ -31,18 +31,18 @@ import rx.functions.Func1;
  */
 public class CompensationRepository {
 
-    private final DatabaseReference databseRef;
+    private final DatabaseReference databaseRef;
 
     @Inject
     public CompensationRepository(@NonNull FirebaseDatabase database) {
-        databseRef = database.getReference();
+        databaseRef = database.getReference();
     }
 
     public Observable<RxChildEvent<Compensation>> observeCompensationChildren(@NonNull final String groupId,
                                                                               @NonNull final String currentIdentityId,
                                                                               boolean getPaid) {
         final String pathPaid = getPaid ? Compensation.BASE_PATH_PAID : Compensation.BASE_PATH_UNPAID;
-        final Query query = databseRef.child(Compensation.BASE_PATH).child(pathPaid).orderByChild(Compensation.PATH_GROUP).equalTo(groupId);
+        final Query query = databaseRef.child(Compensation.BASE_PATH).child(pathPaid).orderByChild(Compensation.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeChildren(query, Compensation.class)
                 .filter(new Func1<RxChildEvent<Compensation>, Boolean>() {
                     @Override
@@ -58,7 +58,7 @@ public class CompensationRepository {
                                                      @NonNull final String currentIdentityId,
                                                      boolean getPaid) {
         final String pathPaid = getPaid ? Compensation.BASE_PATH_PAID : Compensation.BASE_PATH_UNPAID;
-        final Query query = databseRef.child(Compensation.BASE_PATH).child(pathPaid).orderByChild(Compensation.PATH_GROUP).equalTo(groupId);
+        final Query query = databaseRef.child(Compensation.BASE_PATH).child(pathPaid).orderByChild(Compensation.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeValuesOnce(query, Compensation.class)
                 .filter(new Func1<Compensation, Boolean>() {
                     @Override
@@ -72,7 +72,7 @@ public class CompensationRepository {
     public Single<Compensation> confirmAmountAndAccept(@NonNull final String compensationId,
                                                        @NonNull final BigFraction amount,
                                                        final boolean amountChanged) {
-        final Query query = databseRef.child(Compensation.BASE_PATH).child(Compensation.BASE_PATH_UNPAID).child(compensationId);
+        final Query query = databaseRef.child(Compensation.BASE_PATH).child(Compensation.BASE_PATH_UNPAID).child(compensationId);
         return RxFirebaseDatabase.observeValueOnce(query, Compensation.class)
                 .doOnSuccess(new Action1<Compensation>() {
                     @Override
@@ -92,7 +92,7 @@ public class CompensationRepository {
                         compMap.put(Compensation.PATH_AMOUNT_CHANGED, amountChanged);
 
                         childUpdates.put(Compensation.BASE_PATH + "/" + Compensation.BASE_PATH_PAID + "/" + compensationId, compMap);
-                        databseRef.updateChildren(childUpdates);
+                        databaseRef.updateChildren(childUpdates);
                     }
                 });
 
@@ -101,6 +101,6 @@ public class CompensationRepository {
 
     public void remindDebtor(@NonNull String compensationId) {
         final CompRemindQueue remind = new CompRemindQueue(compensationId, RemindType.REMIND_DEBTOR);
-        databseRef.child(Constants.PATH_PUSH_QUEUE).push().setValue(remind);
+        databaseRef.child(Constants.PATH_PUSH_QUEUE).push().setValue(remind);
     }
 }

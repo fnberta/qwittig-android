@@ -130,23 +130,23 @@
             android:label="@string/title_activity_stats"
             android:theme="@style/AppTheme.DrawStatusBar"/>
         <activity
-            android:name=".presentation.tasks.list.TasksActivity"
-            android:label="@string/title_activity_tasks"
+            android:name=".presentation.assignments.list.AssignmentsActivity"
+            android:label="@string/title_activity_assignments"
             android:theme="@style/AppTheme.DrawStatusBar"/>
         <activity
-            android:name=".presentation.tasks.details.TaskDetailsActivity"
-            android:label="@string/title_activity_task_detail"
-            android:parentActivityName=".presentation.tasks.list.TasksActivity"
+            android:name=".presentation.assignments.details.AssignmentDetailsActivity"
+            android:label="@string/title_activity_assignment_detail"
+            android:parentActivityName=".presentation.assignments.list.AssignmentsActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode"/>
         <activity
-            android:name=".presentation.tasks.addedit.TaskAddActivity"
-            android:label="@string/title_activity_task_add"
-            android:parentActivityName=".presentation.tasks.list.TasksActivity"
+            android:name=".presentation.assignments.addedit.AssignmentAddActivity"
+            android:label="@string/title_activity_assignment_add"
+            android:parentActivityName=".presentation.assignments.list.AssignmentsActivity"
             android:theme="@style/AppTheme.SlideBottom"/>
         <activity
-            android:name=".presentation.tasks.addedit.TaskEditActivity"
-            android:label="@string/title_activity_task_edit"
-            android:parentActivityName=".presentation.tasks.details.TaskDetailsActivity"
+            android:name=".presentation.assignments.addedit.AssignmentEditActivity"
+            android:label="@string/title_activity_assignment_edit"
+            android:parentActivityName=".presentation.assignments.details.AssignmentDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd"/>
         <activity
             android:name=".presentation.camera.CameraActivity"

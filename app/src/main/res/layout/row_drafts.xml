@@ -13,7 +13,7 @@
 
         <variable
             name="itemModel"
-            type="ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftsItemModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftItemModel"
             />
 
         <variable

@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.databinding.RowPurchasesBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchasesItemModel;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchaseItemModel;
 
 /**
  * Handles the display of recent purchases.
@@ -45,7 +45,7 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
     @Override
     public void onBindViewHolder(BindingRow<RowPurchasesBinding> holder, int position) {
         final RowPurchasesBinding binding = holder.getBinding();
-        final PurchasesItemModel itemModel = viewModel.getItemAtPosition(position);
+        final PurchaseItemModel itemModel = viewModel.getItemAtPosition(position);
         binding.setItemModel(itemModel);
         binding.setViewModel(viewModel);
         binding.executePendingBindings();

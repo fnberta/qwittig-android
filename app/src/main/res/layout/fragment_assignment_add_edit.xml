@@ -1,0 +1,112 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditViewModel"
+            />
+    </data>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/small_space"
+        android:fillViewport="true"
+        tools:context=".presentation.assignments.addedit.AssignmentAddFragment"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:animateLayoutChanges="true"
+            >
+
+            <TextView
+                android:id="@+id/tv_assignment_header_time"
+                style="@style/SubHeader"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/subheader_height"
+                android:gravity="center_vertical"
+                android:paddingEnd="@dimen/key_line_1"
+                android:paddingStart="@dimen/key_line_1"
+                android:text="@string/hint_time_frame"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/small_space"
+                android:orientation="horizontal"
+                android:paddingEnd="@dimen/key_line_1"
+                android:paddingStart="@dimen/key_line_1"
+                >
+
+                <ImageView
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                    android:contentDescription="@string/hint_time_frame"
+                    android:src="@drawable/ic_autorenew_black_24dp"
+                    />
+
+                <Spinner
+                    android:id="@+id/sp_assignment_time_frame"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onItemSelected="@{viewModel::onTimeFrameSelected}"
+                    android:selection="@{viewModel.selectedTimeFrame}"
+                    />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_assignment_deadline"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_target_min"
+                android:background="?selectableItemBackground"
+                android:drawablePadding="@dimen/icon_compound_drawable_padding_end"
+                android:drawableStart="@drawable/ic_assignment_turned_in_black_24dp"
+                android:gravity="center_vertical"
+                android:onClick="@{viewModel::onDeadlineClicked}"
+                android:paddingEnd="@dimen/key_line_1"
+                android:paddingStart="@dimen/key_line_1"
+                android:text="@{viewModel.deadline}"
+                android:visibility="@{viewModel.asNeeded ? View.GONE : View.VISIBLE}"
+                tools:text="27. November 2014"
+                />
+
+            <TextView
+                android:id="@+id/tv_assignment_header_identities"
+                style="@style/SubHeader"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/subheader_height"
+                android:gravity="center_vertical"
+                android:paddingEnd="@dimen/key_line_1"
+                android:paddingStart="@dimen/key_line_1"
+                android:text="@string/header_users"
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_assignment_identities"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</layout>
+

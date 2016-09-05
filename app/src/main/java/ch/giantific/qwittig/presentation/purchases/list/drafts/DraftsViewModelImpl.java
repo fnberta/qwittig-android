@@ -20,6 +20,7 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
@@ -27,7 +28,7 @@ import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftsItemModel;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftItemModel;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.Subscriber;
@@ -36,7 +37,7 @@ import rx.functions.Func1;
 /**
  * Provides an implementation of the {@link DraftsViewModel}.
  */
-public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, DraftsViewModel.ViewListener>
+public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftItemModel, DraftsViewModel.ViewListener>
         implements DraftsViewModel {
 
     private static final String STATE_DRAFTS_SELECTED = "STATE_DRAFTS_SELECTED";
@@ -67,12 +68,12 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, 
     }
 
     @Override
-    protected Class<DraftsItemModel> getItemModelClass() {
-        return DraftsItemModel.class;
+    protected Class<DraftItemModel> getItemModelClass() {
+        return DraftItemModel.class;
     }
 
     @Override
-    protected int compareItemModels(DraftsItemModel o1, DraftsItemModel o2) {
+    protected int compareItemModels(DraftItemModel o1, DraftItemModel o2) {
         return o1.compareTo(o2);
     }
 
@@ -132,9 +133,9 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, 
                         return initialDataLoaded;
                     }
                 })
-                .map(new Func1<RxChildEvent<Purchase>, DraftsItemModel>() {
+                .map(new Func1<RxChildEvent<Purchase>, DraftItemModel>() {
                     @Override
-                    public DraftsItemModel call(RxChildEvent<Purchase> event) {
+                    public DraftItemModel call(RxChildEvent<Purchase> event) {
                         final Purchase draft = event.getValue();
                         return getItemModel(event.getValue(), event.getEventType(),
                                 draftsSelected.contains(draft.getId()));
@@ -146,14 +147,14 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, 
 
     private void loadInitialData(@NonNull String identityId) {
         setInitialDataSub(purchaseRepo.getPurchases(currentGroupId, identityId, true)
-                .map(new Func1<Purchase, DraftsItemModel>() {
+                .map(new Func1<Purchase, DraftItemModel>() {
                     @Override
-                    public DraftsItemModel call(Purchase draft) {
-                        return getItemModel(draft, -1, draftsSelected.contains(draft.getId()));
+                    public DraftItemModel call(Purchase draft) {
+                        return getItemModel(draft, EventType.NONE, draftsSelected.contains(draft.getId()));
                     }
                 })
                 .toList()
-                .subscribe(new Subscriber<List<DraftsItemModel>>() {
+                .subscribe(new Subscriber<List<DraftItemModel>>() {
                     @Override
                     public void onCompleted() {
                         initialDataLoaded = true;
@@ -167,22 +168,22 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, 
                     }
 
                     @Override
-                    public void onNext(List<DraftsItemModel> draftsItemModels) {
-                        items.addAll(draftsItemModels);
+                    public void onNext(List<DraftItemModel> draftItemModels) {
+                        items.addAll(draftItemModels);
                     }
                 })
         );
     }
 
     @NonNull
-    private DraftsItemModel getItemModel(@NonNull Purchase draft, int eventType, boolean isSelected) {
-        return new DraftsItemModel(eventType, draft, isSelected, moneyFormatter);
+    private DraftItemModel getItemModel(@NonNull Purchase draft, int eventType, boolean isSelected) {
+        return new DraftItemModel(eventType, draft, isSelected, moneyFormatter);
     }
 
     private void scrollToFirstSelectedItem() {
         if (selectionModeEnabled) {
             for (int i = 0, size = items.size(); i < size; i++) {
-                final DraftsItemModel itemModel = items.get(i);
+                final DraftItemModel itemModel = items.get(i);
                 if (itemModel.isSelected()) {
                     listInteraction.scrollToPosition(i);
                     break;
@@ -218,7 +219,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, 
     }
 
     @Override
-    public void onDraftRowClick(@NonNull DraftsItemModel itemModel) {
+    public void onDraftRowClick(@NonNull DraftItemModel itemModel) {
         if (!selectionModeEnabled) {
             navigator.startPurchaseEdit(itemModel.getId(), true);
         } else {
@@ -228,7 +229,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, 
     }
 
     @Override
-    public boolean onDraftRowLongClick(@NonNull DraftsItemModel itemModel) {
+    public boolean onDraftRowLongClick(@NonNull DraftItemModel itemModel) {
         if (!selectionModeEnabled) {
             toggleSelection(items.indexOf(itemModel));
             view.startSelectionMode();
@@ -241,7 +242,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, 
 
     @Override
     public void toggleSelection(int position) {
-        final DraftsItemModel itemModel = getItemAtPosition(position);
+        final DraftItemModel itemModel = getItemAtPosition(position);
         final String id = itemModel.getId();
         if (itemModel.isSelected()) {
             itemModel.setSelected(false);
@@ -257,7 +258,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, 
     @Override
     public void clearSelection() {
         for (int i = items.size() - 1; i >= 0; i--) {
-            final DraftsItemModel itemModel = items.get(i);
+            final DraftItemModel itemModel = items.get(i);
             if (itemModel.isSelected()) {
                 itemModel.setSelected(false);
                 draftsSelected.remove(itemModel.getId());
@@ -271,7 +272,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, 
         }
     }
 
-    private void deleteDraft(@NonNull DraftsItemModel itemModel) {
+    private void deleteDraft(@NonNull DraftItemModel itemModel) {
         purchaseRepo.deleteDraft(itemModel.getId(), itemModel.getBuyer());
     }
 }

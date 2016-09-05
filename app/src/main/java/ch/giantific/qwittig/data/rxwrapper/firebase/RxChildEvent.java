@@ -41,9 +41,10 @@ public class RxChildEvent<T extends FirebaseModel> {
         return previousChildKey;
     }
 
-    @IntDef({EventType.ADDED, EventType.CHANGED, EventType.REMOVED, EventType.MOVED})
+    @IntDef({EventType.NONE, EventType.ADDED, EventType.CHANGED, EventType.REMOVED, EventType.MOVED})
     @Retention(RetentionPolicy.SOURCE)
     public @interface EventType {
+        int NONE = -1;
         int ADDED = 0;
         int CHANGED = 1;
         int REMOVED = 2;

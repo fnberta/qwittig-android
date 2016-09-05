@@ -33,7 +33,7 @@
 
     <!-- Toolbar -->
     <dimen name="toolbar_height_x2">112dp</dimen>
-    <dimen name="toolbar_task_add">168dp</dimen>
+    <dimen name="toolbar_assignment_add">168dp</dimen>
     <dimen name="toolbar_height_x4">224dp</dimen>
     <dimen name="toolbar_height_x5">280dp</dimen>
 

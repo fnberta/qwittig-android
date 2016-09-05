@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.databinding.RowDraftsBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftsItemModel;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftItemModel;
 
 /**
  * Handles the display of the user's drafts.
@@ -44,7 +44,7 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDra
     @Override
     public void onBindViewHolder(BindingRow<RowDraftsBinding> holder, int position) {
         final RowDraftsBinding binding = holder.getBinding();
-        final DraftsItemModel itemModel = viewModel.getItemAtPosition(position);
+        final DraftItemModel itemModel = viewModel.getItemAtPosition(position);
 
         binding.setItemModel(itemModel);
         binding.setViewModel(viewModel);
