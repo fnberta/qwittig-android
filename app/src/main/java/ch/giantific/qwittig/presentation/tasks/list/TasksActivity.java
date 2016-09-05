@@ -57,7 +57,6 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
         binding = DataBindingUtil.setContentView(this, R.layout.activity_tasks);
         binding.setViewModel(tasksViewModel);
 
-        // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_tasks);
 
         final ActionBar actionBar = getSupportActionBar();

@@ -71,8 +71,7 @@
                 android:layout_height="match_parent"
                 android:fabMenuClickListener="@{viewModel.fabMenuClickListener}"
                 android:gravity="bottom|end"
-                app:animStop="@{viewModel.animStop}"
-                app:progress="@{viewModel.ocrProcessing}"
+                app:complete="@{viewModel.ocrAvailable}"
                 />
 
         </android.support.design.widget.CoordinatorLayout>

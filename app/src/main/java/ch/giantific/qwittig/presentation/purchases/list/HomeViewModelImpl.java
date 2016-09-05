@@ -13,6 +13,8 @@ import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.List;
+
 import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -21,12 +23,14 @@ import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Observable;
 import rx.SingleSubscriber;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import timber.log.Timber;
@@ -38,14 +42,12 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         implements HomeViewModel {
 
     private static final String STATE_OCR_PURCHASE_ID = "OCR_PURCHASE_ID";
-    private static final String STATE_OCR_PROCESSING = "STATE_OCR_PROCESSING";
     private static final String STATE_DRAFTS_AVAILABLE = "STATE_DRAFTS_AVAILABLE";
 
     private final GroupRepository groupRepo;
     private final PurchaseRepository purchaseRepo;
+    private Subscription groupUsersSubscription;
     private String currentUserId;
-    private boolean ocrProcessing;
-    private boolean animStop;
     private boolean draftsAvailable;
     private String ocrPurchaseId;
 
@@ -62,7 +64,6 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
         if (savedState != null) {
             ocrPurchaseId = savedState.getString(STATE_OCR_PURCHASE_ID, "");
-            ocrProcessing = savedState.getBoolean(STATE_OCR_PROCESSING);
             draftsAvailable = savedState.getBoolean(STATE_DRAFTS_AVAILABLE);
         }
     }
@@ -74,8 +75,30 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         if (!TextUtils.isEmpty(ocrPurchaseId)) {
             outState.putString(STATE_OCR_PURCHASE_ID, ocrPurchaseId);
         }
-        outState.putBoolean(STATE_OCR_PROCESSING, ocrProcessing);
         outState.putBoolean(STATE_DRAFTS_AVAILABLE, draftsAvailable);
+    }
+
+    @Override
+    @Bindable
+    public boolean isOcrAvailable() {
+        return !TextUtils.isEmpty(ocrPurchaseId);
+    }
+
+    private void setOcrPurchaseId(@NonNull String ocrPurchaseId) {
+        this.ocrPurchaseId = ocrPurchaseId;
+        notifyPropertyChanged(BR.ocrAvailable);
+    }
+
+    @Override
+    @Bindable
+    public boolean isDraftsAvailable() {
+        return draftsAvailable;
+    }
+
+    @Override
+    public void setDraftsAvailable(boolean available) {
+        draftsAvailable = available;
+        notifyPropertyChanged(BR.draftsAvailable);
     }
 
     @Override
@@ -117,59 +140,30 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                 })
         );
 
-        userRepo.getAuthToken()
-                .subscribe(new SingleSubscriber<String>() {
+        getSubscriptions().add(purchaseRepo.observeOcrData(currentUserId, false)
+                .subscribe(new IndefiniteSubscriber<List<OcrData>>() {
                     @Override
-                    public void onSuccess(String value) {
-                        Timber.d("auth token: %s", value);
+                    public void onNext(List<OcrData> ocrData) {
+                        setOcrPurchaseId(!ocrData.isEmpty() ? ocrData.get(0).getId() : "");
                     }
 
                     @Override
-                    public void onError(Throwable error) {
-                        Timber.e(error, "failed to get auth token with error:");
+                    public void onError(Throwable e) {
+                        super.onError(e);
+
+                        view.showMessage(R.string.push_purchase_ocr_failed_alert);
                     }
-                });
+                })
+        );
     }
 
     private void observeGroupIdentities(@NonNull String groupId) {
-        getSubscriptions().add(groupRepo.observeGroupIdentityChildren(groupId).subscribe());
-    }
+        if (groupUsersSubscription != null && !groupUsersSubscription.isUnsubscribed()) {
+            groupUsersSubscription.unsubscribe();
+        }
 
-    @Override
-    @Bindable
-    public boolean isOcrProcessing() {
-        return ocrProcessing;
-    }
-
-    @Override
-    @Bindable
-    public boolean isAnimStop() {
-        return animStop;
-    }
-
-    @Override
-    public void startProgress() {
-        ocrProcessing = true;
-        notifyPropertyChanged(BR.ocrProcessing);
-    }
-
-    @Override
-    public void stopProgress(boolean animate) {
-        ocrProcessing = false;
-        animStop = animate;
-        notifyPropertyChanged(BR.ocrProcessing);
-    }
-
-    @Override
-    @Bindable
-    public boolean isDraftsAvailable() {
-        return draftsAvailable;
-    }
-
-    @Override
-    public void setDraftsAvailable(boolean available) {
-        draftsAvailable = available;
-        notifyPropertyChanged(BR.draftsAvailable);
+        groupUsersSubscription = groupRepo.observeGroupIdentityChildren(groupId).subscribe();
+        getSubscriptions().add(groupUsersSubscription);
     }
 
     @Override
@@ -204,7 +198,6 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     @Override
     public void onReceiptImageTaken(@NonNull String receipt) {
-//        startProgress();
         view.showMessage(R.string.toast_purchase_ocr_started);
         purchaseRepo.uploadReceiptForOcr(receipt, currentUserId);
     }
@@ -217,18 +210,6 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     @Override
     public void onReceiptImageFailed() {
         view.showMessage(R.string.toast_create_image_file_failed);
-    }
-
-    @Override
-    public void onOcrPurchaseReady(@NonNull String ocrPurchaseId) {
-        this.ocrPurchaseId = ocrPurchaseId;
-//        stopProgress(true);
-    }
-
-    @Override
-    public void onOcrPurchaseFailed() {
-//        stopProgress(false);
-        view.showMessage(R.string.push_purchase_ocr_failed_alert);
     }
 
     @Override
@@ -249,6 +230,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
             @Override
             public void onFabCompleteClicked() {
+                view.clearOcrNotification(ocrPurchaseId);
                 navigator.startPurchaseAdd(ocrPurchaseId);
             }
         };

@@ -41,7 +41,6 @@
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginTop="@dimen/normal_space"
                 android:orientation="vertical"
-                android:visibility="@{viewModel.loading ? View.GONE : viewModel.empty ? View.GONE : View.VISIBLE}"
                 >
 
                 <TextView
@@ -50,6 +49,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="@{@string/stats_pie_total(viewModel.pieTotal)}"
+                    android:visibility="@{viewModel.loading ? View.GONE : viewModel.empty ? View.GONE : View.VISIBLE}"
                     />
 
                 <View
@@ -58,6 +58,7 @@
                     android:layout_marginBottom="@dimen/normal_space"
                     android:layout_marginTop="@dimen/normal_space"
                     android:background="?android:attr/listDivider"
+                    android:visibility="@{viewModel.loading ? View.GONE : viewModel.empty ? View.GONE : View.VISIBLE}"
                     />
 
                 <ch.giantific.qwittig.presentation.stats.widgets.PieChart
@@ -65,6 +66,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:layout_marginBottom="@dimen/normal_space"
+                    android:visibility="@{viewModel.loading ? View.GONE : viewModel.empty ? View.GONE : View.VISIBLE}"
                     app:pieData="@{viewModel.storesData}"
                     />
 
@@ -73,6 +75,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:layout_marginTop="@dimen/normal_space"
+                    android:visibility="@{viewModel.loading ? View.GONE : viewModel.empty ? View.GONE : View.VISIBLE}"
                     app:pieData="@{viewModel.identitiesData}"
                     />
             </LinearLayout>

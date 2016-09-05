@@ -5,16 +5,16 @@
 package ch.giantific.qwittig.data.push.di;
 
 import ch.giantific.qwittig.data.push.FcmInstanceIdService;
-import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerService;
 import dagger.Component;
 
 /**
- * Provides the dependencies for the push broadcast receiver.
+ * Provides the dependencies for the fcm instance id service.
  *
- * @see {@link PushBroadcastReceiver}
+ * @see {@link FcmInstanceIdService}
  */
 @PerService
 @Component(dependencies = {ApplicationComponent.class},
@@ -22,4 +22,6 @@ import dagger.Component;
 public interface FcmServiceComponent {
 
     void inject(FcmInstanceIdService fcmInstanceIdService);
+
+    void inject(FcmMessagingService fcmMessagingService);
 }

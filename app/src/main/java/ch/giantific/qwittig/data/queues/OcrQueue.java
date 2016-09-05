@@ -11,23 +11,16 @@ import com.google.firebase.database.IgnoreExtraProperties;
 public class OcrQueue {
 
     private final String receipt;
-    private final String purchaseId;
     private final String userId;
 
     public OcrQueue(@NonNull String receipt,
-                    @NonNull String purchaseId,
                     @NonNull String userId) {
         this.receipt = receipt;
-        this.purchaseId = purchaseId;
         this.userId = userId;
     }
 
     public String getReceipt() {
         return receipt;
-    }
-
-    public String getPurchaseId() {
-        return purchaseId;
     }
 
     public String getUserId() {

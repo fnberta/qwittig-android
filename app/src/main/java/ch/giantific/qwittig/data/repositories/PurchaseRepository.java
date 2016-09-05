@@ -25,8 +25,8 @@ import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.helper.SharedPrefsHelper;
 import ch.giantific.qwittig.data.jobs.UploadReceiptJob;
 import ch.giantific.qwittig.data.queues.OcrQueue;
-import ch.giantific.qwittig.data.rest.ExchangeRatesResult;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
+import ch.giantific.qwittig.data.rest.ExchangeRatesResult;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseStorage;
@@ -49,7 +49,7 @@ public class PurchaseRepository {
     public static final int JPEG_COMPRESSION_RATE = 100;
     public static final int HEIGHT = 2048;
     public static final int WIDTH = 1024;
-    public static final String PATH_OCR_QUEUE = "queue/ocr/tasks";
+    private static final String PATH_OCR_QUEUE = "queue/ocr/tasks";
 
     private final DatabaseReference databaseRef;
     private final StorageReference storageRef;
@@ -137,8 +137,7 @@ public class PurchaseRepository {
     }
 
     public void uploadReceiptForOcr(@NonNull String receiptBase64, @NonNull String userId) {
-        final String purchaseId = databaseRef.child(Purchase.BASE_PATH_PURCHASES).push().getKey();
-        final OcrQueue ocrQueue = new OcrQueue(receiptBase64, purchaseId, userId);
+        final OcrQueue ocrQueue = new OcrQueue(receiptBase64, userId);
         databaseRef.child(PATH_OCR_QUEUE).push().setValue(ocrQueue);
     }
 
@@ -156,22 +155,24 @@ public class PurchaseRepository {
     }
 
     public void savePurchase(@NonNull Purchase purchase, @Nullable String purchaseId,
-                             boolean wasDraft) {
+                             @NonNull String userId, boolean wasDraft) {
         final String key = TextUtils.isEmpty(purchaseId)
                 ? databaseRef.child(Purchase.BASE_PATH_PURCHASES).push().getKey()
                 : purchaseId;
-
         final String buyerId = purchase.getBuyer();
-        if (wasDraft) {
-            final Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put(Purchase.BASE_PATH_DRAFTS + "/" + buyerId + "/" + key, null);
-            final Map<String, Object> purchaseMap = purchase.toMap();
-            purchaseMap.put(Purchase.PATH_DRAFT, false);
-            childUpdates.put(Purchase.BASE_PATH_PURCHASES + "/" + key, purchaseMap);
-            databaseRef.updateChildren(childUpdates);
-        } else {
-            databaseRef.child(Purchase.BASE_PATH_PURCHASES).child(key).setValue(purchase);
+
+        final Map<String, Object> childUpdates = new HashMap<>();
+        final String ocrDataId = purchase.getOcrData();
+        if (!TextUtils.isEmpty(ocrDataId)) {
+            childUpdates.put(OcrData.BASE_PATH + "/" + userId + "/" + ocrDataId + "/" + OcrData.PATH_PROCESSED, true);
         }
+        final Map<String, Object> purchaseMap = purchase.toMap();
+        if (wasDraft) {
+            childUpdates.put(Purchase.BASE_PATH_DRAFTS + "/" + buyerId + "/" + key, null);
+            purchaseMap.put(Purchase.PATH_DRAFT, false);
+        }
+        childUpdates.put(Purchase.BASE_PATH_PURCHASES + "/" + key, purchaseMap);
+        databaseRef.updateChildren(childUpdates);
 
         final String receipt = purchase.getReceipt();
         if (!TextUtils.isEmpty(receipt) && !Utils.isHttpsUrl(receipt)) {
@@ -220,9 +221,40 @@ public class PurchaseRepository {
                 .child(Purchase.PATH_READ_BY).child(currentIdentityId).setValue(true);
     }
 
-    public Single<OcrData> getOcrData(@NonNull String ocrDataId) {
-        final Query query = databaseRef.child(OcrData.BASE_PATH).child(ocrDataId);
+    public Observable<List<OcrData>> observeOcrData(@NonNull String currentUserId, boolean processed) {
+        final Query query = databaseRef.child(OcrData.BASE_PATH).child(currentUserId).orderByChild(OcrData.PATH_PROCESSED).equalTo(processed);
+        return RxFirebaseDatabase.observeValues(query, OcrData.class);
+    }
+
+    public Single<OcrData> getOcrData(@NonNull String ocrDataId, @NonNull String userId) {
+        final Query query = databaseRef.child(OcrData.BASE_PATH).child(userId).child(ocrDataId);
         return RxFirebaseDatabase.observeValueOnce(query, OcrData.class);
+    }
+
+    public void discardOcrData(@NonNull String currentUserId, @NonNull String ocrDataId) {
+        final Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(OcrData.BASE_PATH + "/" + currentUserId + "/" + ocrDataId + "/" + OcrData.PATH_PROCESSED, true);
+        childUpdates.put(OcrData.BASE_PATH + "/" + currentUserId + "/" + ocrDataId + "/" + OcrData.PATH_PURCHASE, null);
+        databaseRef.updateChildren(childUpdates);
+    }
+
+    /**
+     * TODO: only needed as long as firebase node.js sdk lacks storage support
+     */
+    public Single<Uri> setOcrDataReceiptUrl(@NonNull final String currentUserId,
+                                            @NonNull final String ocrDataId,
+                                            @NonNull String purchaseId) {
+        return RxFirebaseStorage.getDownloadUrl(storageRef.child(purchaseId + ".jpg"))
+                .doOnSuccess(new Action1<Uri>() {
+                    @Override
+                    public void call(Uri uri) {
+                        databaseRef.child(OcrData.BASE_PATH)
+                                .child(currentUserId)
+                                .child(ocrDataId)
+                                .child(OcrData.PATH_RECEIPT)
+                                .setValue(uri.toString());
+                    }
+                });
     }
 
     public void saveOcrRating(int satisfaction, int ratingNames, int ratingPrices,

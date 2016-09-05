@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.purchases.list;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
@@ -15,9 +14,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Base64;
@@ -37,7 +36,6 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
@@ -81,7 +79,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
 
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
-
+    private NotificationManagerCompat notificationManager;
     @Inject
     HomeViewModel homeViewModel;
     @Inject
@@ -92,26 +90,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     GoogleApiClientDelegate googleApiDelegate;
     private DraftsFragment draftsFragment;
     private ActivityHomeBinding binding;
-    private ProgressDialog progressDialog;
     private HomeTabsAdapter tabsAdapter;
-
-    @Override
-    protected void handleLocalBroadcast(Intent intent, int dataType) {
-        super.handleLocalBroadcast(intent, dataType);
-
-        switch (dataType) {
-            case LocalBroadcast.DataType.OCR_PURCHASE_UPDATED: {
-                final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-                if (successful) {
-                    final String ocrPurchaseId = intent.getStringExtra(LocalBroadcast.INTENT_EXTRA_OCR_PURCHASE_ID);
-                    homeViewModel.onOcrPurchaseReady(ocrPurchaseId);
-                } else {
-                    homeViewModel.onOcrPurchaseFailed();
-                }
-                break;
-            }
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +99,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         binding.setViewModel(homeViewModel);
 
-        // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_home);
 
         final ActionBar actionBar = getSupportActionBar();
@@ -129,6 +107,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         }
 
         googleApiDelegate.createGoogleApiClient(AppInvite.API);
+        notificationManager = NotificationManagerCompat.from(this);
 
         if (userLoggedIn) {
             if (homeViewModel.isDraftsAvailable()) {
@@ -339,6 +318,11 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     }
 
     @Override
+    public void clearOcrNotification(@NonNull String ocrPurchaseId) {
+        notificationManager.cancel(ocrPurchaseId.hashCode());
+    }
+
+    @Override
     public void onJoinInvitedGroupSelected(@NonNull String identityId) {
         homeViewModel.onJoinInvitedGroupSelected(identityId);
     }
@@ -353,18 +337,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                                     @NonNull String groupName,
                                     @NonNull String inviterNickname) {
         JoinGroupDialogFragment.display(getSupportFragmentManager(), identityId, groupName, inviterNickname);
-    }
-
-    @Override
-    public void showProgressDialog(@StringRes int message) {
-        progressDialog = ProgressDialog.show(this, null, getString(message), true);
-    }
-
-    @Override
-    public void hideProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
     }
 
     @Override

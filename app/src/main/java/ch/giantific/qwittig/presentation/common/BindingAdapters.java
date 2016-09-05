@@ -269,6 +269,15 @@ public class BindingAdapters {
         }
     }
 
+    @BindingAdapter({"complete"})
+    public static void setFabMenuComplete(FabMenu view, boolean complete) {
+        if (complete) {
+            view.showCompleteView();
+        } else {
+            view.hideCompleteView();
+        }
+    }
+
     @BindingAdapter({"contentLoading"})
     public static void setContentLoadingProgressBarLoading(ContentLoadingProgressBar view,
                                                            boolean loading) {

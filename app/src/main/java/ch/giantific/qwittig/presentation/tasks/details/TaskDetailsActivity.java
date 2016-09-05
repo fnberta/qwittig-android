@@ -14,16 +14,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityTaskDetailsBinding;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
@@ -80,14 +76,14 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsSubcom
         final Intent intent = getIntent();
         String taskId = intent.getStringExtra(Navigator.INTENT_TASK_ID); // started from TaskFragment
 
-        if (taskId == null) { // started via Push Notification
-            try {
-                final JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-                taskId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_TASK_ID);
-            } catch (JSONException e) {
-                showMessage(R.string.toast_error_task_details_load);
-            }
-        }
+//        if (taskId == null) { // started via Push Notification
+//            try {
+//                final JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
+//                taskId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_TASK_ID);
+//            } catch (JSONException e) {
+//                showMessage(R.string.toast_error_task_details_load);
+//            }
+//        }
 
         return taskId;
     }

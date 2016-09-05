@@ -58,7 +58,6 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_stats);
 
-        // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_stats);
 
         final ActionBar actionBar = getSupportActionBar();

@@ -44,12 +44,8 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseEditViewModelImpl
     }
 
     @Override
-    protected void savePurchase(Purchase purchase, boolean asDraft) {
-        if (asDraft) {
-            purchaseRepo.saveDraft(purchase, editPurchaseId);
-        } else {
-            purchaseRepo.savePurchase(purchase, editPurchaseId, true);
-        }
+    boolean isDraft() {
+        return true;
     }
 
     @Override

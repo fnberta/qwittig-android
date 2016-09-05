@@ -29,6 +29,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAd
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link PurchaseAddEditViewModel} for the screen where the
@@ -42,6 +43,7 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
 
     private String ocrDataId;
     private boolean ocrValuesSet;
+    private String purchaseId;
 
     public PurchaseAddOcrViewModelImpl(@Nullable Bundle savedState,
                                        @NonNull Navigator navigator,
@@ -73,12 +75,12 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
     }
 
     @Override
-    protected void loadPurchase(@NonNull FirebaseUser currentUser) {
+    protected void loadPurchase(@NonNull final FirebaseUser currentUser) {
         getSubscriptions().add(getInitialChain(currentUser)
                 .flatMap(new Func1<List<Identity>, Single<OcrData>>() {
                     @Override
                     public Single<OcrData> call(List<Identity> identities) {
-                        return purchaseRepo.getOcrData(ocrDataId);
+                        return purchaseRepo.getOcrData(ocrDataId, currentUser.getUid());
                     }
                 })
                 .subscribe(new SingleSubscriber<OcrData>() {
@@ -94,6 +96,7 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
 
                     @Override
                     public void onError(Throwable error) {
+                        Timber.e(error, "failed to load ocr data with error:");
                         view.showMessage(R.string.toast_error_purchase_ocr_load);
                     }
                 })
@@ -102,16 +105,18 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
 
     @SuppressWarnings("unchecked")
     private void setOcrData(@NonNull OcrData ocrData) {
+        purchaseId = ocrData.getPurchase();
+
         final Map<String, Object> data = ocrData.getData();
 //        setDate(data.get("date"));
         final List<String> stores = (List<String>) data.get("store");
-        if (!stores.isEmpty()) {
+        if (stores != null && !stores.isEmpty()) {
             setStore(stores.get(0));
         }
         setReceipt(ocrData.getReceipt());
 
         final List<Map<String, Object>> items = (List<Map<String, Object>>) data.get("items");
-        if (!items.isEmpty()) {
+        if (items != null && !items.isEmpty()) {
             for (Map<String, Object> item : items) {
                 final String price = moneyFormatter.format(item.get("price"));
                 final String name = (String) item.get("name");
@@ -137,6 +142,14 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                 purchaseIdentities, purchaseItems);
     }
 
+    protected void savePurchase(@NonNull Purchase purchase, boolean asDraft) {
+        if (asDraft) {
+            purchaseRepo.saveDraft(purchase, purchaseId);
+        } else {
+            purchaseRepo.savePurchase(purchase, purchaseId, currentUserId, false);
+        }
+    }
+
     @Override
     protected void onPurchaseSaved(boolean asDraft) {
         if (configHelper.isShowOcrRating()) {
@@ -144,5 +157,12 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
         }
 
         super.onPurchaseSaved(asDraft);
+    }
+
+    @Override
+    public void onDiscardChangesSelected() {
+        purchaseRepo.discardOcrData(currentUserId, ocrDataId);
+
+        super.onDiscardChangesSelected();
     }
 }

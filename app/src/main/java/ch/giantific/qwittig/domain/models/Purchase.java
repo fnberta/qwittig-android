@@ -59,13 +59,13 @@ public class Purchase implements FirebaseModel {
         // required for firebase de-/serialization
     }
 
-    public Purchase(@NonNull String group, @NonNull String buyerId, @NonNull Date date,
+    public Purchase(@NonNull String group, @NonNull String buyer, @NonNull Date date,
                     @Nullable String store, double total, @NonNull String currency,
                     double exchangeRate, @Nullable String receipt, @Nullable String note,
-                    boolean isDraft, @Nullable String ocrData,
+                    boolean draft, @Nullable String ocrData,
                     @NonNull List<String> identities, @NonNull List<Item> items) {
         this.group = group;
-        buyer = buyerId;
+        this.buyer = buyer;
         this.date = date.getTime();
         this.store = store;
         this.total = total;
@@ -73,7 +73,7 @@ public class Purchase implements FirebaseModel {
         this.exchangeRate = exchangeRate;
         this.receipt = receipt;
         this.note = note;
-        draft = isDraft;
+        this.draft = draft;
         this.ocrData = ocrData;
         this.identities = new HashMap<>();
         for (String id : identities) {
@@ -81,7 +81,7 @@ public class Purchase implements FirebaseModel {
         }
         this.items = items;
         readBy = new HashMap<>();
-        readBy.put(buyerId, true);
+        readBy.put(buyer, true);
     }
 
     @Override

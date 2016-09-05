@@ -88,7 +88,7 @@ public class StatsViewModelImpl extends ViewModelBaseImpl<StatsViewModel.ViewLis
     @Override
     public void setPeriod(@NonNull StatsPeriodItem period) {
         this.period = period;
-        updateStartAndEndDate();
+        updateStartEndDate();
     }
 
     @Override
@@ -101,6 +101,7 @@ public class StatsViewModelImpl extends ViewModelBaseImpl<StatsViewModel.ViewLis
         return endDate;
     }
 
+    @Override
     @Bindable
     public boolean isEmpty() {
         return empty;
@@ -148,6 +149,7 @@ public class StatsViewModelImpl extends ViewModelBaseImpl<StatsViewModel.ViewLis
     }
 
     @Override
+    @Bindable
     public String getBarAverage() {
         return barAverage;
     }
@@ -159,6 +161,7 @@ public class StatsViewModelImpl extends ViewModelBaseImpl<StatsViewModel.ViewLis
     }
 
     @Override
+    @Bindable
     public BarData getTimeData() {
         return timeData;
     }
@@ -349,12 +352,12 @@ public class StatsViewModelImpl extends ViewModelBaseImpl<StatsViewModel.ViewLis
         }
 
         this.period = period;
-        updateStartAndEndDate();
+        updateStartEndDate();
         // TODO: don't if custom
         reloadData();
     }
 
-    private void updateStartAndEndDate() {
+    private void updateStartEndDate() {
         final int type = period.getType();
         switch (type) {
             case StatsPeriod.THIS_MONTH: {

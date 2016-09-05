@@ -87,6 +87,7 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
     protected List<Identity> identities;
     protected Identity currentIdentity;
     protected NumberFormat moneyFormatter;
+    protected String currentUserId;
     protected String currency;
     protected String receipt;
     protected String note;
@@ -464,6 +465,7 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
+        currentUserId = currentUser.getUid();
         loadPurchase(currentUser);
     }
 
@@ -755,11 +757,11 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
         onPurchaseSaved(asDraft);
     }
 
-    protected void savePurchase(Purchase purchase, boolean asDraft) {
+    protected void savePurchase(@NonNull Purchase purchase, boolean asDraft) {
         if (asDraft) {
             purchaseRepo.saveDraft(purchase, null);
         } else {
-            purchaseRepo.savePurchase(purchase, null, false);
+            purchaseRepo.savePurchase(purchase, null, currentUserId, false);
         }
     }
 

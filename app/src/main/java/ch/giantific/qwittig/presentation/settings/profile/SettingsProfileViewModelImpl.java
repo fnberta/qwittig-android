@@ -49,42 +49,42 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
     private static final String STATE_PASSWORD = "STATE_PASSWORD";
     private static final String STATE_PASSWORD_REPEAT = "STATE_PASSWORD_REPEAT";
-    private final List<String> mGroupNicknames;
-    private final GroupRepository mGroupRepo;
-    private boolean mFacebookUser;
-    private boolean mGoogleUser;
-    private boolean mValidate;
-    private boolean mUnlinkSocialLogin;
-    private String mAvatar;
-    private String mAvatarOrig;
-    private String mEmail;
-    private String mEmailOrig;
-    private String mNickname;
-    private String mNicknameOrig;
-    private String mPassword;
-    private String mPasswordRepeat;
+    private final List<String> groupNicknames;
+    private final GroupRepository groupRepo;
+    private boolean facebookUser;
+    private boolean googleUser;
+    private boolean validate;
+    private boolean unlinkSocialLogin;
+    private String avatar;
+    private String avatarOrig;
+    private String email;
+    private String emailOrig;
+    private String nickname;
+    private String nicknameOrig;
+    private String password;
+    private String passwordRepeat;
 
     public SettingsProfileViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
-                                        @NonNull UserRepository userRepository,
-                                        @NonNull GroupRepository groupRepository) {
-        super(savedState, navigator, eventBus, userRepository);
+                                        @NonNull UserRepository userRepo,
+                                        @NonNull GroupRepository groupRepo) {
+        super(savedState, navigator, eventBus, userRepo);
 
-        mGroupRepo = groupRepository;
-        mGroupNicknames = new ArrayList<>();
+        this.groupRepo = groupRepo;
+        groupNicknames = new ArrayList<>();
 
         if (savedState != null) {
-            mValidate = savedState.getBoolean(STATE_VALIDATE);
-            mUnlinkSocialLogin = savedState.getBoolean(STATE_UNLINK_THIRD_PARTY);
-            mEmail = savedState.getString(STATE_EMAIL);
-            mPassword = savedState.getString(STATE_PASSWORD);
-            mPasswordRepeat = savedState.getString(STATE_PASSWORD_REPEAT);
-            mAvatar = savedState.getString(STATE_AVATAR);
-            mNickname = savedState.getString(STATE_NICKNAME);
+            validate = savedState.getBoolean(STATE_VALIDATE);
+            unlinkSocialLogin = savedState.getBoolean(STATE_UNLINK_THIRD_PARTY);
+            email = savedState.getString(STATE_EMAIL);
+            password = savedState.getString(STATE_PASSWORD);
+            passwordRepeat = savedState.getString(STATE_PASSWORD_REPEAT);
+            avatar = savedState.getString(STATE_AVATAR);
+            nickname = savedState.getString(STATE_NICKNAME);
         } else {
-            mPassword = "";
-            mPasswordRepeat = "";
+            password = "";
+            passwordRepeat = "";
         }
     }
 
@@ -92,35 +92,35 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_VALIDATE, mValidate);
-        outState.putBoolean(STATE_UNLINK_THIRD_PARTY, mUnlinkSocialLogin);
-        outState.putString(STATE_AVATAR, mAvatar);
-        outState.putString(STATE_EMAIL, mEmail);
-        outState.putString(STATE_NICKNAME, mNickname);
-        outState.putString(STATE_PASSWORD, mPassword);
-        outState.putString(STATE_PASSWORD_REPEAT, mPasswordRepeat);
+        outState.putBoolean(STATE_VALIDATE, validate);
+        outState.putBoolean(STATE_UNLINK_THIRD_PARTY, unlinkSocialLogin);
+        outState.putString(STATE_AVATAR, avatar);
+        outState.putString(STATE_EMAIL, email);
+        outState.putString(STATE_NICKNAME, nickname);
+        outState.putString(STATE_PASSWORD, password);
+        outState.putString(STATE_PASSWORD_REPEAT, passwordRepeat);
     }
 
     @Override
     public boolean isValidate() {
-        return mValidate;
+        return validate;
     }
 
     @Override
     public void setValidate(boolean validate) {
-        mValidate = validate;
+        this.validate = validate;
         notifyPropertyChanged(BR.validate);
     }
 
     @Override
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     @Override
     public void setAvatar(@NonNull String avatarUrl) {
-        mAvatar = avatarUrl;
+        avatar = avatarUrl;
         notifyPropertyChanged(BR.avatar);
     }
 
@@ -132,79 +132,79 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Override
     public void setNickname(@NonNull String nickname) {
-        mNickname = nickname;
+        this.nickname = nickname;
         notifyPropertyChanged(BR.nickname);
     }
 
     @Override
     @Bindable
     public String getEmail() {
-        return mEmail;
+        return email;
     }
 
     @Override
     public void setEmail(@NonNull String email) {
-        mEmail = email;
+        this.email = email;
         notifyPropertyChanged(BR.email);
     }
 
     @Override
     @Bindable
     public boolean isNicknameComplete() {
-        return !TextUtils.isEmpty(mNickname);
+        return !TextUtils.isEmpty(nickname);
     }
 
     @Override
     @Bindable
     public boolean isEmailValid() {
-        return Utils.isEmailValid(mEmail);
+        return Utils.isEmailValid(email);
     }
 
     @Override
     @Bindable
     public boolean isPasswordValid() {
-        return TextUtils.isEmpty(mPassword) || Utils.isPasswordValid(mPassword);
+        return TextUtils.isEmpty(password) || Utils.isPasswordValid(password);
     }
 
     @Override
     @Bindable
     public boolean isPasswordEqual() {
-        return Objects.equals(mPassword, mPasswordRepeat);
+        return Objects.equals(password, passwordRepeat);
     }
 
     @Override
     @Bindable
     public boolean isEmailAndPasswordVisible() {
-        return !mFacebookUser && !mGoogleUser || mUnlinkSocialLogin;
+        return !facebookUser && !googleUser || unlinkSocialLogin;
     }
 
     @Override
     public boolean showUnlinkFacebook() {
-        return mFacebookUser && !mUnlinkSocialLogin;
+        return facebookUser && !unlinkSocialLogin;
     }
 
     @Override
     public boolean showUnlinkGoogle() {
-        return mGoogleUser && !mUnlinkSocialLogin;
+        return googleUser && !unlinkSocialLogin;
     }
 
     @Override
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        mGoogleUser = userRepo.isGoogleUser(currentUser);
-        mFacebookUser = userRepo.isFacebookUser(currentUser);
+        googleUser = userRepo.isGoogleUser(currentUser);
+        facebookUser = userRepo.isFacebookUser(currentUser);
         notifyPropertyChanged(BR.emailAndPasswordVisible);
         view.reloadOptionsMenu();
 
-        mEmailOrig = currentUser.getEmail();
-        if (TextUtils.isEmpty(mEmail) && !TextUtils.isEmpty(mEmailOrig)) {
-            setEmail(mEmailOrig);
+        emailOrig = currentUser.getEmail();
+        if (TextUtils.isEmpty(email) && !TextUtils.isEmpty(emailOrig)) {
+            setEmail(emailOrig);
         }
 
         getSubscriptions().add(userRepo.getUser(currentUser.getUid())
@@ -218,14 +218,14 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                     @Override
                     public void call(Identity identity) {
                         final String nickname = identity.getNickname();
-                        mNicknameOrig = nickname;
-                        if (TextUtils.isEmpty(mNickname)) {
+                        nicknameOrig = nickname;
+                        if (TextUtils.isEmpty(SettingsProfileViewModelImpl.this.nickname)) {
                             setNickname(nickname);
                         }
 
                         final String avatar = identity.getAvatar();
-                        mAvatarOrig = avatar;
-                        if (TextUtils.isEmpty(mAvatar)) {
+                        avatarOrig = avatar;
+                        if (TextUtils.isEmpty(SettingsProfileViewModelImpl.this.avatar)) {
                             setAvatar(avatar);
                         }
                     }
@@ -233,13 +233,13 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
-                        return mGroupRepo.getGroupIdentities(identity.getGroup(), true);
+                        return groupRepo.getGroupIdentities(identity.getGroup(), true);
                     }
                 })
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
-                        mGroupNicknames.add(identity.getNickname());
+                        groupNicknames.add(identity.getNickname());
                     }
                 })
         );
@@ -264,7 +264,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onUnlinkThirdPartyLoginMenuClick() {
-        mUnlinkSocialLogin = true;
+        unlinkSocialLogin = true;
         notifyPropertyChanged(BR.emailAndPasswordVisible);
         view.reloadOptionsMenu();
         view.showSetPasswordMessage(R.string.toast_unlink_password_required);
@@ -280,14 +280,14 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     }
 
     private boolean changesWereMade() {
-        return !Objects.equals(mEmail, mEmailOrig)
-                || !Objects.equals(mNickname, mNicknameOrig)
+        return !Objects.equals(email, emailOrig)
+                || !Objects.equals(nickname, nicknameOrig)
                 || isAvatarChanged()
-                || !TextUtils.isEmpty(mPassword);
+                || !TextUtils.isEmpty(password);
     }
 
     private boolean isAvatarChanged() {
-        return !Objects.equals(mAvatar, mAvatarOrig);
+        return !Objects.equals(avatar, avatarOrig);
     }
 
     @Override
@@ -297,29 +297,29 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onEmailChanged(CharSequence s, int start, int before, int count) {
-        mEmail = s.toString();
-        if (mValidate) {
+        email = s.toString();
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
 
     @Override
     public void onNicknameChanged(CharSequence s, int start, int before, int count) {
-        mNickname = s.toString();
-        if (mValidate) {
+        nickname = s.toString();
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
 
     @Override
     public void onPasswordChanged(CharSequence s, int start, int before, int count) {
-        mPassword = s.toString();
-        if (mValidate) {
+        password = s.toString();
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
 
-        if (mUnlinkSocialLogin) {
-            if (TextUtils.isEmpty(mPassword)) {
+        if (unlinkSocialLogin) {
+            if (TextUtils.isEmpty(password)) {
                 view.showSetPasswordMessage(R.string.toast_unlink_password_required);
             } else {
                 view.dismissSetPasswordMessage();
@@ -329,8 +329,8 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onPasswordRepeatChanged(CharSequence s, int start, int before, int count) {
-        mPasswordRepeat = s.toString();
-        if (mValidate) {
+        passwordRepeat = s.toString();
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
@@ -341,20 +341,20 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
             return;
         }
 
-        if (!Objects.equals(mNickname, mNicknameOrig) && mGroupNicknames.contains(mNickname)) {
+        if (!Objects.equals(nickname, nicknameOrig) && groupNicknames.contains(nickname)) {
             this.view.showMessage(R.string.toast_profile_nickname_taken);
             return;
         }
 
-        if (mUnlinkSocialLogin) {
+        if (unlinkSocialLogin) {
             unlinkSocialLogin();
             return;
         }
 
-        final String email = mGoogleUser || mFacebookUser || Objects.equals(mEmail, mEmailOrig) ? null : mEmail;
-        final String password = mGoogleUser || mFacebookUser ? null : mPassword;
+        final String email = googleUser || facebookUser || Objects.equals(this.email, emailOrig) ? null : this.email;
+        final String password = googleUser || facebookUser ? null : this.password;
         if (!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
-            this.view.showReAuthenticateDialog(mEmailOrig);
+            this.view.showReAuthenticateDialog(emailOrig);
             return;
         }
 
@@ -368,9 +368,9 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     }
 
     private void unlinkSocialLogin() {
-        if (mGoogleUser) {
+        if (googleUser) {
             view.reAuthenticateGoogle();
-        } else if (mFacebookUser) {
+        } else if (facebookUser) {
             view.reAuthenticateFacebook();
         }
     }
@@ -378,7 +378,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
         view.showProgressDialog(R.string.progress_profile_unlink);
-        view.loadUnlinkGoogleWorker(mEmail, mPassword, idToken);
+        view.loadUnlinkGoogleWorker(email, password, idToken);
     }
 
     @Override
@@ -392,7 +392,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 .flatMap(new Func1<Void, Single<User>>() {
                     @Override
                     public Single<User> call(Void aVoid) {
-                        return userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                        return userRepo.updateProfile(nickname, avatar, isAvatarChanged());
                     }
                 })
                 .subscribe(profileSubscriber(workerTag))
@@ -402,7 +402,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     public void onFacebookSignedIn(@NonNull String token) {
         view.showProgressDialog(R.string.progress_profile_unlink);
-        view.loadUnlinkFacebookWorker(mEmail, mPassword, token);
+        view.loadUnlinkFacebookWorker(email, password, token);
     }
 
     @Override
@@ -416,7 +416,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 .flatMap(new Func1<Void, Single<User>>() {
                     @Override
                     public Single<User> call(Void aVoid) {
-                        return userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                        return userRepo.updateProfile(nickname, avatar, isAvatarChanged());
                     }
                 })
                 .subscribe(profileSubscriber(workerTag))
@@ -426,7 +426,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
         view.showProgressDialog(R.string.progress_profile_change_email_pw);
-        view.loadChangeEmailPasswordWorker(email, password, mEmail, mPassword);
+        view.loadChangeEmailPasswordWorker(email, password, this.email, this.password);
     }
 
     @Override
@@ -435,7 +435,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 .flatMap(new Func1<Void, Single<User>>() {
                     @Override
                     public Single<User> call(Void aVoid) {
-                        return userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                        return userRepo.updateProfile(nickname, avatar, isAvatarChanged());
                     }
                 })
                 .subscribe(profileSubscriber(workerTag))
@@ -465,7 +465,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     }
 
     private void saveProfile() {
-        getSubscriptions().add(userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged())
+        getSubscriptions().add(userRepo.updateProfile(nickname, avatar, isAvatarChanged())
                 .subscribe(new SingleSubscriber<User>() {
                     @Override
                     public void onSuccess(User user) {

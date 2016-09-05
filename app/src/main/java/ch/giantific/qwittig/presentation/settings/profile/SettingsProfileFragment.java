@@ -47,10 +47,10 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         SettingsProfileViewModel.ViewListener,
         EmailReAuthenticateDialogFragment.DialogInteractionListener {
 
-    private FragmentSettingsProfileBinding mBinding;
-    private Snackbar mSnackbarSetPassword;
-    private ProgressDialog mProgressDialog;
-    private CallbackManager mFacebookCallbackManager;
+    private FragmentSettingsProfileBinding binding;
+    private Snackbar snackbarSetPassword;
+    private ProgressDialog progressDialog;
+    private CallbackManager facebookCallbackManager;
 
     public SettingsProfileFragment() {
         // required empty constructor
@@ -61,8 +61,8 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-        mFacebookCallbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(mFacebookCallbackManager, new FacebookCallback<LoginResult>() {
+        facebookCallbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 viewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
@@ -83,8 +83,8 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentSettingsProfileBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentSettingsProfileBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -92,7 +92,7 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         super.onActivityCreated(savedInstanceState);
 
         viewModel.attachView(this);
-        mBinding.setViewModel(viewModel);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -138,12 +138,12 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+        facebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.etSettingsProfileNickname;
+        return binding.etSettingsProfileNickname;
     }
 
     @Override
@@ -153,13 +153,13 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
 
     @Override
     public void showProgressDialog(@StringRes int message) {
-        mProgressDialog = ProgressDialog.show(getActivity(), null, getString(message), true);
+        progressDialog = ProgressDialog.show(getActivity(), null, getString(message), true);
     }
 
     @Override
     public void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
+        if (progressDialog != null) {
+            progressDialog.dismiss();
         }
     }
 
@@ -182,13 +182,13 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
 
     @Override
     public void showSetPasswordMessage(@StringRes int message) {
-        mSnackbarSetPassword = Snackbar.make(getSnackbarView(), message, Snackbar.LENGTH_INDEFINITE);
-        mSnackbarSetPassword.show();
+        snackbarSetPassword = Snackbar.make(getSnackbarView(), message, Snackbar.LENGTH_INDEFINITE);
+        snackbarSetPassword.show();
     }
 
     @Override
     public void dismissSetPasswordMessage() {
-        mSnackbarSetPassword.dismiss();
+        snackbarSetPassword.dismiss();
     }
 
     @Override

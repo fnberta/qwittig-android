@@ -17,15 +17,19 @@ public class OcrData implements FirebaseModel {
 
     public static final String BASE_PATH = "ocrData";
 
+    public static final String PATH_PURCHASE = "purchase";
     public static final String PATH_USER = "user";
     public static final String PATH_DATA = "data";
     public static final String PATH_RECEIPT = "receipt";
+    public static final String PATH_PROCESSED = "processed";
 
     private String id;
     private long createdAt;
+    private String purchase;
     private String user;
     private Map<String, Object> data;
     private String receipt;
+    private boolean processed;
 
     public OcrData() {
         // required for firebase de-/serialization
@@ -50,6 +54,10 @@ public class OcrData implements FirebaseModel {
         return new Date(createdAt);
     }
 
+    public String getPurchase() {
+        return purchase;
+    }
+
     public String getUser() {
         return user;
     }
@@ -60,5 +68,9 @@ public class OcrData implements FirebaseModel {
 
     public String getReceipt() {
         return receipt;
+    }
+
+    public boolean isProcessed() {
+        return processed;
     }
 }

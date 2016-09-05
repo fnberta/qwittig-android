@@ -6,6 +6,7 @@ package ch.giantific.qwittig.di;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
@@ -38,6 +39,8 @@ public interface ApplicationComponent {
     SharedPreferences getSharedPreferences();
 
     LocalBroadcastManager getLocalBroadcastManager();
+
+    NotificationManagerCompat getNotificationManagerCompat();
 
     ExchangeRates getExchangeRates();
 

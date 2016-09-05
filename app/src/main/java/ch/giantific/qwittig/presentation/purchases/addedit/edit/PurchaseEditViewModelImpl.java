@@ -35,6 +35,7 @@ import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link PurchaseAddEditViewModel} for the edit purchase screen.
@@ -107,6 +108,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
 
                     @Override
                     public void onError(Throwable error) {
+                        Timber.e(error, "failed to load edit purchase with error:");
                         view.showMessage(R.string.toast_error_purchase_edit_load);
                     }
                 })
@@ -144,12 +146,16 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
     }
 
     @Override
-    protected void savePurchase(Purchase purchase, boolean asDraft) {
+    protected void savePurchase(@NonNull Purchase purchase, boolean asDraft) {
         if (asDraft) {
             purchaseRepo.saveDraft(purchase, editPurchaseId);
         } else {
-            purchaseRepo.savePurchase(purchase, editPurchaseId, false);
+            purchaseRepo.savePurchase(purchase, editPurchaseId, currentUserId, isDraft());
         }
+    }
+
+    boolean isDraft() {
+        return false;
     }
 
     @Override

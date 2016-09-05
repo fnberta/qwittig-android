@@ -7,6 +7,7 @@ package ch.giantific.qwittig.di;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.preference.PreferenceManager;
 
@@ -43,5 +44,11 @@ public class ApplicationModule {
     @Singleton
     LocalBroadcastManager providesLocalBroadcastManager(Application application) {
         return LocalBroadcastManager.getInstance(application);
+    }
+
+    @Provides
+    @Singleton
+    NotificationManagerCompat providesNotificationManagerCompat(Application application) {
+        return NotificationManagerCompat.from(application);
     }
 }

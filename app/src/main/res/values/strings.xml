@@ -326,7 +326,7 @@
     <string name="toast_error_join_group">Failed to join the new group. Please try again.</string>
     <string name="push_purchase_ocr_failed_title">Processing failed</string>
     <string name="toast_del_identity_balance_not_zero">Clear all outstanding debts and credits before deleting this user</string>
-    <string name="camera_pick_image">Pick from gallery</string>
+    <string name="camera_pick_image">From gallery</string>
     <string name="rating_general">How satisfying was the automatic recognition?</string>
     <string name="rating_names">Improve quality of recognized article names.</string>
     <string name="rating_prices">Ensure all prices are recognized correctly.</string>

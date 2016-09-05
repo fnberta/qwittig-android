@@ -18,14 +18,7 @@ public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
         JoinGroupDialogFragment.DialogInteractionListener {
 
     @Bindable
-    boolean isOcrProcessing();
-
-    @Bindable
-    boolean isAnimStop();
-
-    void startProgress();
-
-    void stopProgress(boolean animate);
+    boolean isOcrAvailable();
 
     @Bindable
     boolean isDraftsAvailable();
@@ -41,10 +34,6 @@ public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
 
     void onReceiptImageFailed();
 
-    void onOcrPurchaseReady(@NonNull String ocrPurchaseId);
-
-    void onOcrPurchaseFailed();
-
     FabMenuClickListener getFabMenuClickListener();
 
     /**
@@ -55,12 +44,10 @@ public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
                                  @NonNull String groupName,
                                  @NonNull String inviterNickname);
 
-        void showProgressDialog(@StringRes int message);
-
-        void hideProgressDialog();
-
         void captureImage();
 
         void toggleDraftTab(boolean draftsAvailable);
+
+        void clearOcrNotification(@NonNull String ocrPurchaseId);
     }
 }

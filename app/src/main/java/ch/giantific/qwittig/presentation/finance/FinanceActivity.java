@@ -67,7 +67,6 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_finance);
         binding.setViewModel(headerViewModel);
 
-        // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_finance);
 
         final ActionBar actionBar = getSupportActionBar();
