@@ -288,16 +288,6 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
                                 .toList();
                     }
                 })
-                .doOnNext(new Action1<List<PurchaseDetailsIdentityItemModel>>() {
-                    @Override
-                    public void call(List<PurchaseDetailsIdentityItemModel> itemModels) {
-                        identityItems.clear();
-                        identityItems.addAll(itemModels);
-                        identitiesListInteraction.notifyDataSetChanged();
-
-                        checkIdentitiesActive(itemModels);
-                    }
-                })
                 .subscribe(new IndefiniteSubscriber<List<PurchaseDetailsIdentityItemModel>>() {
                     @Override
                     public void onError(Throwable e) {
@@ -308,6 +298,11 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
 
                     @Override
                     public void onNext(List<PurchaseDetailsIdentityItemModel> itemModels) {
+                        identityItems.clear();
+                        identityItems.addAll(itemModels);
+                        identitiesListInteraction.notifyDataSetChanged();
+                        checkIdentitiesActive(itemModels);
+
                         setLoading(false);
                         view.startEnterTransition();
                     }
