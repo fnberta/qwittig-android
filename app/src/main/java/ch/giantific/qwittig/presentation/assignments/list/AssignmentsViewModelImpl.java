@@ -28,9 +28,9 @@ import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.AssignmentHistoryEvent;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentHeaderItem;
 import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItem;
 import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItemModel;
+import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItemModel.Type;
 import ch.giantific.qwittig.presentation.assignments.list.models.AssignmentDeadline;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -76,7 +76,7 @@ public class AssignmentsViewModelImpl extends ListViewModelBaseImpl<AssignmentIt
 
     @Override
     protected int compareItemModels(AssignmentItemModel o1, AssignmentItemModel o2) {
-        if (o1 instanceof AssignmentItem && o2 instanceof AssignmentItem) {
+        if (o1.getViewType() == Type.ASSIGNMENT && o2.getViewType() == Type.ASSIGNMENT) {
             return ((AssignmentItem) o1).compareTo((AssignmentItem) o2);
         }
 
@@ -138,32 +138,32 @@ public class AssignmentsViewModelImpl extends ListViewModelBaseImpl<AssignmentIt
 
     private void loadInitialData() {
         setInitialDataSub(assignmentRepo.getAssignments(currentGroupId, currentIdentityId, deadline.getDate())
-                .flatMap(new Func1<Assignment, Observable<AssignmentItemModel>>() {
-                    @Override
-                    public Observable<AssignmentItemModel> call(Assignment assignment) {
-                        return getItemModel(assignment, EventType.NONE, currentIdentityId);
-                    }
-                })
-                .toList()
-                .subscribe(new Subscriber<List<AssignmentItemModel>>() {
-                    @Override
-                    public void onCompleted() {
-                        initialDataLoaded = true;
-                        setLoading(false);
-                    }
+                        .flatMap(new Func1<Assignment, Observable<AssignmentItemModel>>() {
+                            @Override
+                            public Observable<AssignmentItemModel> call(Assignment assignment) {
+                                return getItemModel(assignment, EventType.NONE, currentIdentityId);
+                            }
+                        })
+                        .toList()
+                        .subscribe(new Subscriber<List<AssignmentItemModel>>() {
+                            @Override
+                            public void onCompleted() {
+                                initialDataLoaded = true;
+                                setLoading(false);
+                            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        onDataError(e);
-                    }
+                            @Override
+                            public void onError(Throwable e) {
+                                onDataError(e);
+                            }
 
-                    @Override
-                    public void onNext(List<AssignmentItemModel> itemModels) {
-//                        items.add(new AssignmentHeaderItem(R.string.assignment_header_my));
-//                        items.add(new AssignmentHeaderItem(R.string.assignment_header_group));
-                        items.addAll(itemModels);
-                    }
-                })
+                            @Override
+                            public void onNext(List<AssignmentItemModel> itemModels) {
+//                        items.add(new AssignmentHeaderItem(R.string.assignment_header_my, Type.HEADER_MY));
+//                        items.add(new AssignmentHeaderItem(R.string.assignment_header_group, Type.HEADER_GROUP));
+                                items.addAll(itemModels);
+                            }
+                        })
         );
     }
 

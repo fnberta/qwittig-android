@@ -19,6 +19,7 @@ import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsItemModel;
 import ch.giantific.qwittig.presentation.common.itemmodels.BaseChildItemModel;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link AssignmentDetailsItemModel} interface for a task item.
@@ -112,10 +113,6 @@ public class AssignmentItem extends BaseChildItemModel
                 : R.color.green;
     }
 
-    public int getDaysToDeadline() {
-        return daysToDeadline;
-    }
-
     public String[] getIdentitiesSorted() {
         return identitiesSorted;
     }
@@ -177,8 +174,13 @@ public class AssignmentItem extends BaseChildItemModel
             return deadline.compareTo(itemModel.getDeadline());
         }
 
-        return -1;
+        if (responsible && !itemModel.isResponsible()) {
+            return -1;
+        }
+
+        return 0;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -187,15 +189,15 @@ public class AssignmentItem extends BaseChildItemModel
 
         final AssignmentItem that = (AssignmentItem) o;
 
-        if (daysToDeadline != that.getDaysToDeadline()) return false;
-        if (pending != that.isPending()) return false;
-        if (responsible != that.isResponsible()) return false;
-        if (!title.equals(that.getTitle())) return false;
-        if (!timeFrame.equals(that.getTimeFrame())) return false;
-        if (!deadline.equals(that.getDeadline())) return false;
-        if (!nickname.equals(that.getNickname())) return false;
-        if (avatar != null ? !avatar.equals(that.getAvatar()) : that.getAvatar() != null) return false;
-        return upNext.equals(that.getUpNext());
+        if (daysToDeadline != that.daysToDeadline) return false;
+        if (pending != that.pending) return false;
+        if (responsible != that.responsible) return false;
+        if (!title.equals(that.title)) return false;
+        if (!timeFrame.equals(that.timeFrame)) return false;
+        if (!deadline.equals(that.deadline)) return false;
+        if (!nickname.equals(that.nickname)) return false;
+        if (avatar != null ? !avatar.equals(that.avatar) : that.avatar != null) return false;
+        return upNext.equals(that.upNext);
     }
 
     @Override

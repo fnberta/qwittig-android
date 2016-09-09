@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.assignments.list.itemmodels;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
@@ -18,8 +17,13 @@ import ch.giantific.qwittig.presentation.common.itemmodels.HeaderItemModelBaseIm
 @SuppressLint("ParcelCreator")
 public class AssignmentHeaderItem extends HeaderItemModelBaseImpl implements AssignmentItemModel {
 
-    public AssignmentHeaderItem(@StringRes int header) {
+    @Type
+    private int viewType;
+
+    public AssignmentHeaderItem(@StringRes int header, @Type int viewType) {
         super(header);
+
+        this.viewType = viewType;
     }
 
     @Override
@@ -28,13 +32,13 @@ public class AssignmentHeaderItem extends HeaderItemModelBaseImpl implements Ass
     }
 
     @Override
-    @Nullable
     public String getId() {
-        return null;
+        return String.valueOf(viewType);
     }
 
     @Override
+    @Type
     public int getViewType() {
-        return Type.HEADER;
+        return viewType;
     }
 }

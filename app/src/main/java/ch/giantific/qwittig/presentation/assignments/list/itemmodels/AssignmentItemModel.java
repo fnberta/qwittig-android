@@ -19,10 +19,11 @@ public interface AssignmentItemModel extends ChildItemModel {
     @Type
     int getViewType();
 
-    @IntDef({Type.HEADER, Type.ASSIGNMENT})
+    @IntDef({Type.HEADER_MY, Type.HEADER_GROUP, Type.ASSIGNMENT})
     @Retention(RetentionPolicy.SOURCE)
     @interface Type {
-        int HEADER = 0;
-        int ASSIGNMENT = 1;
+        int HEADER_MY = 0;
+        int HEADER_GROUP = 1;
+        int ASSIGNMENT = 2;
     }
 }

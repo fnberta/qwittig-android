@@ -50,6 +50,7 @@ public class FcmMessagingService extends FirebaseMessagingService {
     public static final String PUSH_NICKNAME = "nickname";
     public static final String PUSH_CURRENCY = "currency";
     public static final String PUSH_GROUP_NAME = "groupName";
+    public static final String PUSH_ASSIGNMENT_ID = "assignmentId";
     @Inject
     PurchaseRepository purchaseRepo;
     @Inject

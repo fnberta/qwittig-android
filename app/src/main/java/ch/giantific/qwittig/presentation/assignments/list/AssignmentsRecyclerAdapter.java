@@ -9,8 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowAssignmentsBinding;
+import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentHeaderItem;
 import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItem;
 import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItemModel;
@@ -47,7 +47,9 @@ public class AssignmentsRecyclerAdapter extends BaseRecyclerAdapter {
                 final RowAssignmentsBinding binding = RowAssignmentsBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.HEADER: {
+            case Type.HEADER_MY:
+                // fall through
+            case Type.HEADER_GROUP: {
                 final RowGenericHeaderBinding binding = RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
@@ -73,7 +75,9 @@ public class AssignmentsRecyclerAdapter extends BaseRecyclerAdapter {
 
                 break;
             }
-            case Type.HEADER: {
+            case Type.HEADER_MY:
+                // fall through
+            case Type.HEADER_GROUP: {
                 final BindingRow<RowGenericHeaderBinding> headerRow =
                         (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();

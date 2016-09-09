@@ -34,8 +34,8 @@ import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 
 /**
- * Hosts {@link AssignmentsFragment} that displays a list of recent tasks. Only loads the fragment if the
- * user is logged in.
+ * Hosts {@link AssignmentsFragment} that displays a list of recent assignments. Only loads the
+ * fragment if the user is logged in.
  * <p/>
  * Allows the user to change the tasks display by changing the value of the spinner in the
  * {@link Toolbar}.

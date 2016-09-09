@@ -50,4 +50,20 @@ public abstract class HeaderItemModelBaseImpl extends BaseObservable
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(headerRes);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final HeaderItemModelBaseImpl that = (HeaderItemModelBaseImpl) o;
+
+        return headerRes == that.headerRes;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return headerRes;
+    }
 }

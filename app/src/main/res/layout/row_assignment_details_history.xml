@@ -57,7 +57,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:text="@{itemModel.eventDate}"
+            android:text="@{itemModel.eventDateText}"
             tools:text="27.02.2015"
             />
 

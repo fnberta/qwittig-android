@@ -13,7 +13,8 @@ import ch.giantific.qwittig.presentation.common.itemmodels.HeaderItemModelBaseIm
  * Provides an implementation of the {@link AssignmentDetailsItemModel} interface for a header row.
  */
 @SuppressLint("ParcelCreator")
-public class AssignmentDetailsHeaderItem extends HeaderItemModelBaseImpl implements AssignmentDetailsItemModel {
+public class AssignmentDetailsHeaderItem extends HeaderItemModelBaseImpl
+        implements AssignmentDetailsItemModel {
 
     public AssignmentDetailsHeaderItem(@StringRes int header) {
         super(header);

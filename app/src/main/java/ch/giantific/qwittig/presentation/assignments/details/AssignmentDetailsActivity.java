@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.databinding.ActivityAssignmentDetailsBinding;
 import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditViewModel.AssignmentResult;
 import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsSubcomponent;
@@ -68,24 +70,21 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
 
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
-        component = navComp.plus(new AssignmentDetailsViewModelModule(savedInstanceState, getTaskObjectId()));
+        component = navComp.plus(new AssignmentDetailsViewModelModule(savedInstanceState,
+                getAssignmentId()));
         component.inject(this);
     }
 
-    private String getTaskObjectId() {
+    private String getAssignmentId() {
         final Intent intent = getIntent();
-        String taskId = intent.getStringExtra(Navigator.INTENT_ASSIGNMENT_ID); // started from TaskFragment
+        // started from AssignmentActivity
+        String assignmentId = intent.getStringExtra(Navigator.INTENT_ASSIGNMENT_ID);
+        if (TextUtils.isEmpty(assignmentId)) {
+            // started via push notification
+            assignmentId = intent.getStringExtra(FcmMessagingService.PUSH_ASSIGNMENT_ID);
+        }
 
-//        if (taskId == null) { // started via Push Notification
-//            try {
-//                final JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-//                taskId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_TASK_ID);
-//            } catch (JSONException e) {
-//                showMessage(R.string.toast_error_task_details_load);
-//            }
-//        }
-
-        return taskId;
+        return assignmentId;
     }
 
     @Override
