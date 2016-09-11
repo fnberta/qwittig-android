@@ -24,16 +24,16 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.Article;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsArticleItemModel;
 import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsIdentityItemModel;
-import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsItemModel;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
@@ -49,7 +49,7 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
     private final PurchaseRepository purchaseRepo;
     private final String purchaseId;
     private final String purchaseGroupId;
-    private final List<PurchaseDetailsItemModel> items;
+    private final List<PurchaseDetailsArticleItemModel> articleItems;
     private final List<PurchaseDetailsIdentityItemModel> identityItems;
     private final DateFormat dateFormatter;
     private ListInteraction itemsListInteraction;
@@ -80,7 +80,7 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
         this.purchaseRepo = purchaseRepo;
         this.purchaseId = purchaseId;
         this.purchaseGroupId = purchaseGroupId;
-        items = new ArrayList<>();
+        articleItems = new ArrayList<>();
         identityItems = new ArrayList<>();
         dateFormatter = DateUtils.getDateFormatter(false);
     }
@@ -321,15 +321,15 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
         setMyShareForeign(myShare / exchangeRate);
         setNote(purchase.getNote());
         setReceipt(purchase.getReceipt());
-        setItems(purchase.getItems(), identityId);
+        setArticles(purchase.getArticles(), identityId);
     }
 
-    private void setItems(@NonNull List<Item> items, @NonNull String identityId) {
-        this.items.clear();
-        for (Item item : items) {
-            final PurchaseDetailsItemModel itemModel =
-                    new PurchaseDetailsItemModel(item, identityId, moneyFormatter);
-            this.items.add(itemModel);
+    private void setArticles(@NonNull List<Article> articles, @NonNull String identityId) {
+        this.articleItems.clear();
+        for (Article article : articles) {
+            final PurchaseDetailsArticleItemModel itemModel =
+                    new PurchaseDetailsArticleItemModel(article, identityId, moneyFormatter);
+            this.articleItems.add(itemModel);
         }
         itemsListInteraction.notifyDataSetChanged();
     }
@@ -385,12 +385,12 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
     @Override
     @Bindable
     public boolean isEmpty() {
-        return items.isEmpty();
+        return articleItems.isEmpty();
     }
 
     @Override
-    public PurchaseDetailsItemModel getItemAtPosition(int position) {
-        return items.get(position);
+    public PurchaseDetailsArticleItemModel getItemAtPosition(int position) {
+        return articleItems.get(position);
     }
 
     @Override
@@ -400,7 +400,7 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return articleItems.size();
     }
 
     @Override

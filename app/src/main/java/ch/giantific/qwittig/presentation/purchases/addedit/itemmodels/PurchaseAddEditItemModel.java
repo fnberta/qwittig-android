@@ -18,14 +18,14 @@ public interface PurchaseAddEditItemModel extends Parcelable {
     @Type
     int getType();
 
-    @IntDef({Type.HEADER, Type.DATE, Type.STORE, Type.ITEM, Type.USERS, Type.ADD_ROW, Type.TOTAL})
+    @IntDef({Type.HEADER, Type.DATE, Type.STORE, Type.ARTICLE, Type.IDENTITIES, Type.ADD_ROW, Type.TOTAL})
     @Retention(RetentionPolicy.SOURCE)
     @interface Type {
         int HEADER = 0;
         int DATE = 1;
         int STORE = 2;
-        int ITEM = 3;
-        int USERS = 4;
+        int ARTICLE = 3;
+        int IDENTITIES = 4;
         int ADD_ROW = 5;
         int TOTAL = 6;
     }

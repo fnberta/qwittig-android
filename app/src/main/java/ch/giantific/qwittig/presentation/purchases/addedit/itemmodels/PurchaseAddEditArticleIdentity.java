@@ -16,17 +16,17 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 /**
  * Represents a user with an object id, a nickname, an avatar and whether it is selected or not.
  */
-public class PurchaseAddEditItemIdentity extends BaseObservable implements Parcelable {
+public class PurchaseAddEditArticleIdentity extends BaseObservable implements Parcelable {
 
-    public static final Creator<PurchaseAddEditItemIdentity> CREATOR = new Creator<PurchaseAddEditItemIdentity>() {
+    public static final Creator<PurchaseAddEditArticleIdentity> CREATOR = new Creator<PurchaseAddEditArticleIdentity>() {
         @Override
-        public PurchaseAddEditItemIdentity createFromParcel(Parcel source) {
-            return new PurchaseAddEditItemIdentity(source);
+        public PurchaseAddEditArticleIdentity createFromParcel(Parcel source) {
+            return new PurchaseAddEditArticleIdentity(source);
         }
 
         @Override
-        public PurchaseAddEditItemIdentity[] newArray(int size) {
-            return new PurchaseAddEditItemIdentity[size];
+        public PurchaseAddEditArticleIdentity[] newArray(int size) {
+            return new PurchaseAddEditArticleIdentity[size];
         }
     };
     private final String identityId;
@@ -34,15 +34,15 @@ public class PurchaseAddEditItemIdentity extends BaseObservable implements Parce
     private final String avatar;
     private boolean selected;
 
-    public PurchaseAddEditItemIdentity(@NonNull String identityId, @NonNull String nickname,
-                                       @Nullable String avatar, boolean selected) {
+    public PurchaseAddEditArticleIdentity(@NonNull String identityId, @NonNull String nickname,
+                                          @Nullable String avatar, boolean selected) {
         this.identityId = identityId;
         this.nickname = nickname;
         this.avatar = avatar;
         this.selected = selected;
     }
 
-    private PurchaseAddEditItemIdentity(Parcel in) {
+    private PurchaseAddEditArticleIdentity(Parcel in) {
         identityId = in.readString();
         nickname = in.readString();
         avatar = in.readString();

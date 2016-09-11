@@ -7,7 +7,7 @@ package ch.giantific.qwittig.presentation.purchases.addedit;
 /**
  * Defines the actions to take when users are clicked.
  */
-public interface PurchaseAddEditItemUsersClickListener {
+public interface PurchaseAddEditArticleIdentitiesClickListener {
 
     void onItemRowIdentityClick(int position);
 

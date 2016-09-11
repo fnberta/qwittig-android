@@ -12,16 +12,15 @@ import android.view.View;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.text.NumberFormat;
 import java.util.List;
 
 import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleIdentity;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditDateItemModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditStoreItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditTotalItemModel;
 
@@ -29,7 +28,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAd
  * Defines an observable view model for the add or edit purchase screen.
  */
 public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditItemModel, PurchaseAddEditViewModel.ViewListener>,
-        PurchaseAddEditItem.PriceChangedListener,
+        PurchaseAddEditArticleItem.PriceChangedListener,
         PurchaseAddEditDateItemModel, PurchaseAddEditStoreItemModel,
         PurchaseAddEditTotalItemModel,
         NoteDialogFragment.DialogInteractionListener,
@@ -56,15 +55,15 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
 
     void onAddEditNoteMenuClick();
 
-    void onToggleUsersClick(@NonNull PurchaseAddEditItem itemModel);
+    void onToggleIdentitiesClick(@NonNull PurchaseAddEditArticleItem itemModel);
 
     void onAddRowClick(@NonNull PurchaseAddEditItemModel itemModel);
 
-    void onItemDismiss(int position);
+    void onArticleDismiss(int position);
 
-    void onItemRowUserClick();
+    void onArticleRowIdentityClick();
 
-    void onItemRowUserLongClick(@NonNull PurchaseAddEditItemIdentity userClicked);
+    void onArticleRowIdentityLongClick(@NonNull PurchaseAddEditArticleIdentity userClicked);
 
     void onExitClick();
 
@@ -103,8 +102,6 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
         void showAddEditNoteDialog(@NonNull String note);
 
         void captureImage();
-
-        void showPurchaseItems();
 
         void reloadOptionsMenu();
     }

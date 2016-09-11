@@ -36,8 +36,8 @@ import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.Article;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.ListInteraction;
@@ -46,11 +46,11 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel.ViewListener;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditGenericItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditHeaderItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentities;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleIdentitiesItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleIdentity;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -324,9 +324,9 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
         // update items price formatting
         for (int i = 0, size = items.size(); i < size; i++) {
             final PurchaseAddEditItemModel addEditItem = items.get(i);
-            if (addEditItem.getType() == Type.ITEM) {
-                final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) addEditItem;
-                purchaseAddEditItem.updatePriceFormat(moneyFormatter);
+            if (addEditItem.getType() == Type.ARTICLE) {
+                final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) addEditItem;
+                articleItem.updatePriceFormat(moneyFormatter);
             }
         }
 
@@ -403,7 +403,6 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
     @Override
     public void onDeleteNote() {
         setNote("");
-        view.showPurchaseItems();
         view.reloadOptionsMenu();
         view.showMessage(R.string.toast_note_deleted);
     }
@@ -428,27 +427,27 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
         double total = 0;
         double myShare = 0;
         for (PurchaseAddEditItemModel addEditItem : items) {
-            if (addEditItem.getType() != Type.ITEM) {
+            if (addEditItem.getType() != Type.ARTICLE) {
                 continue;
             }
 
-            final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) addEditItem;
-            final double itemPrice = purchaseAddEditItem.parsePrice();
+            final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) addEditItem;
+            final double itemPrice = articleItem.parsePrice();
 
             // update total price
             total += itemPrice;
 
             // update my share
-            final PurchaseAddEditItemIdentity[] itemUsersRows = purchaseAddEditItem.getIdentities();
+            final PurchaseAddEditArticleIdentity[] articleIdentities = articleItem.getIdentities();
             int selectedCount = 0;
             boolean currentIdentityInvolved = false;
-            for (PurchaseAddEditItemIdentity addEditPurchaseItemUsersUser : itemUsersRows) {
-                if (!addEditPurchaseItemUsersUser.isSelected()) {
+            for (PurchaseAddEditArticleIdentity articleIdentity : articleIdentities) {
+                if (!articleIdentity.isSelected()) {
                     continue;
                 }
 
                 selectedCount++;
-                if (Objects.equals(addEditPurchaseItemUsersUser.getIdentityId(), currentIdentity.getId())) {
+                if (Objects.equals(articleIdentity.getIdentityId(), currentIdentity.getId())) {
                     currentIdentityInvolved = true;
                 }
             }
@@ -521,25 +520,25 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
     }
 
     protected final void updateRows() {
-        boolean hasItems = false;
+        boolean hasArticles = false;
         for (int i = 0, size = items.size(); i < size; i++) {
             final PurchaseAddEditItemModel addEditItem = items.get(i);
 
-            if (addEditItem.getType() == Type.ITEM) {
-                hasItems = true;
+            if (addEditItem.getType() == Type.ARTICLE) {
+                hasArticles = true;
 
-                final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) addEditItem;
-                purchaseAddEditItem.setMoneyFormatter(moneyFormatter);
-                purchaseAddEditItem.setPriceChangedListener(this);
+                final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) addEditItem;
+                articleItem.setMoneyFormatter(moneyFormatter);
+                articleItem.setPriceChangedListener(this);
                 continue;
             }
 
             // fill with one row on first start
-            if (addEditItem.getType() == Type.ADD_ROW && !hasItems) {
-                final PurchaseAddEditItem purchaseAddEditItem = new PurchaseAddEditItem(getItemUsers());
-                purchaseAddEditItem.setMoneyFormatter(moneyFormatter);
-                purchaseAddEditItem.setPriceChangedListener(this);
-                items.add(i, purchaseAddEditItem);
+            if (addEditItem.getType() == Type.ADD_ROW && !hasArticles) {
+                final PurchaseAddEditArticleItem articleItem = new PurchaseAddEditArticleItem(getArticleIdentities());
+                articleItem.setMoneyFormatter(moneyFormatter);
+                articleItem.setPriceChangedListener(this);
+                items.add(i, articleItem);
                 listInteraction.notifyItemInserted(i);
                 return;
             }
@@ -550,33 +549,33 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
         updateTotalAndMyShare();
     }
 
-    protected final PurchaseAddEditItemIdentity[] getItemUsers() {
+    protected final PurchaseAddEditArticleIdentity[] getArticleIdentities() {
         final Set<String> identitiesIds = new HashSet<>(identities.size());
         for (Identity identity : identities) {
             identitiesIds.add(identity.getId());
         }
 
-        return getItemUsers(identitiesIds);
+        return getArticleIdentities(identitiesIds);
     }
 
-    protected final PurchaseAddEditItemIdentity[] getItemUsers(@NonNull Set<String> identities) {
+    protected final PurchaseAddEditArticleIdentity[] getArticleIdentities(@NonNull Set<String> identities) {
         final int size = this.identities.size();
-        final PurchaseAddEditItemIdentity[] itemUsersRow = new PurchaseAddEditItemIdentity[size];
+        final PurchaseAddEditArticleIdentity[] articleIdentities = new PurchaseAddEditArticleIdentity[size];
         for (int i = 0; i < size; i++) {
             final Identity identity = this.identities.get(i);
             final String id = identity.getId();
-            itemUsersRow[i] = new PurchaseAddEditItemIdentity(id, identity.getNickname(),
+            articleIdentities[i] = new PurchaseAddEditArticleIdentity(id, identity.getNickname(),
                     identity.getAvatar(), identities.contains(id));
         }
 
-        return itemUsersRow;
+        return articleIdentities;
     }
 
 
     @Override
-    public void onItemDismiss(int position) {
+    public void onArticleDismiss(int position) {
         items.remove(position);
-        if (getItemViewType(position) != Type.USERS) {
+        if (getItemViewType(position) != Type.IDENTITIES) {
             listInteraction.notifyItemRemoved(position);
         } else {
             items.remove(position);
@@ -586,55 +585,55 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
     }
 
     @Override
-    public void onItemRowUserClick() {
+    public void onArticleRowIdentityClick() {
         for (int i = 0, mItemsSize = items.size(); i < mItemsSize; i++) {
             final PurchaseAddEditItemModel itemModel = items.get(i);
-            if (itemModel.getType() != Type.USERS) {
+            if (itemModel.getType() != Type.IDENTITIES) {
                 continue;
             }
 
-            final PurchaseAddEditItem addEditItem = (PurchaseAddEditItem) getItemAtPosition(i - 1);
-            addEditItem.notifyPropertyChanged(BR.identities);
+            final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) getItemAtPosition(i - 1);
+            articleItem.notifyPropertyChanged(BR.identities);
         }
 
         updateTotalAndMyShare();
     }
 
     @Override
-    public void onItemRowUserLongClick(@NonNull PurchaseAddEditItemIdentity userClicked) {
+    public void onArticleRowIdentityLongClick(@NonNull PurchaseAddEditArticleIdentity userClicked) {
         for (PurchaseAddEditItemModel itemModel : items) {
-            if (itemModel.getType() != Type.ITEM) {
+            if (itemModel.getType() != Type.ARTICLE) {
                 continue;
             }
 
-            final PurchaseAddEditItem addEditItem = (PurchaseAddEditItem) itemModel;
-            addEditItem.toggleUser(userClicked);
-            addEditItem.notifyPropertyChanged(BR.identities);
+            final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) itemModel;
+            articleItem.toggleUser(userClicked);
+            articleItem.notifyPropertyChanged(BR.identities);
         }
 
         updateTotalAndMyShare();
     }
 
     @Override
-    public void onToggleUsersClick(@NonNull PurchaseAddEditItem itemModel) {
+    public void onToggleIdentitiesClick(@NonNull PurchaseAddEditArticleItem itemModel) {
         final int insertPos = items.indexOf(itemModel) + 1;
         if (items.size() < insertPos) {
-            expandItemRow(insertPos, itemModel);
-        } else if (getItemViewType(insertPos) == Type.USERS) {
-            collapseItemRow(insertPos);
+            expandArticleRow(insertPos, itemModel);
+        } else if (getItemViewType(insertPos) == Type.IDENTITIES) {
+            collapseArticleRow(insertPos);
         } else {
-            expandItemRow(insertPos, itemModel);
+            expandArticleRow(insertPos, itemModel);
         }
     }
 
-    private void collapseItemRow(int pos) {
+    private void collapseArticleRow(int pos) {
         items.remove(pos);
         listInteraction.notifyItemRemoved(pos);
     }
 
-    private void expandItemRow(int pos, PurchaseAddEditItemModel parent) {
-        final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) parent;
-        items.add(pos, new PurchaseAddEditItemIdentities(purchaseAddEditItem.getIdentities()));
+    private void expandArticleRow(int pos, PurchaseAddEditItemModel parent) {
+        final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) parent;
+        items.add(pos, new PurchaseAddEditArticleIdentitiesItem(articleItem.getIdentities()));
         listInteraction.notifyItemInserted(pos);
 
         collapseOtherItemRows(pos);
@@ -644,7 +643,7 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
         int pos = 0;
         for (Iterator<PurchaseAddEditItemModel> iterator = items.iterator(); iterator.hasNext(); ) {
             final int type = iterator.next().getType();
-            if (type == Type.USERS && pos != insertPos) {
+            if (type == Type.IDENTITIES && pos != insertPos) {
                 iterator.remove();
                 listInteraction.notifyItemRemoved(pos);
             }
@@ -657,10 +656,10 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
     public void onAddRowClick(@NonNull PurchaseAddEditItemModel itemModel) {
         final int position = items.indexOf(itemModel);
 
-        final PurchaseAddEditItem purchaseAddEditItem = new PurchaseAddEditItem(getItemUsers());
-        purchaseAddEditItem.setMoneyFormatter(moneyFormatter);
-        purchaseAddEditItem.setPriceChangedListener(this);
-        items.add(position, purchaseAddEditItem);
+        final PurchaseAddEditArticleItem articleItem = new PurchaseAddEditArticleItem(getArticleIdentities());
+        articleItem.setMoneyFormatter(moneyFormatter);
+        articleItem.setPriceChangedListener(this);
+        items.add(position, articleItem);
         listInteraction.notifyItemInserted(position);
         listInteraction.scrollToPosition(position + 1);
     }
@@ -732,13 +731,13 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
         boolean hasItem = false;
         boolean allValid = true;
         for (PurchaseAddEditItemModel addEditItem : items) {
-            if (addEditItem.getType() != Type.ITEM) {
+            if (addEditItem.getType() != Type.ARTICLE) {
                 continue;
             }
 
             hasItem = true;
-            final PurchaseAddEditItem itemRow = (PurchaseAddEditItem) addEditItem;
-            if (!itemRow.validateFields()) {
+            final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) addEditItem;
+            if (!articleItem.validateFields()) {
                 allValid = false;
             }
         }
@@ -772,21 +771,21 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
     @NonNull
     private Purchase getPurchase(final boolean isDraft) {
         final List<String> purchaseIdentities = new ArrayList<>();
-        final List<Item> purchaseItems = new ArrayList<>();
+        final List<Article> purchaseArticles = new ArrayList<>();
         final int fractionDigits = MoneyUtils.getFractionDigits(currency);
 
         for (PurchaseAddEditItemModel addEditItem : items) {
-            if (addEditItem.getType() != Type.ITEM) {
+            if (addEditItem.getType() != Type.ARTICLE) {
                 continue;
             }
 
-            final PurchaseAddEditItem itemModel = (PurchaseAddEditItem) addEditItem;
-            final String itemName = itemModel.getName();
+            final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) addEditItem;
+            final String itemName = articleItem.getName();
             final String name = itemName != null ? itemName : "";
-            final String price = itemModel.getPrice();
+            final String price = articleItem.getPrice();
 
             final List<String> identities = new ArrayList<>();
-            for (PurchaseAddEditItemIdentity row : itemModel.getIdentities()) {
+            for (PurchaseAddEditArticleIdentity row : articleItem.getIdentities()) {
                 if (row.isSelected()) {
                     final String identityId = row.getIdentityId();
                     identities.add(identityId);
@@ -797,11 +796,11 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
             }
 
             final double priceRounded = convertRoundItemPrice(price, fractionDigits);
-            final Item item = new Item(name, priceRounded, identities);
-            purchaseItems.add(item);
+            final Article article = new Article(name, priceRounded, identities);
+            purchaseArticles.add(article);
         }
 
-        return createPurchase(purchaseIdentities, purchaseItems, fractionDigits, isDraft);
+        return createPurchase(purchaseIdentities, purchaseArticles, fractionDigits, isDraft);
     }
 
     private double convertRoundItemPrice(@NonNull String priceText, int fractionDigits) {
@@ -836,12 +835,12 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
 
     @NonNull
     protected Purchase createPurchase(@NonNull List<String> purchaseIdentities,
-                                      @NonNull List<Item> purchaseItems,
+                                      @NonNull List<Article> purchaseArticles,
                                       int fractionDigits, boolean isDraft) {
         final double total = convertRoundTotal(fractionDigits);
         return new Purchase(currentIdentity.getGroup(), currentIdentity.getId(), date, store,
                 total, currency, exchangeRate, receipt, note, isDraft, null,
-                purchaseIdentities, purchaseItems);
+                purchaseIdentities, purchaseArticles);
     }
 
     final double convertRoundTotal(int fractionDigits) {

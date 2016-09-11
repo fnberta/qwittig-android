@@ -50,13 +50,13 @@ public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditVi
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                viewModel.onItemDismiss(viewHolder.getAdapterPosition());
+                viewModel.onArticleDismiss(viewHolder.getAdapterPosition());
             }
 
             @Override
             public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 final int position = viewHolder.getAdapterPosition();
-                if (viewModel.getItemViewType(position) != Type.ITEM) {
+                if (viewModel.getItemViewType(position) != Type.ARTICLE) {
                     return 0;
                 }
 

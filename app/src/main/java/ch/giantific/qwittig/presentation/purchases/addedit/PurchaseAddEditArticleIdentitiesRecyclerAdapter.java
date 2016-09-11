@@ -12,24 +12,24 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import ch.giantific.qwittig.databinding.RowPurchaseAddItemUsersUserBinding;
+import ch.giantific.qwittig.databinding.RowPurchaseAddEditArticleIdentityBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleIdentity;
 
 /**
  * Provides an adapter for a {@link RecyclerView} showing a list of users.
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter<PurchaseAddEditItemUsersRecyclerAdapter.ItemUserRow>
-        implements PurchaseAddEditItemUsersClickListener {
+public class PurchaseAddEditArticleIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<PurchaseAddEditArticleIdentitiesRecyclerAdapter.ItemUserRow>
+        implements PurchaseAddEditArticleIdentitiesClickListener {
 
     private final PurchaseAddEditViewModel viewModel;
-    private final List<PurchaseAddEditItemIdentity> identities;
+    private final List<PurchaseAddEditArticleIdentity> identities;
 
-    public PurchaseAddEditItemUsersRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel,
-                                                   @NonNull List<PurchaseAddEditItemIdentity> identities) {
+    public PurchaseAddEditArticleIdentitiesRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel,
+                                                           @NonNull List<PurchaseAddEditArticleIdentity> identities) {
         this.viewModel = viewModel;
         this.identities = identities;
     }
@@ -37,15 +37,15 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
     @Override
     public ItemUserRow onCreateViewHolder(ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        final RowPurchaseAddItemUsersUserBinding binding =
-                RowPurchaseAddItemUsersUserBinding.inflate(inflater, parent, false);
+        final RowPurchaseAddEditArticleIdentityBinding binding =
+                RowPurchaseAddEditArticleIdentityBinding.inflate(inflater, parent, false);
         return new ItemUserRow(binding, this);
     }
 
     @Override
     public void onBindViewHolder(ItemUserRow holder, int position) {
-        final RowPurchaseAddItemUsersUserBinding binding = holder.getBinding();
-        final PurchaseAddEditItemIdentity addEditPurchaseItemUsersUser = identities.get(position);
+        final RowPurchaseAddEditArticleIdentityBinding binding = holder.getBinding();
+        final PurchaseAddEditArticleIdentity addEditPurchaseItemUsersUser = identities.get(position);
         binding.setItemModel(addEditPurchaseItemUsersUser);
         binding.executePendingBindings();
     }
@@ -57,21 +57,21 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onItemRowIdentityClick(int position) {
-        final PurchaseAddEditItemIdentity user = identities.get(position);
+        final PurchaseAddEditArticleIdentity user = identities.get(position);
         user.setSelected(!user.isSelected());
         notifyItemChanged(position);
 
         // notify main view model because total and my share values need to be updated
-        viewModel.onItemRowUserClick();
+        viewModel.onArticleRowIdentityClick();
     }
 
     @Override
     public void onItemRowIdentityLongClick(int position) {
-        final PurchaseAddEditItemIdentity identity = identities.get(position);
+        final PurchaseAddEditArticleIdentity identity = identities.get(position);
         identity.setSelected(!identity.isSelected());
         notifyItemChanged(position);
 
-        viewModel.onItemRowUserLongClick(identity);
+        viewModel.onArticleRowIdentityLongClick(identity);
     }
 
     /**
@@ -79,10 +79,10 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
      * <p/>
      * Subclass of {@link BindingRow}.
      */
-    public static class ItemUserRow extends BindingRow<RowPurchaseAddItemUsersUserBinding> {
+    public static class ItemUserRow extends BindingRow<RowPurchaseAddEditArticleIdentityBinding> {
 
-        public ItemUserRow(@NonNull RowPurchaseAddItemUsersUserBinding binding,
-                           @NonNull final PurchaseAddEditItemUsersClickListener listener) {
+        public ItemUserRow(@NonNull RowPurchaseAddEditArticleIdentityBinding binding,
+                           @NonNull final PurchaseAddEditArticleIdentitiesClickListener listener) {
             super(binding);
 
             final View root = binding.getRoot();

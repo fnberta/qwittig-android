@@ -15,7 +15,6 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,7 +33,7 @@ import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleIdentity;
 import ch.giantific.qwittig.presentation.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
 import ch.giantific.qwittig.presentation.stats.widgets.BarChart;
@@ -147,16 +146,16 @@ public class BindingAdapters {
                 .into(view);
     }
 
-    @BindingAdapter({"itemUsers"})
-    public static void loadItemUsers(ImageView view, PurchaseAddEditItemIdentity[] users) {
+    @BindingAdapter({"articleIdentities"})
+    public static void loadItemUsers(ImageView view, PurchaseAddEditArticleIdentity[] users) {
         final Context context = view.getContext();
         final int padding = context.getResources().getDimensionPixelSize(R.dimen.small_space);
         final Drawable fallback = ContextCompat.getDrawable(view.getContext(), R.drawable.ic_group_black_24dp);
         int selected = 0;
-        PurchaseAddEditItemIdentity selectedUser = null;
-        for (PurchaseAddEditItemIdentity user : users) {
+        PurchaseAddEditArticleIdentity articleIdentity = null;
+        for (PurchaseAddEditArticleIdentity user : users) {
             if (user.isSelected()) {
-                selectedUser = user;
+                articleIdentity = user;
                 selected++;
                 if (selected > 1) {
                     view.setPadding(0, padding, padding, padding);
@@ -166,12 +165,12 @@ public class BindingAdapters {
             }
         }
 
-        if (selectedUser == null) {
+        if (articleIdentity == null) {
             view.setPadding(0, 0, 0, 0);
             view.setImageResource(R.drawable.empty_circle);
         } else {
             Glide.with(context)
-                    .load(selectedUser.getAvatar())
+                    .load(articleIdentity.getAvatar())
                     .asBitmap()
                     .error(fallback)
                     .into(new BitmapImageViewTarget(view) {

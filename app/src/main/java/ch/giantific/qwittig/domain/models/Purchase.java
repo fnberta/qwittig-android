@@ -35,7 +35,7 @@ public class Purchase implements FirebaseModel {
     public static final String PATH_DRAFT = "draft";
     public static final String PATH_OCR_DATA = "ocrData";
     public static final String PATH_IDENTITIES = "identities";
-    public static final String PATH_ITEMS = "items";
+    public static final String PATH_ARTICLES = "articles";
     public static final String PATH_READ_BY = "readBy";
 
     private String id;
@@ -52,7 +52,7 @@ public class Purchase implements FirebaseModel {
     private boolean draft;
     private String ocrData;
     private Map<String, Boolean> identities;
-    private List<Item> items;
+    private List<Article> articles;
     private Map<String, Boolean> readBy;
 
     public Purchase() {
@@ -63,7 +63,7 @@ public class Purchase implements FirebaseModel {
                     @Nullable String store, double total, @NonNull String currency,
                     double exchangeRate, @Nullable String receipt, @Nullable String note,
                     boolean draft, @Nullable String ocrData,
-                    @NonNull List<String> identities, @NonNull List<Item> items) {
+                    @NonNull List<String> identities, @NonNull List<Article> articles) {
         this.group = group;
         this.buyer = buyer;
         this.date = date.getTime();
@@ -79,7 +79,7 @@ public class Purchase implements FirebaseModel {
         for (String id : identities) {
             this.identities.put(id, true);
         }
-        this.items = items;
+        this.articles = articles;
         readBy = new HashMap<>();
         readBy.put(buyer, true);
     }
@@ -163,8 +163,8 @@ public class Purchase implements FirebaseModel {
         return identities.keySet();
     }
 
-    public List<Item> getItems() {
-        return items;
+    public List<Article> getArticles() {
+        return articles;
     }
 
     public Map<String, Boolean> getReadBy() {
@@ -210,10 +210,10 @@ public class Purchase implements FirebaseModel {
     @Exclude
     public double calculateUserShare(@NonNull String identityId) {
         double userShare = 0;
-        for (Item item : items) {
-            final Set<String> identitiesIds = item.getIdentitiesIds();
+        for (Article article : articles) {
+            final Set<String> identitiesIds = article.getIdentitiesIds();
             if (identitiesIds.contains(identityId)) {
-                userShare += (item.getPrice() * exchangeRate / identitiesIds.size());
+                userShare += (article.getPrice() * exchangeRate / identitiesIds.size());
             }
         }
 
@@ -236,11 +236,11 @@ public class Purchase implements FirebaseModel {
         result.put(PATH_DRAFT, draft);
         result.put(PATH_OCR_DATA, ocrData);
         result.put(PATH_IDENTITIES, identities);
-        final List<Map<String, Object>> items = new ArrayList<>();
-        for (Item item : this.items) {
-            items.add(item.toMap());
+        final List<Map<String, Object>> articles = new ArrayList<>();
+        for (Article article : this.articles) {
+            articles.add(article.toMap());
         }
-        result.put(PATH_ITEMS, items);
+        result.put(PATH_ARTICLES, articles);
         result.put(PATH_READ_BY, readBy);
 
         return result;

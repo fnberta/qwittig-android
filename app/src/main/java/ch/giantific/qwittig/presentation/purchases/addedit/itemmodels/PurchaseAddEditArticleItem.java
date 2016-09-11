@@ -22,17 +22,17 @@ import ch.giantific.qwittig.BR;
 /**
  * Provides a purchase list item in the add or edit purchase screen.
  */
-public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEditItemModel {
+public class PurchaseAddEditArticleItem extends BaseObservable implements PurchaseAddEditItemModel {
 
-    public static final Creator<PurchaseAddEditItem> CREATOR = new Creator<PurchaseAddEditItem>() {
+    public static final Creator<PurchaseAddEditArticleItem> CREATOR = new Creator<PurchaseAddEditArticleItem>() {
         @Override
-        public PurchaseAddEditItem createFromParcel(Parcel source) {
-            return new PurchaseAddEditItem(source);
+        public PurchaseAddEditArticleItem createFromParcel(Parcel source) {
+            return new PurchaseAddEditArticleItem(source);
         }
 
         @Override
-        public PurchaseAddEditItem[] newArray(int size) {
-            return new PurchaseAddEditItem[size];
+        public PurchaseAddEditArticleItem[] newArray(int size) {
+            return new PurchaseAddEditArticleItem[size];
         }
     };
     private PriceChangedListener priceChangedListener;
@@ -40,24 +40,24 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
     private boolean validate;
     private String name;
     private String price;
-    private PurchaseAddEditItemIdentity[] identities;
+    private PurchaseAddEditArticleIdentity[] identities;
 
-    public PurchaseAddEditItem(@NonNull PurchaseAddEditItemIdentity[] identities) {
+    public PurchaseAddEditArticleItem(@NonNull PurchaseAddEditArticleIdentity[] identities) {
         this("", "", identities);
     }
 
-    public PurchaseAddEditItem(@NonNull String name, @NonNull String price,
-                               @NonNull PurchaseAddEditItemIdentity[] identities) {
+    public PurchaseAddEditArticleItem(@NonNull String name, @NonNull String price,
+                                      @NonNull PurchaseAddEditArticleIdentity[] identities) {
         this.name = name;
         this.price = price;
         this.identities = identities;
     }
 
-    private PurchaseAddEditItem(Parcel in) {
+    private PurchaseAddEditArticleItem(Parcel in) {
         validate = in.readByte() != 0;
         name = in.readString();
         price = in.readString();
-        identities = in.createTypedArray(PurchaseAddEditItemIdentity.CREATOR);
+        identities = in.createTypedArray(PurchaseAddEditArticleIdentity.CREATOR);
     }
 
     public void setPriceChangedListener(@NonNull PriceChangedListener priceChangedListener) {
@@ -111,17 +111,17 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
     }
 
     @Bindable
-    public PurchaseAddEditItemIdentity[] getIdentities() {
+    public PurchaseAddEditArticleIdentity[] getIdentities() {
         return identities;
     }
 
-    public void setIdentities(@NonNull PurchaseAddEditItemIdentity[] identities) {
+    public void setIdentities(@NonNull PurchaseAddEditArticleIdentity[] identities) {
         this.identities = identities;
     }
 
-    public void toggleUser(@NonNull PurchaseAddEditItemIdentity userClicked) {
+    public void toggleUser(@NonNull PurchaseAddEditArticleIdentity userClicked) {
         final boolean isSelected = userClicked.isSelected();
-        for (PurchaseAddEditItemIdentity user : identities) {
+        for (PurchaseAddEditArticleIdentity user : identities) {
             if (Objects.equals(user.getIdentityId(), userClicked.getIdentityId())) {
                 user.setSelected(isSelected);
             }
@@ -174,7 +174,7 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
 
     public List<String> getSelectedIdentitiesIds() {
         final List<String> userIds = new ArrayList<>();
-        for (PurchaseAddEditItemIdentity user : identities) {
+        for (PurchaseAddEditArticleIdentity user : identities) {
             if (user.isSelected()) {
                 userIds.add(user.getIdentityId());
             }
@@ -184,7 +184,7 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
 
     @Override
     public int getType() {
-        return Type.ITEM;
+        return Type.ARTICLE;
     }
 
     @Override

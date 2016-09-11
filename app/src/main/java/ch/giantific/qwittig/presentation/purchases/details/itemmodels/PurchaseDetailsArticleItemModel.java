@@ -11,27 +11,27 @@ import android.support.annotation.NonNull;
 import java.text.NumberFormat;
 import java.util.Set;
 
-import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.Article;
 
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
 /**
- * Provides an implementation of the {@link PurchaseDetailsItemModel} for a purchase item.
+ * Provides an implementation of the {@link PurchaseDetailsArticleItemModel} for a purchase item.
  */
-public class PurchaseDetailsItemModel extends BaseObservable {
+public class PurchaseDetailsArticleItemModel extends BaseObservable {
 
     private final String name;
     private final String price;
     private final float alpha;
     private final float percentage;
 
-    public PurchaseDetailsItemModel(@NonNull Item item,
-                                    @NonNull String currentIdentityId,
-                                    @NonNull NumberFormat numberFormat) {
-        name = item.getName();
-        price = numberFormat.format(item.getPrice());
+    public PurchaseDetailsArticleItemModel(@NonNull Article article,
+                                           @NonNull String currentIdentityId,
+                                           @NonNull NumberFormat numberFormat) {
+        name = article.getName();
+        price = numberFormat.format(article.getPrice());
 
-        final Set<String> identities = item.getIdentitiesIds();
+        final Set<String> identities = article.getIdentitiesIds();
         if (identities.contains(currentIdentityId)) {
             alpha = 1f;
             percentage = (1f / identities.size()) * 100;

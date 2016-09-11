@@ -14,7 +14,7 @@ import java.util.Set;
  * Created by fabio on 02.07.16.
  */
 @IgnoreExtraProperties
-public class Item {
+public class Article {
 
     public static final String PATH_NAME = "name";
     public static final String PATH_PRICE = "price";
@@ -24,11 +24,11 @@ public class Item {
     private double price;
     private Map<String, Boolean> identities;
 
-    public Item() {
+    public Article() {
         // required for firebase de-/serialization
     }
 
-    public Item(@NonNull String name, double price, @NonNull List<String> identities) {
+    public Article(@NonNull String name, double price, @NonNull List<String> identities) {
         this.name = name;
         this.price = price;
         this.identities = new HashMap<>();

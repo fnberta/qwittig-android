@@ -15,7 +15,7 @@
 
         <variable
             name="itemModel"
-            type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleItem"
             />
 
         <variable
@@ -41,8 +41,8 @@
             android:layout_marginStart="@dimen/key_line_1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/header_users"
-            android:onClick="@{() -> viewModel.onToggleUsersClick(itemModel)}"
-            app:itemUsers="@{itemModel.identities}"
+            android:onClick="@{() -> viewModel.onToggleIdentitiesClick(itemModel)}"
+            app:articleIdentities="@{itemModel.identities}"
             />
 
         <LinearLayout

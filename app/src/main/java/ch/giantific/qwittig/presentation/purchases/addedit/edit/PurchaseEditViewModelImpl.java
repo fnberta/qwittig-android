@@ -21,13 +21,13 @@ import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.Article;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddViewModelImpl;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -100,8 +100,8 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
                         if (oldValuesSet) {
                             updateRows();
                         } else {
-                            setOldPurchaseValues(purchase);
-                            setOldItemValues();
+                            setOldPurchase(purchase);
+                            setOldArticles();
                             oldValuesSet = true;
                         }
                     }
@@ -119,7 +119,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
         return purchaseRepo.getPurchase(editPurchaseId);
     }
 
-    private void setOldPurchaseValues(@NonNull Purchase purchase) {
+    private void setOldPurchase(@NonNull Purchase purchase) {
         setNote(purchase.getNote());
         view.reloadOptionsMenu();
 
@@ -130,17 +130,17 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
         setReceipt(purchase.getReceipt());
     }
 
-    private void setOldItemValues() {
-        final List<Item> oldItems = editPurchase.getItems();
-        for (Item item : oldItems) {
-            final Set<String> identities = item.getIdentitiesIds();
-            final String price = moneyFormatter.format(item.getPriceForeign(exchangeRate));
-            final PurchaseAddEditItem purchaseAddEditItem =
-                    new PurchaseAddEditItem(item.getName(), price, getItemUsers(identities));
-            purchaseAddEditItem.setMoneyFormatter(moneyFormatter);
-            purchaseAddEditItem.setPriceChangedListener(this);
+    private void setOldArticles() {
+        final List<Article> oldArticles = editPurchase.getArticles();
+        for (Article article : oldArticles) {
+            final Set<String> identities = article.getIdentitiesIds();
+            final String price = moneyFormatter.format(article.getPriceForeign(exchangeRate));
+            final PurchaseAddEditArticleItem articleItem =
+                    new PurchaseAddEditArticleItem(article.getName(), price, getArticleIdentities(identities));
+            articleItem.setMoneyFormatter(moneyFormatter);
+            articleItem.setPriceChangedListener(this);
             final int pos = getItemCount() - 2;
-            items.add(pos, purchaseAddEditItem);
+            items.add(pos, articleItem);
             listInteraction.notifyItemInserted(pos);
         }
     }
@@ -183,33 +183,33 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
             return true;
         }
 
-        final List<Item> oldItems = editPurchase.getItems();
+        final List<Article> oldArticles = editPurchase.getArticles();
         for (int i = 0, size = items.size(), skipCount = 0; i < size; i++) {
             final PurchaseAddEditItemModel addEditItem = items.get(i);
-            if (addEditItem.getType() != Type.ITEM) {
+            if (addEditItem.getType() != Type.ARTICLE) {
                 skipCount++;
                 continue;
             }
 
-            final Item itemOld;
+            final Article articleOld;
             try {
-                itemOld = oldItems.get(i - skipCount);
+                articleOld = oldArticles.get(i - skipCount);
             } catch (IndexOutOfBoundsException e) {
                 return true;
             }
-            final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) addEditItem;
-            if (!Objects.equals(itemOld.getName(), purchaseAddEditItem.getName())) {
+            final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) addEditItem;
+            if (!Objects.equals(articleOld.getName(), articleItem.getName())) {
                 return true;
             }
 
-            final double oldPrice = itemOld.getPriceForeign(editPurchase.getExchangeRate());
-            final double newPrice = purchaseAddEditItem.parsePrice();
+            final double oldPrice = articleOld.getPriceForeign(editPurchase.getExchangeRate());
+            final double newPrice = articleItem.parsePrice();
             if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
                 return true;
             }
 
-            final Set<String> identitiesOld = itemOld.getIdentitiesIds();
-            final List<String> identitiesNew = purchaseAddEditItem.getSelectedIdentitiesIds();
+            final Set<String> identitiesOld = articleOld.getIdentitiesIds();
+            final List<String> identitiesNew = articleItem.getSelectedIdentitiesIds();
             if (!identitiesNew.containsAll(identitiesOld) ||
                     !identitiesOld.containsAll(identitiesNew)) {
                 return true;

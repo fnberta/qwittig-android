@@ -20,12 +20,12 @@ import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.Article;
 import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleItem;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
@@ -120,13 +120,13 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
             for (Map<String, Object> item : items) {
                 final String price = moneyFormatter.format(item.get("price"));
                 final String name = (String) item.get("name");
-                final PurchaseAddEditItem purchaseAddEditItem =
-                        new PurchaseAddEditItem(name, price, getItemUsers());
-                purchaseAddEditItem.setMoneyFormatter(moneyFormatter);
-                purchaseAddEditItem.setPriceChangedListener(this);
+                final PurchaseAddEditArticleItem articleItem =
+                        new PurchaseAddEditArticleItem(name, price, getArticleIdentities());
+                articleItem.setMoneyFormatter(moneyFormatter);
+                articleItem.setPriceChangedListener(this);
                 final int pos = getItemCount() - 2;
-                this.items.add(pos, purchaseAddEditItem);
-                listInteraction.notifyItemInserted(this.items.indexOf(purchaseAddEditItem));
+                this.items.add(pos, articleItem);
+                listInteraction.notifyItemInserted(this.items.indexOf(articleItem));
             }
         }
     }
@@ -134,12 +134,12 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
     @NonNull
     @Override
     protected Purchase createPurchase(@NonNull List<String> purchaseIdentities,
-                                      @NonNull List<Item> purchaseItems, int fractionDigits,
+                                      @NonNull List<Article> purchaseArticles, int fractionDigits,
                                       boolean isDraft) {
         final double total = convertRoundTotal(fractionDigits);
         return new Purchase(currentIdentity.getGroup(), currentIdentity.getId(), date, store,
                 total, currency, exchangeRate, receipt, note, isDraft, ocrDataId,
-                purchaseIdentities, purchaseItems);
+                purchaseIdentities, purchaseArticles);
     }
 
     protected void savePurchase(@NonNull Purchase purchase, boolean asDraft) {

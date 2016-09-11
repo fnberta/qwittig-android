@@ -293,11 +293,6 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     }
 
     @Override
-    public void showPurchaseItems() {
-        getSupportFragmentManager().popBackStack();
-    }
-
-    @Override
     public void reloadOptionsMenu() {
         invalidateOptionsMenu();
     }
