@@ -39,19 +39,17 @@ public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> impl
         super(context, VIEW_RESOURCE, viewModel.getIdentities());
     }
 
-    @Nullable
+    @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, false);
     }
 
-    @Nullable
     @Override
     public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, true);
     }
 
-    @Nullable
     private View getCustomView(int position, @Nullable View convertView, @NonNull ViewGroup parent,
                                boolean isDropDown) {
         final GroupRow groupRow;
@@ -66,7 +64,10 @@ public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> impl
             groupRow = (GroupRow) convertView.getTag();
         }
 
-        groupRow.setGroup(getItem(position).getGroupName());
+        final Identity identity = getItem(position);
+        if (identity != null) {
+            groupRow.setGroup(identity.getGroupName());
+        }
 
         return convertView;
     }

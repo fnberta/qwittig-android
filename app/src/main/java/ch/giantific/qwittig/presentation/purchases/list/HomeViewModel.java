@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.purchases.list;
 
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 
 import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;

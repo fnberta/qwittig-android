@@ -13,7 +13,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.View;
 
 import java.util.Arrays;
 import java.util.List;

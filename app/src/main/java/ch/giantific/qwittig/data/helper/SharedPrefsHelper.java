@@ -18,7 +18,7 @@ public class SharedPrefsHelper {
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
 
-    private SharedPreferences sharedPrefs;
+    private final SharedPreferences sharedPrefs;
 
     @Inject
     public SharedPrefsHelper(@NonNull SharedPreferences sharedPrefs) {

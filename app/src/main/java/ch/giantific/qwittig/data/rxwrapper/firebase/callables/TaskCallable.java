@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 
 public class TaskCallable<T> implements Callable<T> {
 
-    private Task<T> task;
+    private final Task<T> task;
 
     public TaskCallable(@NonNull Task<T> task) {
         this.task = task;

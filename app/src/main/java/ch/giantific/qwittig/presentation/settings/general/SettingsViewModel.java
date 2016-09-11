@@ -13,12 +13,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
-import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 
 /**
  * Defines an observable view model for the main settings screen.

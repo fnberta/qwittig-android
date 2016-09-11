@@ -7,9 +7,6 @@ package ch.giantific.qwittig.presentation.stats.widgets;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.Legend.LegendPosition;
-
 /**
  * Provides a pie char with sensible default settings already set.
  * <p/>

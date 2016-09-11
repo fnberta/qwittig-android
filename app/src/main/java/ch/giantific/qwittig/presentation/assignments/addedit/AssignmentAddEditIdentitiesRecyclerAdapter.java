@@ -9,13 +9,12 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowAssignmentAddEditIdentityBinding;
+import ch.giantific.qwittig.presentation.assignments.addedit.itemmodels.AssignmentAddEditIdentityItemModel;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.assignments.addedit.itemmodels.AssignmentAddEditIdentityItemModel;
 
 
 /**

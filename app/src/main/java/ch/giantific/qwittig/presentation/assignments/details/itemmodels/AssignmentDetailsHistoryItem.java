@@ -24,8 +24,8 @@ public class AssignmentDetailsHistoryItem extends BaseObservable implements Assi
 
     private final Date eventDate;
     private final String eventDateText;
-    private String nickname;
-    private String avatar;
+    private final String nickname;
+    private final String avatar;
 
     public AssignmentDetailsHistoryItem(@NonNull AssignmentHistory assignmentHistory,
                                         @NonNull Identity identity) {

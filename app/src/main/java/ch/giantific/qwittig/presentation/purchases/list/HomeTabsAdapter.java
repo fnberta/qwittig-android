@@ -52,11 +52,6 @@ public class HomeTabsAdapter extends TabsAdapter {
         notifyDataSetChanged();
     }
 
-    @Override
-    public long getItemId(int position) {
-        return super.getItemId(position);
-    }
-
     @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     public int getItemPosition(Object object) {

@@ -38,7 +38,6 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     private static final String STATE_GROUP_NAME = "STATE_GROUP_NAME";
     private static final String STATE_GROUP_CURRENCY = "STATE_GROUP_CURRENCY";
 
-    private final RemoteConfigHelper configHelper;
     private final GroupRepository groupRepo;
     private final List<Currency> currencies;
     private Identity identity;
@@ -54,7 +53,6 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
                                         @Nullable GroupRepository groupRepo) {
         super(savedState, navigator, eventBus, userRepo);
 
-        this.configHelper = configHelper;
         this.groupRepo = groupRepo;
         currencies = configHelper.getSupportedCurrencies();
 

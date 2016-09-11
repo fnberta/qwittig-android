@@ -2,7 +2,6 @@ package ch.giantific.qwittig.data.rest;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
 import java.util.Map;
 
 /**

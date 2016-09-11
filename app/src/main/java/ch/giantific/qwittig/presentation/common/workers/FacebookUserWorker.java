@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,8 +23,6 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import rx.Observable;
-import rx.Single;
-import rx.functions.Func1;
 
 /**
  * Handles Google login sign out and unlink.

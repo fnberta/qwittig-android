@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.login;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -13,7 +12,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 
 import ch.giantific.qwittig.R;

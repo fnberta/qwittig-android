@@ -19,7 +19,6 @@ import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsItemModel;
 import ch.giantific.qwittig.presentation.common.itemmodels.BaseChildItemModel;
-import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link AssignmentDetailsItemModel} interface for a task item.

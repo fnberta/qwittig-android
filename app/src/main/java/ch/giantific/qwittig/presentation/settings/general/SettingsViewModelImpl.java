@@ -42,10 +42,10 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     private static final String STATE_CURRENT_IDENTITY_ID = "STATE_CURRENT_IDENTITY_ID";
 
     private final GroupRepository groupRepo;
+    private final ArrayList<String> identityIds;
+    private final ArrayList<String> groupNames;
     private FirebaseUser firebaseUser;
     private Identity currentIdentity;
-    private ArrayList<String> identityIds;
-    private ArrayList<String> groupNames;
     private String currentIdentityId;
 
     public SettingsViewModelImpl(@Nullable Bundle savedState,

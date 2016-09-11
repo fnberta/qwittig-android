@@ -8,17 +8,14 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 
 import com.google.android.gms.appinvite.AppInvite;
-import com.google.android.gms.appinvite.AppInviteInvitationResult;
 import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.Api.ApiOptions.NotRequiredOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 
 import timber.log.Timber;
 
@@ -31,10 +28,10 @@ public class GoogleApiClientDelegate {
     private static final String GOOGLE_SERVER_ID = "1032365366003-7rsbsnqc5b0504mmdt6j1n61m39lgllp.apps.googleusercontent.com";
 
     @Nullable
-    private GoogleLoginCallback loginCallback;
+    private final GoogleLoginCallback loginCallback;
     @Nullable
-    private GoogleInvitationCallback invitationCallback;
-    private FragmentActivity activity;
+    private final GoogleInvitationCallback invitationCallback;
+    private final FragmentActivity activity;
     private GoogleApiClient googleApiClient;
 
     public GoogleApiClientDelegate(@NonNull FragmentActivity activity,

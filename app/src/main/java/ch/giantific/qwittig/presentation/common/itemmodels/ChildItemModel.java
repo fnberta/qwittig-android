@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.presentation.common.itemmodels;
 
 import android.databinding.Observable;
-import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 

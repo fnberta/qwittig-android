@@ -18,7 +18,7 @@ import ch.giantific.qwittig.presentation.common.itemmodels.HeaderItemModelBaseIm
 public class AssignmentHeaderItem extends HeaderItemModelBaseImpl implements AssignmentItemModel {
 
     @Type
-    private int viewType;
+    private final int viewType;
 
     public AssignmentHeaderItem(@StringRes int header, @Type int viewType) {
         super(header);

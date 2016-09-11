@@ -23,8 +23,6 @@ import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.domain.models.Compensation;
 import rx.Observable;
 import rx.Single;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 /**
  * Created by fabio on 07.07.16.

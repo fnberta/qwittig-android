@@ -22,7 +22,6 @@ import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Article;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
@@ -33,8 +32,6 @@ import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAd
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
