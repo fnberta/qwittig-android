@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 import java.text.DateFormat;
 import java.util.Date;
 
-import ch.giantific.qwittig.domain.models.AssignmentHistoryEvent;
+import ch.giantific.qwittig.domain.models.AssignmentHistory;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.utils.DateUtils;
 
@@ -27,10 +27,10 @@ public class AssignmentDetailsHistoryItem extends BaseObservable implements Assi
     private String nickname;
     private String avatar;
 
-    public AssignmentDetailsHistoryItem(@NonNull AssignmentHistoryEvent assignmentHistoryEvent,
+    public AssignmentDetailsHistoryItem(@NonNull AssignmentHistory assignmentHistory,
                                         @NonNull Identity identity) {
         final DateFormat dateFormatter = DateUtils.getDateFormatter(false);
-        eventDate = assignmentHistoryEvent.getDateDate();
+        eventDate = assignmentHistory.getDateDate();
         eventDateText = dateFormatter.format(eventDate);
         nickname = identity.getNickname();
         avatar = identity.getAvatar();

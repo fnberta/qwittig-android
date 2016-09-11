@@ -25,12 +25,11 @@ import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
-import ch.giantific.qwittig.domain.models.AssignmentHistoryEvent;
+import ch.giantific.qwittig.domain.models.AssignmentHistory;
 import ch.giantific.qwittig.utils.DateUtils;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;
-import timber.log.Timber;
 
 /**
  * Created by fabio on 12.07.16.
@@ -93,19 +92,19 @@ public class AssignmentRepository {
     public void deleteAssignment(@NonNull String assignmentId) {
         final Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(Assignment.BASE_PATH + "/" + assignmentId, null);
-        childUpdates.put(AssignmentHistoryEvent.BASE_PATH + "/" + assignmentId, null);
+        childUpdates.put(AssignmentHistory.BASE_PATH + "/" + assignmentId, null);
         databaseRef.updateChildren(childUpdates);
     }
 
-    public void addHistoryEvent(@NonNull AssignmentHistoryEvent historyEvent,
-                                @NonNull String[] identitiesSorted,
-                                @NonNull String timeFrame) {
+    public void addHistory(@NonNull AssignmentHistory assignmentHistory,
+                           @NonNull String[] identitiesSorted,
+                           @NonNull String timeFrame) {
         final Map<String, Object> childUpdates = new HashMap<>();
 
         // add history event
-        final String assignmentId = historyEvent.getAssignment();
-        final String key = databaseRef.child(AssignmentHistoryEvent.BASE_PATH).child(assignmentId).push().getKey();
-        childUpdates.put(AssignmentHistoryEvent.BASE_PATH + "/" + assignmentId + "/" + key, historyEvent.toMap());
+        final String assignmentId = assignmentHistory.getAssignment();
+        final String key = databaseRef.child(AssignmentHistory.BASE_PATH).child(assignmentId).push().getKey();
+        childUpdates.put(AssignmentHistory.BASE_PATH + "/" + assignmentId + "/" + key, assignmentHistory.toMap());
 
         // update identities position
         final List<String> identityIds = Arrays.asList(identitiesSorted);
@@ -142,15 +141,9 @@ public class AssignmentRepository {
         databaseRef.updateChildren(childUpdates);
     }
 
-    public Observable<AssignmentHistoryEvent> getAssignmentHistoryEvents(@NonNull String assignmentId) {
-        final Query query = databaseRef.child(AssignmentHistoryEvent.BASE_PATH).child(assignmentId);
-        return RxFirebaseDatabase.observeValuesOnce(query, AssignmentHistoryEvent.class);
-    }
-
-    public Single<AssignmentHistoryEvent> getHistoryEvent(@NonNull String historyEventId,
-                                                          @NonNull String assignmentId) {
-        final Query query = databaseRef.child(AssignmentHistoryEvent.BASE_PATH).child(assignmentId).child(historyEventId);
-        return RxFirebaseDatabase.observeValueOnce(query, AssignmentHistoryEvent.class);
+    public Observable<AssignmentHistory> getAssignmentHistory(@NonNull String assignmentId) {
+        final Query query = databaseRef.child(AssignmentHistory.BASE_PATH).child(assignmentId);
+        return RxFirebaseDatabase.observeValuesOnce(query, AssignmentHistory.class);
     }
 
     public void remindResponsible(@NonNull String assignmentId) {

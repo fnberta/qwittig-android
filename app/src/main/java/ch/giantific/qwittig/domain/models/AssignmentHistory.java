@@ -18,9 +18,9 @@ import java.util.Map;
  * Represents an event when a user finished a assignment.
  */
 @IgnoreExtraProperties
-public class AssignmentHistoryEvent implements FirebaseModel {
+public class AssignmentHistory implements FirebaseModel {
 
-    public static final String BASE_PATH = "assignmentHistoryEvents";
+    public static final String BASE_PATH = "assignmentHistory";
 
     public static final String PATH_ASSIGNMENT = "assignment";
     public static final String PATH_IDENTITY = "identity";
@@ -32,13 +32,13 @@ public class AssignmentHistoryEvent implements FirebaseModel {
     private String identity;
     private long date;
 
-    public AssignmentHistoryEvent() {
+    public AssignmentHistory() {
         // required for firebase de-/serialization
     }
 
-    public AssignmentHistoryEvent(@NonNull String assignment,
-                                  @NonNull String identity,
-                                  @NonNull Date date) {
+    public AssignmentHistory(@NonNull String assignment,
+                             @NonNull String identity,
+                             @NonNull Date date) {
         this.assignment = assignment;
         this.identity = identity;
         this.date = date.getTime();

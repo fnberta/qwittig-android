@@ -27,7 +27,7 @@ import ch.giantific.qwittig.data.repositories.AssignmentRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
-import ch.giantific.qwittig.domain.models.AssignmentHistoryEvent;
+import ch.giantific.qwittig.domain.models.AssignmentHistory;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsHeaderItem;
@@ -202,14 +202,14 @@ public class AssignmentDetailsViewModelImpl extends ViewModelBaseImpl<Assignment
                 .flatMap(new Func1<List<Identity>, Observable<List<AssignmentDetailsHistoryItem>>>() {
                     @Override
                     public Observable<List<AssignmentDetailsHistoryItem>> call(final List<Identity> identities) {
-                        return assignmentRepo.getAssignmentHistoryEvents(assignmentId)
-                                .map(new Func1<AssignmentHistoryEvent, AssignmentDetailsHistoryItem>() {
+                        return assignmentRepo.getAssignmentHistory(assignmentId)
+                                .map(new Func1<AssignmentHistory, AssignmentDetailsHistoryItem>() {
                                     @Override
-                                    public AssignmentDetailsHistoryItem call(AssignmentHistoryEvent historyEvent) {
-                                        final String identityId = historyEvent.getIdentity();
+                                    public AssignmentDetailsHistoryItem call(AssignmentHistory assignmentHistory) {
+                                        final String identityId = assignmentHistory.getIdentity();
                                         for (Identity identity : identities) {
                                             if (Objects.equals(identityId, identity.getId())) {
-                                                return new AssignmentDetailsHistoryItem(historyEvent, identity);
+                                                return new AssignmentDetailsHistoryItem(assignmentHistory, identity);
                                             }
                                         }
 
@@ -320,9 +320,9 @@ public class AssignmentDetailsViewModelImpl extends ViewModelBaseImpl<Assignment
             return;
         }
 
-        final AssignmentHistoryEvent historyEvent = new AssignmentHistoryEvent(assignmentId,
+        final AssignmentHistory assignmentHistory = new AssignmentHistory(assignmentId,
                 currentIdentityId, new Date());
-        assignmentRepo.addHistoryEvent(historyEvent, assignment.getIdentityIdsSorted(),
+        assignmentRepo.addHistory(assignmentHistory, assignment.getIdentityIdsSorted(),
                 assignment.getTimeFrame());
     }
 }

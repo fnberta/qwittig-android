@@ -25,7 +25,7 @@ import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
-import ch.giantific.qwittig.domain.models.AssignmentHistoryEvent;
+import ch.giantific.qwittig.domain.models.AssignmentHistory;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItem;
@@ -247,9 +247,9 @@ public class AssignmentsViewModelImpl extends ListViewModelBaseImpl<AssignmentIt
             return;
         }
 
-        final AssignmentHistoryEvent newEvent = new AssignmentHistoryEvent(itemModel.getId(),
+        final AssignmentHistory newEvent = new AssignmentHistory(itemModel.getId(),
                 currentIdentityId, new Date());
-        assignmentRepo.addHistoryEvent(newEvent, itemModel.getIdentitiesSorted(),
+        assignmentRepo.addHistory(newEvent, itemModel.getIdentitiesSorted(),
                 itemModel.getTimeFrame());
     }
 
