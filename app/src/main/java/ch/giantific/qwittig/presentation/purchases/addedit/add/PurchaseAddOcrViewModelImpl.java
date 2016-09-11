@@ -115,9 +115,9 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
         }
         setReceipt(ocrData.getReceipt());
 
-        final List<Map<String, Object>> items = (List<Map<String, Object>>) data.get("items");
-        if (items != null && !items.isEmpty()) {
-            for (Map<String, Object> item : items) {
+        final List<Map<String, Object>> articles = (List<Map<String, Object>>) data.get("items");
+        if (articles != null && !articles.isEmpty()) {
+            for (Map<String, Object> item : articles) {
                 final String price = moneyFormatter.format(item.get("price"));
                 final String name = (String) item.get("name");
                 final PurchaseAddEditArticleItem articleItem =
