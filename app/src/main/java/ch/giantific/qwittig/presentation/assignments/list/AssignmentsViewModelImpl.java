@@ -21,13 +21,11 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.AssignmentRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.AssignmentHistory;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItem;
 import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItemModel;
 import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItemModel.Type;
@@ -37,7 +35,6 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link AssignmentsViewModel} interface.
@@ -95,12 +92,7 @@ public class AssignmentsViewModelImpl extends ListViewModelBaseImpl<AssignmentIt
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
-                    }
-                })
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -120,30 +112,15 @@ public class AssignmentsViewModelImpl extends ListViewModelBaseImpl<AssignmentIt
 
     private void addDataListener() {
         setDataListenerSub(assignmentRepo.observeAssignmentChildren(currentGroupId, currentIdentityId, deadline.getDate())
-                .filter(new Func1<RxChildEvent<Assignment>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Assignment> childEvent) {
-                        return initialDataLoaded;
-                    }
-                })
-                .flatMap(new Func1<RxChildEvent<Assignment>, Observable<AssignmentItemModel>>() {
-                    @Override
-                    public Observable<AssignmentItemModel> call(final RxChildEvent<Assignment> event) {
-                        return getItemModel(event.getValue(), event.getEventType(), currentIdentityId);
-                    }
-                })
+                .filter(childEvent -> initialDataLoaded)
+                .flatMap(event -> getItemModel(event.getValue(), event.getEventType(), currentIdentityId))
                 .subscribe(this)
         );
     }
 
     private void loadInitialData() {
         setInitialDataSub(assignmentRepo.getAssignments(currentGroupId, currentIdentityId, deadline.getDate())
-                        .flatMap(new Func1<Assignment, Observable<AssignmentItemModel>>() {
-                            @Override
-                            public Observable<AssignmentItemModel> call(Assignment assignment) {
-                                return getItemModel(assignment, EventType.NONE, currentIdentityId);
-                            }
-                        })
+                        .flatMap(assignment -> getItemModel(assignment, EventType.NONE, currentIdentityId))
                         .toList()
                         .subscribe(new Subscriber<List<AssignmentItemModel>>() {
                             @Override
@@ -170,23 +147,15 @@ public class AssignmentsViewModelImpl extends ListViewModelBaseImpl<AssignmentIt
     @NonNull
     private Observable<AssignmentItemModel> getItemModel(@NonNull final Assignment assignment,
                                                          final int eventType,
-                                                         @NonNull final String identityId) {
+                                                         @NonNull final String currentIdentityId) {
         final String[] identityIds = assignment.getIdentityIdsSorted();
         return Observable.from(identityIds)
-                .concatMap(new Func1<String, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(String identityId) {
-                        return userRepo.getIdentity(identityId).toObservable();
-                    }
-                })
+                .concatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
                 .toList()
-                .map(new Func1<List<Identity>, AssignmentItemModel>() {
-                    @Override
-                    public AssignmentItemModel call(List<Identity> identities) {
-                        final String upNext = view.buildUpNextString(identities);
-                        return new AssignmentItem(eventType, assignment, identities.get(0),
-                                getDeadlineText(assignment), upNext, identityId);
-                    }
+                .map(identities -> {
+                    final String upNext = view.buildUpNextString(identities);
+                    return new AssignmentItem(eventType, assignment, identities.get(0),
+                            getDeadlineText(assignment), upNext, currentIdentityId);
                 });
     }
 

@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.purchases.addedit;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
@@ -63,35 +62,17 @@ public class NoteDialogFragment extends BaseDialogFragment<NoteDialogFragment.Di
 
         dialogBuilder.setTitle(R.string.header_note)
                 .setView(binding.getRoot())
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final String note = binding.etDialogPurchaseNote.getText().toString();
-                        NoteDialogFragment.this.activity.onNoteSet(note);
-                    }
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    final String note1 = binding.etDialogPurchaseNote.getText().toString();
+                    this.activity.onNoteSet(note1);
                 });
 
         if (TextUtils.isEmpty(note)) {
-            dialogBuilder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dismiss();
-                }
-            });
+            dialogBuilder.setNegativeButton(android.R.string.no, (dialogInterface, i) -> dismiss());
         } else {
             dialogBuilder
-                    .setNeutralButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dismiss();
-                        }
-                    })
-                    .setNegativeButton(R.string.action_delete, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            NoteDialogFragment.this.activity.onDeleteNote();
-                        }
-                    });
+                    .setNeutralButton(android.R.string.no, (dialog, which) -> dismiss())
+                    .setNegativeButton(R.string.action_delete, (dialogInterface, i) -> this.activity.onDeleteNote());
         }
 
         return dialogBuilder.create();

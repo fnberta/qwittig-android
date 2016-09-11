@@ -21,11 +21,9 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.CompensationRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
@@ -35,7 +33,6 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.SingleSubscriber;
 import rx.Subscriber;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -89,12 +86,7 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompUnpaidIt
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
-                    }
-                })
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -117,30 +109,15 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompUnpaidIt
 
     private void addDataListener(@NonNull final String identityId) {
         setDataListenerSub(compsRepo.observeCompensationChildren(currentGroupId, identityId, false)
-                .filter(new Func1<RxChildEvent<Compensation>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Compensation> compensationRxChildEvent) {
-                        return initialDataLoaded;
-                    }
-                })
-                .flatMap(new Func1<RxChildEvent<Compensation>, Observable<CompUnpaidItemModel>>() {
-                    @Override
-                    public Observable<CompUnpaidItemModel> call(final RxChildEvent<Compensation> event) {
-                        return getItemModel(event.getValue(), event.getEventType(), identityId);
-                    }
-                })
+                .filter(compensationRxChildEvent -> initialDataLoaded)
+                .flatMap(event -> getItemModel(event.getValue(), event.getEventType(), identityId))
                 .subscribe(this)
         );
     }
 
     private void loadInitialData(@NonNull final String identityId) {
         getSubscriptions().add(compsRepo.getCompensations(currentGroupId, identityId, false)
-                .flatMap(new Func1<Compensation, Observable<CompUnpaidItemModel>>() {
-                    @Override
-                    public Observable<CompUnpaidItemModel> call(Compensation compensation) {
-                        return getItemModel(compensation, EventType.NONE, identityId);
-                    }
-                })
+                .flatMap(compensation -> getItemModel(compensation, EventType.NONE, identityId))
                 .toList()
                 .subscribe(new Subscriber<List<CompUnpaidItemModel>>() {
                     @Override
@@ -169,13 +146,8 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompUnpaidIt
         final String creditorId = compensation.getCreditor();
         final boolean isCredit = Objects.equals(creditorId, identityId);
         return userRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
-                .map(new Func1<Identity, CompUnpaidItemModel>() {
-                    @Override
-                    public CompUnpaidItemModel call(Identity identity) {
-                        return new CompUnpaidItemModel(eventType, compensation, identity,
-                                moneyFormatter, isCredit);
-                    }
-                })
+                .map(identity -> new CompUnpaidItemModel(eventType, compensation, identity,
+                        moneyFormatter, isCredit))
                 .toObservable();
     }
 

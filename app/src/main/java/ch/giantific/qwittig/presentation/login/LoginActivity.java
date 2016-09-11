@@ -147,12 +147,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
             case Navigator.INTENT_REQUEST_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
-                        @Override
-                        public void onAvatarSaved(@NonNull String path) {
-                            profileViewModel.onNewAvatarTaken(path);
-                        }
-                    });
+                    AvatarUtils.saveImageLocal(this, imageUri, path -> profileViewModel.onNewAvatarTaken(path));
                 }
         }
     }

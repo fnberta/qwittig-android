@@ -19,7 +19,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.CompensationRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -31,8 +30,6 @@ import ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompPaidItemMod
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link CompsPaidViewModel}.
@@ -72,12 +69,7 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompPaidItemMo
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(final User user) {
-                        return getMatchingIdentity(user);
-                    }
-                })
+                .flatMap(this::getMatchingIdentity)
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -100,58 +92,29 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompPaidItemMo
 
     private Observable<Identity> getMatchingIdentity(final User user) {
         return userRepo.getIdentity(user.getCurrentIdentity())
-                .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(Identity identity) {
-                        if (TextUtils.isEmpty(compGroupId)
-                                || Objects.equals(compGroupId, identity.getGroup())) {
-                            return Observable.just(identity);
-                        }
-
-                        return userRepo.switchGroup(user, compGroupId)
-                                .doOnNext(new Action1<Identity>() {
-                                    @Override
-                                    public void call(Identity identity) {
-                                        compGroupId = identity.getGroup();
-                                    }
-                                })
-                                .flatMap(new Func1<Identity, Observable<Identity>>() {
-                                    @Override
-                                    public Observable<Identity> call(Identity identity) {
-                                        return Observable.never();
-                                    }
-                                });
+                .flatMapObservable(identity -> {
+                    if (TextUtils.isEmpty(compGroupId)
+                            || Objects.equals(compGroupId, identity.getGroup())) {
+                        return Observable.just(identity);
                     }
+
+                    return userRepo.switchGroup(user, compGroupId)
+                            .doOnNext(newIdentity -> compGroupId = newIdentity.getGroup())
+                            .flatMap(newIdentity -> Observable.never());
                 });
     }
 
     private void addDataListener(@NonNull final String identityId) {
         setDataListenerSub(compsRepo.observeCompensationChildren(currentGroupId, identityId, true)
-                .filter(new Func1<RxChildEvent<Compensation>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Compensation> compensationRxChildEvent) {
-                        return initialDataLoaded;
-                    }
-                })
-                .flatMap(new Func1<RxChildEvent<Compensation>, Observable<CompPaidItemModel>>() {
-                    @Override
-                    public Observable<CompPaidItemModel> call(final RxChildEvent<Compensation> event) {
-                        return getItemModel(event.getValue(), event.getEventType(),
-                                identityId);
-                    }
-                })
+                .filter(compensationRxChildEvent -> initialDataLoaded)
+                .flatMap(event -> getItemModel(event.getValue(), event.getEventType(), identityId))
                 .subscribe(this)
         );
     }
 
     private void loadInitialData(@NonNull final String identityId) {
         setInitialDataSub(compsRepo.getCompensations(currentGroupId, identityId, true)
-                .flatMap(new Func1<Compensation, Observable<CompPaidItemModel>>() {
-                    @Override
-                    public Observable<CompPaidItemModel> call(Compensation compensation) {
-                        return getItemModel(compensation, EventType.NONE, identityId);
-                    }
-                })
+                .flatMap(compensation -> getItemModel(compensation, EventType.NONE, identityId))
                 .toList()
                 .subscribe(new Subscriber<List<CompPaidItemModel>>() {
                     @Override
@@ -180,14 +143,7 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompPaidItemMo
         final String creditorId = compensation.getCreditor();
         final boolean isCredit = Objects.equals(creditorId, identityId);
         return userRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
-                .map(new Func1<Identity, CompPaidItemModel>() {
-                    @Override
-                    public CompPaidItemModel call(Identity identity) {
-                        return new CompPaidItemModel(eventType, compensation, identity, isCredit,
-                                moneyFormatter
-                        );
-                    }
-                })
+                .map(identity -> new CompPaidItemModel(eventType, compensation, identity, isCredit, moneyFormatter))
                 .toObservable();
     }
 

@@ -133,24 +133,14 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
         switch (type) {
             case GoogleUserAction.SIGN_OUT: {
                 return userRepo.signOutGoogle(appContext)
-                        .doOnSuccess(new Action1<Void>() {
-                            @Override
-                            public void call(Void aVoid) {
-                                userRepo.signOut(firebaseUser);
-                            }
-                        })
+                        .doOnSuccess(aVoid -> userRepo.signOut(firebaseUser))
                         .toObservable();
             }
             case GoogleUserAction.DELETE: {
                 final String idToken = args.getString(KEY_ID_TOKEN, "");
                 final AuthCredential authCredential = GoogleAuthProvider.getCredential(idToken, null);
                 return userRepo.unlinkGoogle(appContext, firebaseUser, authCredential)
-                        .flatMap(new Func1<Void, Single<Void>>() {
-                            @Override
-                            public Single<Void> call(Void aVoid) {
-                                return userRepo.deleteUser(firebaseUser, authCredential);
-                            }
-                        })
+                        .flatMap(aVoid -> userRepo.deleteUser(firebaseUser, authCredential))
                         .toObservable();
             }
             case GoogleUserAction.UNLINK: {
@@ -160,12 +150,7 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
                 final AuthCredential oldCredential = GoogleAuthProvider.getCredential(idToken, null);
                 final AuthCredential newCredential = EmailAuthProvider.getCredential(email, password);
                 return userRepo.linkUserWithCredential(firebaseUser, oldCredential, newCredential)
-                        .flatMap(new Func1<AuthResult, Single<Void>>() {
-                            @Override
-                            public Single<Void> call(AuthResult authResult) {
-                                return userRepo.unlinkGoogle(appContext, firebaseUser, oldCredential);
-                            }
-                        })
+                        .flatMap(authResult -> userRepo.unlinkGoogle(appContext, firebaseUser, oldCredential))
                         .toObservable();
             }
             default:

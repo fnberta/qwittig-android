@@ -29,13 +29,8 @@ public class ChildEventsAsyncEmitter<T extends FirebaseModel> implements Action1
     @Override
     public void call(AsyncEmitter<RxChildEvent<T>> asyncEmitter) {
         final ChildEventListener childEventListener =
-                query.addChildEventListener(new RxChildEventListener<T>(asyncEmitter, type));
-        asyncEmitter.setCancellation(new AsyncEmitter.Cancellable() {
-            @Override
-            public void cancel() throws Exception {
-                query.removeEventListener(childEventListener);
-            }
-        });
+                query.addChildEventListener(new RxChildEventListener<>(asyncEmitter, type));
+        asyncEmitter.setCancellation(() -> query.removeEventListener(childEventListener));
     }
 
     private static class RxChildEventListener<T extends FirebaseModel> implements ChildEventListener {

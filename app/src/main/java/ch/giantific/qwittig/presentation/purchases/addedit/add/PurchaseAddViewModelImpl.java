@@ -487,36 +487,18 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
     @NonNull
     protected final Single<List<Identity>> getInitialChain(@NonNull FirebaseUser currentUser) {
         return userRepo.getUser(currentUser.getUid())
-                .flatMap(new Func1<User, Single<Identity>>() {
-                    @Override
-                    public Single<Identity> call(final User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity());
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()))
+                .doOnSuccess(identity -> {
+                    currentIdentity = identity;
+                    if (TextUtils.isEmpty(currency)) {
+                        setCurrency(identity.getGroupCurrency());
                     }
+                    moneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
                 })
-                .doOnSuccess(new Action1<Identity>() {
-                    @Override
-                    public void call(Identity identity) {
-                        currentIdentity = identity;
-                        if (TextUtils.isEmpty(currency)) {
-                            setCurrency(identity.getGroupCurrency());
-                        }
-                        moneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
-                    }
-                })
-                .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(Identity identity) {
-                        return groupRepo.getGroupIdentities(identity.getGroup(), true);
-                    }
-                })
+                .flatMapObservable(identity -> groupRepo.getGroupIdentities(identity.getGroup(), true))
                 .toSortedList()
                 .toSingle()
-                .doOnSuccess(new Action1<List<Identity>>() {
-                    @Override
-                    public void call(List<Identity> identities) {
-                        PurchaseAddViewModelImpl.this.identities = identities;
-                    }
-                });
+                .doOnSuccess(identities -> this.identities = identities);
     }
 
     protected final void updateRows() {

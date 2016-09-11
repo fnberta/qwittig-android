@@ -31,25 +31,25 @@ public class RxFirebaseDatabase {
     @NonNull
     public static <T extends FirebaseModel> Observable<T> observeValuesOnce(@NonNull final Query query,
                                                                             @NonNull final Class<T> clazz) {
-        return Observable.fromAsync(new ValuesOnceAsyncEmitter<T>(query, clazz), BackpressureMode.LATEST);
+        return Observable.fromAsync(new ValuesOnceAsyncEmitter<>(query, clazz), BackpressureMode.LATEST);
     }
 
     @NonNull
     public static <T extends FirebaseModel> Observable<T> observeValue(@NonNull final Query query,
                                                                        @NonNull final Class<T> clazz) {
-        return Observable.fromAsync(new ValueAsyncEmitter<T>(query, clazz), BackpressureMode.LATEST);
+        return Observable.fromAsync(new ValueAsyncEmitter<>(query, clazz), BackpressureMode.LATEST);
     }
 
     @NonNull
     public static <T extends FirebaseModel> Observable<List<T>> observeValues(@NonNull final Query query,
                                                                               @NonNull final Class<T> clazz) {
-        return Observable.fromAsync(new ValuesAsyncEmitter<T>(query, clazz), BackpressureMode.LATEST);
+        return Observable.fromAsync(new ValuesAsyncEmitter<>(query, clazz), BackpressureMode.LATEST);
     }
 
     @NonNull
     public static <T extends FirebaseModel> Observable<RxChildEvent<T>> observeChildren(@NonNull final Query query,
                                                                                         @NonNull final Class<T> clazz) {
-        return Observable.fromAsync(new ChildEventsAsyncEmitter<T>(query, clazz), BackpressureMode.LATEST);
+        return Observable.fromAsync(new ChildEventsAsyncEmitter<>(query, clazz), BackpressureMode.LATEST);
     }
 
     @NonNull

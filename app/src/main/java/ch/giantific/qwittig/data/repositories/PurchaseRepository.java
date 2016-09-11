@@ -77,17 +77,14 @@ public class PurchaseRepository {
                 ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId).orderByChild(Purchase.PATH_GROUP).equalTo(groupId)
                 : databaseRef.child(Purchase.BASE_PATH_PURCHASES).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeChildren(query, Purchase.class)
-                .filter(new Func1<RxChildEvent<Purchase>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Purchase> event) {
-                        if (getDrafts) {
-                            return true;
-                        }
-
-                        final Purchase purchase = event.getValue();
-                        return Objects.equals(purchase.getBuyer(), currentIdentityId)
-                                || purchase.getIdentitiesIds().contains(currentIdentityId);
+                .filter(event -> {
+                    if (getDrafts) {
+                        return true;
                     }
+
+                    final Purchase purchase = event.getValue();
+                    return Objects.equals(purchase.getBuyer(), currentIdentityId)
+                            || purchase.getIdentitiesIds().contains(currentIdentityId);
                 });
     }
 
@@ -98,14 +95,9 @@ public class PurchaseRepository {
                 ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId).orderByChild(Purchase.PATH_GROUP).equalTo(groupId)
                 : databaseRef.child(Purchase.BASE_PATH_PURCHASES).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeValuesOnce(query, Purchase.class)
-                .filter(new Func1<Purchase, Boolean>() {
-                    @Override
-                    public Boolean call(Purchase purchase) {
-                        return getDrafts
-                                || Objects.equals(purchase.getBuyer(), currentIdentityId)
-                                || purchase.getIdentitiesIds().contains(currentIdentityId);
-                    }
-                });
+                .filter(purchase -> getDrafts
+                        || Objects.equals(purchase.getBuyer(), currentIdentityId)
+                        || purchase.getIdentitiesIds().contains(currentIdentityId));
     }
 
     public Observable<Purchase> observePurchase(@NonNull String purchaseId) {
@@ -128,12 +120,7 @@ public class PurchaseRepository {
         final Query query = databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId)
                 .orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeValues(query, Purchase.class)
-                .map(new Func1<List<Purchase>, Boolean>() {
-                    @Override
-                    public Boolean call(List<Purchase> drafts) {
-                        return !drafts.isEmpty();
-                    }
-                });
+                .map(drafts -> !drafts.isEmpty());
     }
 
     public void uploadReceiptForOcr(@NonNull String receiptBase64, @NonNull String userId) {
@@ -186,23 +173,20 @@ public class PurchaseRepository {
         final File file = new File(receipt);
         final StorageReference receiptRef = storageRef.child(purchaseId);
         return RxFirebaseStorage.putFile(receiptRef, Uri.fromFile(file))
-                .doOnSuccess(new Action1<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void call(UploadTask.TaskSnapshot taskSnapshot) {
-                        final Uri url = taskSnapshot.getDownloadUrl();
-                        if (url != null) {
-                            if (TextUtils.isEmpty(buyerId)) {
-                                databaseRef.child(Purchase.BASE_PATH_PURCHASES)
-                                        .child(purchaseId)
-                                        .child(Purchase.PATH_RECEIPT)
-                                        .setValue(url.toString());
-                            } else {
-                                databaseRef.child(Purchase.BASE_PATH_DRAFTS)
-                                        .child(buyerId)
-                                        .child(purchaseId)
-                                        .child(Purchase.PATH_RECEIPT)
-                                        .setValue(url.toString());
-                            }
+                .doOnSuccess(taskSnapshot -> {
+                    final Uri url = taskSnapshot.getDownloadUrl();
+                    if (url != null) {
+                        if (TextUtils.isEmpty(buyerId)) {
+                            databaseRef.child(Purchase.BASE_PATH_PURCHASES)
+                                    .child(purchaseId)
+                                    .child(Purchase.PATH_RECEIPT)
+                                    .setValue(url.toString());
+                        } else {
+                            databaseRef.child(Purchase.BASE_PATH_DRAFTS)
+                                    .child(buyerId)
+                                    .child(purchaseId)
+                                    .child(Purchase.PATH_RECEIPT)
+                                    .setValue(url.toString());
                         }
                     }
                 });
@@ -245,16 +229,11 @@ public class PurchaseRepository {
                                             @NonNull final String ocrDataId,
                                             @NonNull String purchaseId) {
         return RxFirebaseStorage.getDownloadUrl(storageRef.child(purchaseId + ".jpg"))
-                .doOnSuccess(new Action1<Uri>() {
-                    @Override
-                    public void call(Uri uri) {
-                        databaseRef.child(OcrData.BASE_PATH)
-                                .child(currentUserId)
-                                .child(ocrDataId)
-                                .child(OcrData.PATH_RECEIPT)
-                                .setValue(uri.toString());
-                    }
-                });
+                .doOnSuccess(uri -> databaseRef.child(OcrData.BASE_PATH)
+                        .child(currentUserId)
+                        .child(ocrDataId)
+                        .child(OcrData.PATH_RECEIPT)
+                        .setValue(uri.toString()));
     }
 
     public void saveOcrRating(int satisfaction, int ratingNames, int ratingPrices,
@@ -287,23 +266,8 @@ public class PurchaseRepository {
         return exchangeRates.getRates(baseCurrency)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<ExchangeRatesResult, Map<String, Float>>() {
-                    @Override
-                    public Map<String, Float> call(ExchangeRatesResult exchangeRatesResult) {
-                        return exchangeRatesResult.getRates();
-                    }
-                })
-                .doOnSuccess(new Action1<Map<String, Float>>() {
-                    @Override
-                    public void call(Map<String, Float> exchangeRates) {
-                        sharedPrefsHelper.saveExchangeRates(exchangeRates);
-                    }
-                })
-                .map(new Func1<Map<String, Float>, Float>() {
-                    @Override
-                    public Float call(Map<String, Float> exchangeRates) {
-                        return exchangeRates.get(currency);
-                    }
-                });
+                .map(ExchangeRatesResult::getRates)
+                .doOnSuccess(sharedPrefsHelper::saveExchangeRates)
+                .map(exchangeRates12 -> exchangeRates12.get(currency));
     }
 }

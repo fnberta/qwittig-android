@@ -19,9 +19,7 @@ import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import rx.Observable;
 import rx.SingleSubscriber;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -121,12 +119,7 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
-                    }
-                })
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {

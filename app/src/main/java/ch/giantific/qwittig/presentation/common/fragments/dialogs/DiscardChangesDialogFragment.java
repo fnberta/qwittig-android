@@ -37,18 +37,11 @@ public class DiscardChangesDialogFragment extends BaseDialogFragment<DiscardChan
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder.setMessage(R.string.dialog_discard_changes_message)
-                .setPositiveButton(R.string.dialog_negative_discard, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        activity.onDiscardChangesSelected();
-                        dismiss();
-                    }
+                .setPositiveButton(R.string.dialog_negative_discard, (dialog, id) -> {
+                    activity.onDiscardChangesSelected();
+                    dismiss();
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dismiss();
-                    }
-                });
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dismiss());
         return dialogBuilder.create();
     }
 

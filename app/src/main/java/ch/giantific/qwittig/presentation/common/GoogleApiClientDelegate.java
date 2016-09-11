@@ -54,12 +54,7 @@ public class GoogleApiClientDelegate {
                         .build();
 
         final GoogleApiClient.Builder builder = new GoogleApiClient.Builder(activity)
-                .enableAutoManage(activity, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult);
-                    }
-                })
+                .enableAutoManage(activity, connectionResult -> Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult))
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso);
         if (extraApis != null) {
             for (Api<? extends NotRequiredOptions> api : extraApis) {
@@ -107,20 +102,17 @@ public class GoogleApiClientDelegate {
 
     public void checkForInvitation() {
         AppInvite.AppInviteApi.getInvitation(googleApiClient, activity, false)
-                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
-                    @Override
-                    public void onResult(@NonNull AppInviteInvitationResult result) {
-                        if (result.getStatus().isSuccess()) {
-                            final Intent intent = result.getInvitationIntent();
-                            final String deepLink = AppInviteReferral.getDeepLink(intent);
-                            Timber.d("deepLink %s", deepLink);
-                            final Uri uri = Uri.parse(deepLink);
-                            if (invitationCallback != null) {
-                                invitationCallback.onDeepLinkFound(uri);
-                            }
-                        } else {
-                            Timber.i("getInvitation: no deep link found.");
+                .setResultCallback(result -> {
+                    if (result.getStatus().isSuccess()) {
+                        final Intent intent = result.getInvitationIntent();
+                        final String deepLink = AppInviteReferral.getDeepLink(intent);
+                        Timber.d("deepLink %s", deepLink);
+                        final Uri uri = Uri.parse(deepLink);
+                        if (invitationCallback != null) {
+                            invitationCallback.onDeepLinkFound(uri);
                         }
+                    } else {
+                        Timber.i("getInvitation: no deep link found.");
                     }
                 });
     }

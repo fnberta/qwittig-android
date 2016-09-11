@@ -68,13 +68,10 @@ public class ExchangeRateDialogFragment extends BaseDialogFragment<ExchangeRateD
 
         dialogBuilder.setTitle(R.string.hint_exchange_rate)
                 .setView(binding.getRoot())
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final String exchangeRate = binding.etExchangeRate.getText().toString().trim();
-                        if (!TextUtils.isEmpty(exchangeRate)) {
-                            ExchangeRateDialogFragment.this.activity.onExchangeRateManuallySet(MoneyUtils.parsePrice(exchangeRate));
-                        }
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    final String exchangeRate1 = binding.etExchangeRate.getText().toString().trim();
+                    if (!TextUtils.isEmpty(exchangeRate1)) {
+                        ExchangeRateDialogFragment.this.activity.onExchangeRateManuallySet(MoneyUtils.parsePrice(exchangeRate1));
                     }
                 })
                 .setNegativeButton(android.R.string.no, null);

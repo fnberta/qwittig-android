@@ -24,10 +24,7 @@ import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.assignments.addedit.itemmodels.AssignmentAddEditIdentityItemModel;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -67,18 +64,8 @@ public class AssignmentAddEditViewModelEditImpl extends AssignmentAddEditViewMod
     @Override
     void loadAssignment(@NonNull final FirebaseUser currentUser) {
         getSubscriptions().add(assignmentRepo.getAssignment(assignmentId)
-                .doOnSuccess(new Action1<Assignment>() {
-                    @Override
-                    public void call(Assignment editAssignment) {
-                        assignment = editAssignment;
-                    }
-                })
-                .flatMap(new Func1<Assignment, Single<List<Identity>>>() {
-                    @Override
-                    public Single<List<Identity>> call(Assignment assignment) {
-                        return getInitialChain(currentUser);
-                    }
-                })
+                .doOnSuccess(editAssignment -> assignment = editAssignment)
+                .flatMap(editAssignment -> getInitialChain(currentUser))
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> identities) {

@@ -16,7 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.util.Arrays;
 import java.util.List;
@@ -68,13 +67,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         unCheckNavDrawerItems();
         supportPostponeEnterTransition();
 
-        final PurchaseDetailsActivity activity = this;
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavUtils.navigateUpFromSameTask(activity);
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> NavUtils.navigateUpFromSameTask(this));
 
         if (userLoggedIn) {
             setupTabs();

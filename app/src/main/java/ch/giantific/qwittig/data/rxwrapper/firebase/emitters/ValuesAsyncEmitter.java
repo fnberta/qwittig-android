@@ -32,12 +32,7 @@ public class ValuesAsyncEmitter<T extends FirebaseModel> implements Action1<Asyn
     public void call(AsyncEmitter<List<T>> asyncEmitter) {
         final ValueEventListener valueEventListener =
                 query.addValueEventListener(new RxValuesEventListener<>(asyncEmitter, type));
-        asyncEmitter.setCancellation(new AsyncEmitter.Cancellable() {
-            @Override
-            public void cancel() throws Exception {
-                query.removeEventListener(valueEventListener);
-            }
-        });
+        asyncEmitter.setCancellation(() -> query.removeEventListener(valueEventListener));
     }
 
     private static class RxValuesEventListener<T extends FirebaseModel> implements ValueEventListener {

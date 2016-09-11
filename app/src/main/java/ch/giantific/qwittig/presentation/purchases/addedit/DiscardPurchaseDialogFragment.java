@@ -39,18 +39,11 @@ public class DiscardPurchaseDialogFragment extends BaseDialogFragment<DiscardPur
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder.setMessage(R.string.dialog_purchase_discard_message)
-                .setPositiveButton(R.string.dialog_positive_save_draft, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        activity.onSaveAsDraftSelected();
-                        dismiss();
-                    }
+                .setPositiveButton(R.string.dialog_positive_save_draft, (dialog, id) -> {
+                    activity.onSaveAsDraftSelected();
+                    dismiss();
                 })
-                .setNegativeButton(R.string.dialog_purchase_discard, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        activity.onDiscardPurchaseSelected();
-                    }
-                });
+                .setNegativeButton(R.string.dialog_purchase_discard, (dialog, which) -> activity.onDiscardPurchaseSelected());
         return dialogBuilder.create();
     }
 

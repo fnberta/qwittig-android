@@ -34,18 +34,14 @@ import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.assignments.addedit.itemmodels.AssignmentAddEditIdentityItemModel;
 import ch.giantific.qwittig.presentation.common.ListDragInteraction;
 import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.utils.DateUtils;
-import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -171,24 +167,9 @@ public class AssignmentAddEditViewModelAddImpl extends ViewModelBaseImpl<Assignm
     @NonNull
     final Single<List<Identity>> getInitialChain(@NonNull FirebaseUser currentUser) {
         return userRepo.getUser(currentUser.getUid())
-                .flatMap(new Func1<User, Single<Identity>>() {
-                    @Override
-                    public Single<Identity> call(final User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity());
-                    }
-                })
-                .doOnSuccess(new Action1<Identity>() {
-                    @Override
-                    public void call(Identity identity) {
-                        currentGroupId = identity.getGroup();
-                    }
-                })
-                .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(Identity identity) {
-                        return groupRepo.getGroupIdentities(identity.getGroup(), true);
-                    }
-                })
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()))
+                .doOnSuccess(identity -> currentGroupId = identity.getGroup())
+                .flatMapObservable(identity -> groupRepo.getGroupIdentities(identity.getGroup(), true))
                 .toSortedList()
                 .toSingle();
     }

@@ -20,14 +20,10 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 /**
  * Defines an observable view model for the header showing the user's balance.
@@ -62,19 +58,8 @@ public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderV
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(User user) {
-                        return userRepo.observeIdentity(user.getCurrentIdentity());
-
-                    }
-                })
-                .doOnNext(new Action1<Identity>() {
-                    @Override
-                    public void call(Identity identity) {
-                        moneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(), true, true);
-                    }
-                })
+                .flatMap(user -> userRepo.observeIdentity(user.getCurrentIdentity()))
+                .doOnNext(identity -> moneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(), true, true))
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onError(Throwable e) {

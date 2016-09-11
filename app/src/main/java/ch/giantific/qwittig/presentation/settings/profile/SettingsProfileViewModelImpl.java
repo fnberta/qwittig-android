@@ -29,11 +29,8 @@ import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.utils.Utils;
-import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -208,34 +205,21 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         }
 
         getSubscriptions().add(userRepo.getUser(currentUser.getUid())
-                .flatMap(new Func1<User, Single<Identity>>() {
-                    @Override
-                    public Single<Identity> call(User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity());
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()))
+                .doOnSuccess(identity -> {
+                    final String nickname1 = identity.getNickname();
+                    nicknameOrig = nickname1;
+                    if (TextUtils.isEmpty(SettingsProfileViewModelImpl.this.nickname)) {
+                        setNickname(nickname1);
                     }
-                })
-                .doOnSuccess(new Action1<Identity>() {
-                    @Override
-                    public void call(Identity identity) {
-                        final String nickname = identity.getNickname();
-                        nicknameOrig = nickname;
-                        if (TextUtils.isEmpty(SettingsProfileViewModelImpl.this.nickname)) {
-                            setNickname(nickname);
-                        }
 
-                        final String avatar = identity.getAvatar();
-                        avatarOrig = avatar;
-                        if (TextUtils.isEmpty(SettingsProfileViewModelImpl.this.avatar)) {
-                            setAvatar(avatar);
-                        }
+                    final String avatar1 = identity.getAvatar();
+                    avatarOrig = avatar1;
+                    if (TextUtils.isEmpty(SettingsProfileViewModelImpl.this.avatar)) {
+                        setAvatar(avatar1);
                     }
                 })
-                .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(Identity identity) {
-                        return groupRepo.getGroupIdentities(identity.getGroup(), true);
-                    }
-                })
+                .flatMapObservable(identity -> groupRepo.getGroupIdentities(identity.getGroup(), true))
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -389,12 +373,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
         getSubscriptions().add(single
-                .flatMap(new Func1<Void, Single<User>>() {
-                    @Override
-                    public Single<User> call(Void aVoid) {
-                        return userRepo.updateProfile(nickname, avatar, isAvatarChanged());
-                    }
-                })
+                .flatMap(aVoid -> userRepo.updateProfile(nickname, avatar, isAvatarChanged()))
                 .subscribe(profileSubscriber(workerTag))
         );
     }
@@ -413,12 +392,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
         getSubscriptions().add(single
-                .flatMap(new Func1<Void, Single<User>>() {
-                    @Override
-                    public Single<User> call(Void aVoid) {
-                        return userRepo.updateProfile(nickname, avatar, isAvatarChanged());
-                    }
-                })
+                .flatMap(aVoid -> userRepo.updateProfile(nickname, avatar, isAvatarChanged()))
                 .subscribe(profileSubscriber(workerTag))
         );
     }
@@ -432,12 +406,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     public void setEmailUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
         getSubscriptions().add(single
-                .flatMap(new Func1<Void, Single<User>>() {
-                    @Override
-                    public Single<User> call(Void aVoid) {
-                        return userRepo.updateProfile(nickname, avatar, isAvatarChanged());
-                    }
-                })
+                .flatMap(aVoid -> userRepo.updateProfile(nickname, avatar, isAvatarChanged()))
                 .subscribe(profileSubscriber(workerTag))
         );
     }

@@ -22,13 +22,10 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link LoginAccountsViewModel}.
@@ -72,36 +69,20 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
                                    @NonNull final String workerTag,
                                    @LoginWorker.LoginType int type) {
         getSubscriptions().add(single
-                .flatMap(new Func1<FirebaseUser, Single<Boolean>>() {
-                    @Override
-                    public Single<Boolean> call(final FirebaseUser firebaseUser) {
-                        final String userId = firebaseUser.getUid();
-                        if (!TextUtils.isEmpty(identityId)) {
-                            return userRepo.getIdentity(identityId)
-                                    .doOnSuccess(new Action1<Identity>() {
-                                        @Override
-                                        public void call(Identity identity) {
-                                            groupRepo.joinGroup(userId, identityId, identity.getGroup());
-                                        }
-                                    })
-                                    .flatMap(new Func1<Identity, Single<? extends Boolean>>() {
-                                        @Override
-                                        public Single<? extends Boolean> call(Identity identity) {
-                                            return userRepo.isUserNew(userId);
-                                        }
-                                    });
-                        }
-
-                        return userRepo.isUserNew(userId)
-                                .doOnSuccess(new Action1<Boolean>() {
-                                    @Override
-                                    public void call(Boolean isUserNew) {
-                                        if (isUserNew) {
-                                            createInitialGroup(firebaseUser, userId);
-                                        }
-                                    }
-                                });
+                .flatMap(firebaseUser -> {
+                    final String userId = firebaseUser.getUid();
+                    if (!TextUtils.isEmpty(identityId)) {
+                        return userRepo.getIdentity(identityId)
+                                .doOnSuccess(identity -> groupRepo.joinGroup(userId, identityId, identity.getGroup()))
+                                .flatMap(identity -> userRepo.isUserNew(userId));
                     }
+
+                    return userRepo.isUserNew(userId)
+                            .doOnSuccess(isUserNew -> {
+                                if (isUserNew) {
+                                    createInitialGroup(firebaseUser, userId);
+                                }
+                            });
                 })
                 .subscribe(new SingleSubscriber<Boolean>() {
                     @Override
@@ -181,12 +162,9 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
 
     @Override
     public View.OnClickListener getLoginGoogleClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setLoading(true);
-                view.loginWithGoogle();
-            }
+        return v -> {
+            setLoading(true);
+            view.loginWithGoogle();
         };
     }
 

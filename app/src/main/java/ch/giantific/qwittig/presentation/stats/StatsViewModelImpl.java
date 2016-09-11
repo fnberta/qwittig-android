@@ -31,8 +31,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.data.rest.StatsResult;
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -43,10 +41,7 @@ import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
-import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -206,25 +201,12 @@ public class StatsViewModelImpl extends ViewModelBaseImpl<StatsViewModel.ViewLis
         }
 
         getSubscriptions().add(userRepo.getUser(currentUser.getUid())
-                .flatMap(new Func1<User, Single<Identity>>() {
-                    @Override
-                    public Single<Identity> call(User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity());
-                    }
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()))
+                .doOnSuccess(identity -> {
+                    currencyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(), true, false);
+                    setChartCurrencyFormatter(new ChartCurrencyFormatter(currencyFormatter));
                 })
-                .doOnSuccess(new Action1<Identity>() {
-                    @Override
-                    public void call(Identity identity) {
-                        currencyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(), true, false);
-                        setChartCurrencyFormatter(new ChartCurrencyFormatter(currencyFormatter));
-                    }
-                })
-                .flatMap(new Func1<Identity, Single<StatsResult>>() {
-                    @Override
-                    public Single<StatsResult> call(Identity identity) {
-                        return data.toSingle();
-                    }
-                })
+                .flatMap(identity -> data.toSingle())
                 .subscribe(new SingleSubscriber<StatsResult>() {
                     @Override
                     public void onSuccess(StatsResult statsResult) {

@@ -15,8 +15,6 @@ import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.data.rest.StatsResult;
 import ch.giantific.qwittig.presentation.common.BaseRxLoader;
 import rx.Observable;
-import rx.Single;
-import rx.functions.Func1;
 
 /**
  * Handles the loading of statistical data and presents them as an {@link Observable}.
@@ -51,12 +49,7 @@ public class StatsLoader extends BaseRxLoader<StatsResult> {
     @Override
     protected Observable<StatsResult> getObservable() {
         return userRepo.getAuthToken()
-                .flatMap(new Func1<String, Single<StatsResult>>() {
-                    @Override
-                    public Single<StatsResult> call(String idToken) {
-                        return statsRepo.calculateSpendingStats(idToken, startDate, endDAte);
-                    }
-                })
+                .flatMap(idToken -> statsRepo.calculateSpendingStats(idToken, startDate, endDAte))
                 .toObservable();
     }
 }

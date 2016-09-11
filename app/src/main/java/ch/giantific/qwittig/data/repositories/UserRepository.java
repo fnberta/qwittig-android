@@ -48,8 +48,6 @@ import ch.giantific.qwittig.utils.Utils;
 import rx.Observable;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -92,12 +90,7 @@ public class UserRepository {
         }
 
         return RxFirebaseUser.getToken(firebaseUser, false)
-                .map(new Func1<GetTokenResult, String>() {
-                    @Override
-                    public String call(GetTokenResult getTokenResult) {
-                        return getTokenResult.getToken();
-                    }
-                });
+                .map(GetTokenResult::getToken);
     }
 
     public Observable<FirebaseUser> observeAuthStatus() {
@@ -131,24 +124,9 @@ public class UserRepository {
     public Observable<Identity> switchGroup(@NonNull final User user,
                                             @NonNull final String newGroupId) {
         return Observable.from(user.getIdentitiesIds())
-                .flatMap(new Func1<String, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(String identityId) {
-                        return getIdentity(identityId).toObservable();
-                    }
-                })
-                .filter(new Func1<Identity, Boolean>() {
-                    @Override
-                    public Boolean call(Identity identity) {
-                        return Objects.equals(identity.getGroup(), newGroupId);
-                    }
-                })
-                .doOnNext(new Action1<Identity>() {
-                    @Override
-                    public void call(Identity identity) {
-                        updateCurrentIdentity(user.getId(), identity.getId());
-                    }
-                });
+                .flatMap(identityId -> getIdentity(identityId).toObservable())
+                .filter(identity -> Objects.equals(identity.getGroup(), newGroupId))
+                .doOnNext(identity -> updateCurrentIdentity(user.getId(), identity.getId()));
     }
 
     public Single<Void> updateEmailPassword(@NonNull final FirebaseUser firebaseUser,
@@ -156,25 +134,19 @@ public class UserRepository {
                                             @Nullable final String email,
                                             @Nullable final String password) {
         return RxFirebaseUser.reauthenticate(firebaseUser, authCredential)
-                .flatMap(new Func1<Void, Single<? extends Void>>() {
-                    @Override
-                    public Single<? extends Void> call(Void aVoid) {
-                        if (!TextUtils.isEmpty(email)) {
-                            return RxFirebaseUser.updateEmail(firebaseUser, email);
-                        }
-
-                        return Single.just(aVoid);
+                .flatMap(aVoid -> {
+                    if (!TextUtils.isEmpty(email)) {
+                        return RxFirebaseUser.updateEmail(firebaseUser, email);
                     }
+
+                    return Single.just(aVoid);
                 })
-                .flatMap(new Func1<Void, Single<? extends Void>>() {
-                    @Override
-                    public Single<? extends Void> call(Void aVoid) {
-                        if (!TextUtils.isEmpty(password)) {
-                            return RxFirebaseUser.updatePassword(firebaseUser, password);
-                        }
-
-                        return Single.just(aVoid);
+                .flatMap(aVoid -> {
+                    if (!TextUtils.isEmpty(password)) {
+                        return RxFirebaseUser.updatePassword(firebaseUser, password);
                     }
+
+                    return Single.just(aVoid);
                 });
     }
 
@@ -187,25 +159,22 @@ public class UserRepository {
         }
 
         return getUser(firebaseUser.getUid())
-                .doOnSuccess(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        final Map<String, Object> childUpdates = new HashMap<>();
-                        final Set<String> identities = user.getIdentitiesIds();
-                        for (String identityId : identities) {
-                            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_NICKNAME, nickname);
-                            if (avatarChanged) {
-                                childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE
-                                                + "/" + identityId + "/" + Identity.PATH_AVATAR,
-                                        !TextUtils.isEmpty(avatar)
-                                                ? avatar : null);
-                            }
+                .doOnSuccess(user -> {
+                    final Map<String, Object> childUpdates = new HashMap<>();
+                    final Set<String> identities = user.getIdentitiesIds();
+                    for (String identityId : identities) {
+                        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_NICKNAME, nickname);
+                        if (avatarChanged) {
+                            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE
+                                            + "/" + identityId + "/" + Identity.PATH_AVATAR,
+                                    !TextUtils.isEmpty(avatar)
+                                            ? avatar : null);
                         }
-                        databaseRef.updateChildren(childUpdates);
+                    }
+                    databaseRef.updateChildren(childUpdates);
 
-                        if (avatarChanged && !TextUtils.isEmpty(avatar) && !Utils.isHttpsUrl(avatar)) {
-                            UploadAvatarJob.schedule(jobDispatcher, avatar, null);
-                        }
+                    if (avatarChanged && !TextUtils.isEmpty(avatar) && !Utils.isHttpsUrl(avatar)) {
+                        UploadAvatarJob.schedule(jobDispatcher, avatar, null);
                     }
                 });
     }
@@ -216,17 +185,14 @@ public class UserRepository {
             final File file = new File(avatar);
             final StorageReference avatarRef = storageRef.child(identityId);
             return RxFirebaseStorage.putFile(avatarRef, Uri.fromFile(file))
-                    .doOnSuccess(new Action1<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void call(UploadTask.TaskSnapshot taskSnapshot) {
-                            final Uri url = taskSnapshot.getDownloadUrl();
-                            if (url != null) {
-                                databaseRef.child(Identity.BASE_PATH)
-                                        .child(Identity.BASE_PATH_ACTIVE)
-                                        .child(identityId)
-                                        .child(Identity.PATH_AVATAR)
-                                        .setValue(url.toString());
-                            }
+                    .doOnSuccess(taskSnapshot -> {
+                        final Uri url = taskSnapshot.getDownloadUrl();
+                        if (url != null) {
+                            databaseRef.child(Identity.BASE_PATH)
+                                    .child(Identity.BASE_PATH_ACTIVE)
+                                    .child(identityId)
+                                    .child(Identity.PATH_AVATAR)
+                                    .setValue(url.toString());
                         }
                     });
         }
@@ -237,30 +203,24 @@ public class UserRepository {
         }
 
         return getUser(firebaseUser.getUid())
-                .flatMap(new Func1<User, Single<? extends UploadTask.TaskSnapshot>>() {
-                    @Override
-                    public Single<? extends UploadTask.TaskSnapshot> call(final User user) {
-                        final File file = new File(avatar);
-                        final StorageReference avatarRef = storageRef.child(user.getId());
-                        return RxFirebaseStorage.putFile(avatarRef, Uri.fromFile(file))
-                                .doOnSuccess(new Action1<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void call(UploadTask.TaskSnapshot taskSnapshot) {
-                                        final Uri url = taskSnapshot.getDownloadUrl();
-                                        if (url != null) {
-                                            final Set<String> identities = user.getIdentitiesIds();
-                                            final Map<String, Object> childUpdates = new HashMap<>();
-                                            for (String identityId : identities) {
-                                                childUpdates.put(Identity.BASE_PATH + "/"
-                                                        + Identity.BASE_PATH_ACTIVE + "/"
-                                                        + identityId + "/"
-                                                        + Identity.PATH_AVATAR, url.toString());
-                                            }
-                                            databaseRef.updateChildren(childUpdates);
-                                        }
+                .flatMap(user -> {
+                    final File file = new File(avatar);
+                    final StorageReference avatarRef = storageRef.child(user.getId());
+                    return RxFirebaseStorage.putFile(avatarRef, Uri.fromFile(file))
+                            .doOnSuccess(taskSnapshot -> {
+                                final Uri url = taskSnapshot.getDownloadUrl();
+                                if (url != null) {
+                                    final Set<String> identities = user.getIdentitiesIds();
+                                    final Map<String, Object> childUpdates = new HashMap<>();
+                                    for (String identityId1 : identities) {
+                                        childUpdates.put(Identity.BASE_PATH + "/"
+                                                + Identity.BASE_PATH_ACTIVE + "/"
+                                                + identityId1 + "/"
+                                                + Identity.PATH_AVATAR, url.toString());
                                     }
-                                });
-                    }
+                                    databaseRef.updateChildren(childUpdates);
+                                }
+                            });
                 });
     }
 
@@ -277,19 +237,11 @@ public class UserRepository {
     public Single<FirebaseUser> loginEmail(@NonNull final String username,
                                            @NonNull final String password) {
         return RxFirebaseAuth.signInWithEmailAndPassword(auth, username, password)
-                .map(new Func1<AuthResult, FirebaseUser>() {
-                    @Override
-                    public FirebaseUser call(AuthResult authResult) {
-                        return authResult.getUser();
-                    }
-                })
-                .doOnSuccess(new Action1<FirebaseUser>() {
-                    @Override
-                    public void call(FirebaseUser firebaseUser) {
-                        final String token = FirebaseInstanceId.getInstance().getToken();
-                        if (!TextUtils.isEmpty(token)) {
-                            updateToken(firebaseUser.getUid(), token);
-                        }
+                .map(AuthResult::getUser)
+                .doOnSuccess(firebaseUser -> {
+                    final String token = FirebaseInstanceId.getInstance().getToken();
+                    if (!TextUtils.isEmpty(token)) {
+                        updateToken(firebaseUser.getUid(), token);
                     }
                 });
     }
@@ -297,19 +249,11 @@ public class UserRepository {
     public Single<FirebaseUser> signUpEmail(@NonNull final String username,
                                             @NonNull final String password) {
         return RxFirebaseAuth.createUserWithEmailAndPassword(auth, username, password)
-                .map(new Func1<AuthResult, FirebaseUser>() {
-                    @Override
-                    public FirebaseUser call(AuthResult authResult) {
-                        return authResult.getUser();
-                    }
-                })
-                .doOnSuccess(new Action1<FirebaseUser>() {
-                    @Override
-                    public void call(FirebaseUser firebaseUser) {
-                        final String token = FirebaseInstanceId.getInstance().getToken();
-                        if (!TextUtils.isEmpty(token)) {
-                            updateToken(firebaseUser.getUid(), token);
-                        }
+                .map(AuthResult::getUser)
+                .doOnSuccess(firebaseUser -> {
+                    final String token = FirebaseInstanceId.getInstance().getToken();
+                    if (!TextUtils.isEmpty(token)) {
+                        updateToken(firebaseUser.getUid(), token);
                     }
                 });
     }
@@ -321,19 +265,11 @@ public class UserRepository {
     public Single<FirebaseUser> loginGoogle(@NonNull String idToken) {
         final AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         return RxFirebaseAuth.signInWithCredential(auth, credential)
-                .map(new Func1<AuthResult, FirebaseUser>() {
-                    @Override
-                    public FirebaseUser call(AuthResult authResult) {
-                        return authResult.getUser();
-                    }
-                })
-                .doOnSuccess(new Action1<FirebaseUser>() {
-                    @Override
-                    public void call(FirebaseUser firebaseUser) {
-                        final String token = FirebaseInstanceId.getInstance().getToken();
-                        if (!TextUtils.isEmpty(token)) {
-                            updateToken(firebaseUser.getUid(), token);
-                        }
+                .map(AuthResult::getUser)
+                .doOnSuccess(firebaseUser -> {
+                    final String token = FirebaseInstanceId.getInstance().getToken();
+                    if (!TextUtils.isEmpty(token)) {
+                        updateToken(firebaseUser.getUid(), token);
                     }
                 });
     }
@@ -346,37 +282,12 @@ public class UserRepository {
                                      @NonNull final FirebaseUser firebaseUser,
                                      @NonNull AuthCredential authCredential) {
         return RxFirebaseUser.reauthenticate(firebaseUser, authCredential)
-                .flatMapObservable(new Func1<Void, Observable<UserInfo>>() {
-                    @Override
-                    public Observable<UserInfo> call(Void aVoid) {
-                        return Observable.from(firebaseUser.getProviderData());
-                    }
-                })
-                .map(new Func1<UserInfo, String>() {
-                    @Override
-                    public String call(UserInfo userInfo) {
-                        return userInfo.getProviderId();
-                    }
-                })
-                .first(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String providerId) {
-                        return Objects.equals(providerId, GoogleAuthProvider.PROVIDER_ID);
-                    }
-                })
+                .flatMapObservable(aVoid -> Observable.from(firebaseUser.getProviderData()))
+                .map(UserInfo::getProviderId)
+                .first(providerId -> Objects.equals(providerId, GoogleAuthProvider.PROVIDER_ID))
                 .toSingle()
-                .flatMap(new Func1<String, Single<AuthResult>>() {
-                    @Override
-                    public Single<AuthResult> call(String providerId) {
-                        return RxFirebaseUser.unlinkFromProvider(firebaseUser, providerId);
-                    }
-                })
-                .flatMap(new Func1<AuthResult, Single<? extends Void>>() {
-                    @Override
-                    public Single<? extends Void> call(AuthResult authResult) {
-                        return GoogleApiClientUnlink.create(context);
-                    }
-                });
+                .flatMap(providerId -> RxFirebaseUser.unlinkFromProvider(firebaseUser, providerId))
+                .flatMap(authResult -> GoogleApiClientUnlink.create(context));
     }
 
     public boolean isGoogleUser(@NonNull FirebaseUser firebaseUser) {
@@ -392,19 +303,11 @@ public class UserRepository {
     public Single<FirebaseUser> loginFacebook(@NonNull String idToken) {
         final AuthCredential credential = FacebookAuthProvider.getCredential(idToken);
         return RxFirebaseAuth.signInWithCredential(auth, credential)
-                .map(new Func1<AuthResult, FirebaseUser>() {
-                    @Override
-                    public FirebaseUser call(AuthResult authResult) {
-                        return authResult.getUser();
-                    }
-                })
-                .doOnSuccess(new Action1<FirebaseUser>() {
-                    @Override
-                    public void call(FirebaseUser firebaseUser) {
-                        final String token = FirebaseInstanceId.getInstance().getToken();
-                        if (!TextUtils.isEmpty(token)) {
-                            updateToken(firebaseUser.getUid(), token);
-                        }
+                .map(AuthResult::getUser)
+                .doOnSuccess(firebaseUser -> {
+                    final String token = FirebaseInstanceId.getInstance().getToken();
+                    if (!TextUtils.isEmpty(token)) {
+                        updateToken(firebaseUser.getUid(), token);
                     }
                 });
     }
@@ -426,12 +329,7 @@ public class UserRepository {
 
     public Single<Boolean> isUserNew(@NonNull String userId) {
         return RxFirebaseDatabase.checkForChild(databaseRef.child(User.BASE_PATH).child(userId), User.PATH_IDENTITIES)
-                .map(new Func1<Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Boolean hasChild) {
-                        return !hasChild;
-                    }
-                });
+                .map(hasChild -> !hasChild);
     }
 
     public void signOut(@NonNull FirebaseUser firebaseUser) {
@@ -450,48 +348,25 @@ public class UserRepository {
                                                      @NonNull AuthCredential oldCredential,
                                                      @NonNull final AuthCredential newCredential) {
         return RxFirebaseUser.reauthenticate(firebaseUser, oldCredential)
-                .flatMap(new Func1<Void, Single<? extends AuthResult>>() {
-                    @Override
-                    public Single<? extends AuthResult> call(Void aVoid) {
-                        return RxFirebaseUser.linkWithCredential(firebaseUser, newCredential);
-                    }
-                });
+                .flatMap(aVoid -> RxFirebaseUser.linkWithCredential(firebaseUser, newCredential));
     }
 
     public Single<Void> deleteUser(@NonNull final FirebaseUser firebaseUser,
                                    @NonNull AuthCredential authCredential) {
         return RxFirebaseUser.reauthenticate(firebaseUser, authCredential)
-                .flatMap(new Func1<Void, Single<GetTokenResult>>() {
-                    @Override
-                    public Single<GetTokenResult> call(Void aVoid) {
-                        return RxFirebaseUser.getToken(firebaseUser, false);
+                .flatMap(aVoid -> RxFirebaseUser.getToken(firebaseUser, false))
+                .flatMap(getTokenResult -> {
+                    final String idToken = getTokenResult.getToken();
+                    if (TextUtils.isEmpty(idToken)) {
+                        return Single.error(new Throwable("could not get id token!"));
                     }
-                })
-                .flatMap(new Func1<GetTokenResult, Single<? extends Void>>() {
-                    @Override
-                    public Single<? extends Void> call(GetTokenResult getTokenResult) {
-                        final String idToken = getTokenResult.getToken();
-                        if (TextUtils.isEmpty(idToken)) {
-                            return Single.error(new Throwable("could not get id token!"));
-                        }
 
-                        return deleteUserData.deleteUserData(new UserIdToken(idToken))
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread());
-                    }
+                    return deleteUserData.deleteUserData(new UserIdToken(idToken))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread());
                 })
-                .flatMap(new Func1<Void, Single<? extends Void>>() {
-                    @Override
-                    public Single<? extends Void> call(Void aVoid) {
-                        return RxFirebaseAuth.deleteUser(firebaseUser);
-                    }
-                })
-                .doOnSuccess(new Action1<Void>() {
-                    @Override
-                    public void call(Void aVoid) {
-                        auth.signOut();
-                    }
-                });
+                .flatMap(aVoid -> RxFirebaseAuth.deleteUser(firebaseUser))
+                .doOnSuccess(aVoid -> auth.signOut());
     }
 
     public void updateToken(@NonNull String userId, @NonNull String token) {

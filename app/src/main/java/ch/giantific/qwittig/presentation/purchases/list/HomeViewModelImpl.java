@@ -24,15 +24,11 @@ import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.OcrData;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import rx.Observable;
 import rx.SingleSubscriber;
 import rx.Subscription;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -107,31 +103,13 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
         currentUserId = currentUser.getUid();
         getSubscriptions().add(userRepo.observeUser(currentUserId)
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
-                    }
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
+                .doOnNext(identity -> {
+                    // listen to group identities, otherwise we wouldn't catch newly added users
+                    observeGroupIdentities(identity.getGroup());
                 })
-                .doOnNext(new Action1<Identity>() {
-                    @Override
-                    public void call(Identity identity) {
-                        // listen to group identities, otherwise we wouldn't catch newly added users
-                        observeGroupIdentities(identity.getGroup());
-                    }
-                })
-                .flatMap(new Func1<Identity, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> call(Identity identity) {
-                        return purchaseRepo.isDraftsAvailable(identity.getGroup(), identity.getId());
-                    }
-                })
-                .doOnNext(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean draftsAvailable) {
-                        setDraftsAvailable(draftsAvailable);
-                    }
-                })
+                .flatMap(identity -> purchaseRepo.isDraftsAvailable(identity.getGroup(), identity.getId()))
+                .doOnNext(this::setDraftsAvailable)
                 .subscribe(new IndefiniteSubscriber<Boolean>() {
                     @Override
                     public void onNext(Boolean draftsAvailable) {

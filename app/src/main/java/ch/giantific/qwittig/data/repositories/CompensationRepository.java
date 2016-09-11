@@ -44,13 +44,10 @@ public class CompensationRepository {
         final String pathPaid = getPaid ? Compensation.BASE_PATH_PAID : Compensation.BASE_PATH_UNPAID;
         final Query query = databaseRef.child(Compensation.BASE_PATH).child(pathPaid).orderByChild(Compensation.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeChildren(query, Compensation.class)
-                .filter(new Func1<RxChildEvent<Compensation>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Compensation> event) {
-                        final Compensation comp = event.getValue();
-                        return Objects.equals(comp.getDebtor(), currentIdentityId)
-                                || Objects.equals(comp.getCreditor(), currentIdentityId);
-                    }
+                .filter(event -> {
+                    final Compensation comp = event.getValue();
+                    return Objects.equals(comp.getDebtor(), currentIdentityId)
+                            || Objects.equals(comp.getCreditor(), currentIdentityId);
                 });
     }
 
@@ -60,13 +57,8 @@ public class CompensationRepository {
         final String pathPaid = getPaid ? Compensation.BASE_PATH_PAID : Compensation.BASE_PATH_UNPAID;
         final Query query = databaseRef.child(Compensation.BASE_PATH).child(pathPaid).orderByChild(Compensation.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeValuesOnce(query, Compensation.class)
-                .filter(new Func1<Compensation, Boolean>() {
-                    @Override
-                    public Boolean call(Compensation compensation) {
-                        return Objects.equals(compensation.getDebtor(), currentIdentityId)
-                                || Objects.equals(compensation.getCreditor(), currentIdentityId);
-                    }
-                });
+                .filter(compensation -> Objects.equals(compensation.getDebtor(), currentIdentityId)
+                        || Objects.equals(compensation.getCreditor(), currentIdentityId));
     }
 
     public Single<Compensation> confirmAmountAndAccept(@NonNull final String compensationId,
@@ -74,26 +66,23 @@ public class CompensationRepository {
                                                        final boolean amountChanged) {
         final Query query = databaseRef.child(Compensation.BASE_PATH).child(Compensation.BASE_PATH_UNPAID).child(compensationId);
         return RxFirebaseDatabase.observeValueOnce(query, Compensation.class)
-                .doOnSuccess(new Action1<Compensation>() {
-                    @Override
-                    public void call(Compensation compensation) {
-                        final Map<String, Object> childUpdates = new HashMap<>();
+                .doOnSuccess(compensation -> {
+                    final Map<String, Object> childUpdates = new HashMap<>();
 
-                        childUpdates.put(Compensation.BASE_PATH + "/" + Compensation.BASE_PATH_UNPAID + "/" + compensationId, null);
-                        final Map<String, Object> compMap = compensation.toMap();
+                    childUpdates.put(Compensation.BASE_PATH + "/" + Compensation.BASE_PATH_UNPAID + "/" + compensationId, null);
+                    final Map<String, Object> compMap = compensation.toMap();
 
-                        final Map<String, Object> amountMap = new HashMap<>(2);
-                        amountMap.put(Compensation.NUMERATOR, amount.getNumerator().intValue());
-                        amountMap.put(Compensation.DENOMINATOR, amount.getDenominator().intValue());
-                        compMap.put(Compensation.PATH_AMOUNT, amountMap);
+                    final Map<String, Object> amountMap = new HashMap<>(2);
+                    amountMap.put(Compensation.NUMERATOR, amount.getNumerator().intValue());
+                    amountMap.put(Compensation.DENOMINATOR, amount.getDenominator().intValue());
+                    compMap.put(Compensation.PATH_AMOUNT, amountMap);
 
-                        compMap.put(Compensation.PATH_PAID, true);
-                        compMap.put(Compensation.PATH_PAID_AT, ServerValue.TIMESTAMP);
-                        compMap.put(Compensation.PATH_AMOUNT_CHANGED, amountChanged);
+                    compMap.put(Compensation.PATH_PAID, true);
+                    compMap.put(Compensation.PATH_PAID_AT, ServerValue.TIMESTAMP);
+                    compMap.put(Compensation.PATH_AMOUNT_CHANGED, amountChanged);
 
-                        childUpdates.put(Compensation.BASE_PATH + "/" + Compensation.BASE_PATH_PAID + "/" + compensationId, compMap);
-                        databaseRef.updateChildren(childUpdates);
-                    }
+                    childUpdates.put(Compensation.BASE_PATH + "/" + Compensation.BASE_PATH_PAID + "/" + compensationId, compMap);
+                    databaseRef.updateChildren(childUpdates);
                 });
 
         // TODO: use transaction because server might change compensation at the same time due to recalculation

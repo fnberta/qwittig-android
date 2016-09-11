@@ -60,18 +60,13 @@ public class JoinGroupDialogFragment extends BaseDialogFragment<JoinGroupDialogF
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder.setTitle(getString(R.string.dialog_group_join_title, groupName))
                 .setMessage(getString(R.string.dialog_group_join_message, inviterNickname, groupName))
-                .setPositiveButton(R.string.dialog_positive_join, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        activity.onJoinInvitedGroupSelected(identityId);
-                        dismiss();
-                    }
+                .setPositiveButton(R.string.dialog_positive_join, (dialog, id) -> {
+                    activity.onJoinInvitedGroupSelected(identityId);
+                    dismiss();
                 })
-                .setNegativeButton(R.string.dialog_negative_discard, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        activity.onDiscardInvitationSelected();
-                        dismiss();
-                    }
+                .setNegativeButton(R.string.dialog_negative_discard, (dialog, which) -> {
+                    activity.onDiscardInvitationSelected();
+                    dismiss();
                 });
         return dialogBuilder.create();
     }

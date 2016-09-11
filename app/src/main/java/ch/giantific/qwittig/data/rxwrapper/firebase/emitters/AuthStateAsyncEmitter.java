@@ -23,12 +23,7 @@ public class AuthStateAsyncEmitter implements Action1<AsyncEmitter<FirebaseUser>
     public void call(final AsyncEmitter<FirebaseUser> asyncEmitter) {
         final FirebaseAuth.AuthStateListener authStateListener = new RxAuthStateListener(asyncEmitter);
         firebaseAuth.addAuthStateListener(authStateListener);
-        asyncEmitter.setCancellation(new AsyncEmitter.Cancellable() {
-            @Override
-            public void cancel() throws Exception {
-                firebaseAuth.removeAuthStateListener(authStateListener);
-            }
-        });
+        asyncEmitter.setCancellation(() -> firebaseAuth.removeAuthStateListener(authStateListener));
     }
 
     private static class RxAuthStateListener implements FirebaseAuth.AuthStateListener {

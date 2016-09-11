@@ -117,22 +117,19 @@ public class CompConfirmAmountDialogFragment extends BaseDialogFragment<CompConf
         // Override View onClickListener because we only want the dialog to close when a valid
         // amount address was entered. Default behavior is to always call dismiss().
         final Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-        positiveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String amountString = binding.etDialogCompConfirmAmount.getText().toString();
-                final double amount = MoneyUtils.parsePrice(amountString);
-                if (amount > 0) {
-                    if (amount > (CompConfirmAmountDialogFragment.this.amount * 2)) {
-                        binding.tilDialogCompConfirmAmount.setError(getString(R.string.error_valid_amount_too_big));
-                    } else {
-                        binding.tilDialogCompConfirmAmount.setErrorEnabled(false);
-                        activity.onAmountConfirmed(amount);
-                        dismiss();
-                    }
+        positiveButton.setOnClickListener(v -> {
+            final String amountString = binding.etDialogCompConfirmAmount.getText().toString();
+            final double amount1 = MoneyUtils.parsePrice(amountString);
+            if (amount1 > 0) {
+                if (amount1 > (CompConfirmAmountDialogFragment.this.amount * 2)) {
+                    binding.tilDialogCompConfirmAmount.setError(getString(R.string.error_valid_amount_too_big));
                 } else {
-                    binding.tilDialogCompConfirmAmount.setError(getString(R.string.error_valid_amount));
+                    binding.tilDialogCompConfirmAmount.setErrorEnabled(false);
+                    activity.onAmountConfirmed(amount1);
+                    dismiss();
                 }
+            } else {
+                binding.tilDialogCompConfirmAmount.setError(getString(R.string.error_valid_amount));
             }
         });
     }

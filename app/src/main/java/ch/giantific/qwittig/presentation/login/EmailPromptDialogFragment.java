@@ -80,12 +80,7 @@ public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDia
                 .setMessage(R.string.dialog_login_reset_password_message)
                 .setView(binding.getRoot())
                 .setPositiveButton(R.string.dialog_positive_reset, null)
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                .setNegativeButton(android.R.string.no, (dialog, which) -> dialog.cancel());
 
         return dialogBuilder.create();
     }
@@ -99,17 +94,14 @@ public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDia
         AlertDialog dialog = (AlertDialog) getDialog();
         if (dialog != null) {
             Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-            positiveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    email = binding.etDialogEmail.getText().toString();
-                    if (Utils.isEmailValid(email)) {
-                        binding.tilDialogEmail.setErrorEnabled(false);
-                        activity.onValidEmailEntered(email);
-                        dismiss();
-                    } else {
-                        binding.tilDialogEmail.setError(getString(R.string.error_email));
-                    }
+            positiveButton.setOnClickListener(v -> {
+                email = binding.etDialogEmail.getText().toString();
+                if (Utils.isEmailValid(email)) {
+                    binding.tilDialogEmail.setErrorEnabled(false);
+                    activity.onValidEmailEntered(email);
+                    dismiss();
+                } else {
+                    binding.tilDialogEmail.setError(getString(R.string.error_email));
                 }
             });
         }

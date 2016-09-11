@@ -86,18 +86,10 @@ public class PurchaseAddEditArticleIdentitiesRecyclerAdapter extends BaseRecycle
             super(binding);
 
             final View root = binding.getRoot();
-            root.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onItemRowIdentityClick(getAdapterPosition());
-                }
-            });
-            root.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    listener.onItemRowIdentityLongClick(getAdapterPosition());
-                    return true;
-                }
+            root.setOnClickListener(v -> listener.onItemRowIdentityClick(getAdapterPosition()));
+            root.setOnLongClickListener(view -> {
+                listener.onItemRowIdentityLongClick(getAdapterPosition());
+                return true;
             });
         }
     }

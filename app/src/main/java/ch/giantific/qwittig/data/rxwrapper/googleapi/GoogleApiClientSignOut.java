@@ -9,8 +9,6 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 
 import ch.giantific.qwittig.data.rxwrapper.googleapi.exceptions.GoogleAuthStatusException;
 import rx.Single;
@@ -34,14 +32,11 @@ public class GoogleApiClientSignOut extends BaseGoogleApiClientSingle<Void> {
     protected void onGoogleApiClientReady(@NonNull GoogleApiClient apiClient,
                                           @NonNull final SingleSubscriber<? super Void> subscriber) {
         Auth.GoogleSignInApi.signOut(apiClient)
-                .setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        if (status.isSuccess()) {
-                            subscriber.onSuccess(null);
-                        } else {
-                            subscriber.onError(new GoogleAuthStatusException(status));
-                        }
+                .setResultCallback(status -> {
+                    if (status.isSuccess()) {
+                        subscriber.onSuccess(null);
+                    } else {
+                        subscriber.onError(new GoogleAuthStatusException(status));
                     }
                 });
     }

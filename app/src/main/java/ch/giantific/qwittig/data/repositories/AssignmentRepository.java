@@ -29,7 +29,6 @@ import ch.giantific.qwittig.domain.models.AssignmentHistory;
 import ch.giantific.qwittig.utils.DateUtils;
 import rx.Observable;
 import rx.Single;
-import rx.functions.Func1;
 
 /**
  * Created by fabio on 12.07.16.
@@ -48,13 +47,10 @@ public class AssignmentRepository {
                                                                           @NonNull final Date deadline) {
         final Query query = databaseRef.child(Assignment.BASE_PATH).orderByChild(Assignment.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeChildren(query, Assignment.class)
-                .filter(new Func1<RxChildEvent<Assignment>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Assignment> childEvent) {
-                        final Assignment assignment = childEvent.getValue();
-                        return assignment.getIdentityIds().contains(currentIdentityId) &&
-                                assignment.getDeadline() <= deadline.getTime();
-                    }
+                .filter(childEvent -> {
+                    final Assignment assignment = childEvent.getValue();
+                    return assignment.getIdentityIds().contains(currentIdentityId) &&
+                            assignment.getDeadline() <= deadline.getTime();
                 });
     }
 
@@ -63,13 +59,8 @@ public class AssignmentRepository {
                                                  @NonNull final Date deadline) {
         final Query query = databaseRef.child(Assignment.BASE_PATH).orderByChild(Assignment.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeValuesOnce(query, Assignment.class)
-                .filter(new Func1<Assignment, Boolean>() {
-                    @Override
-                    public Boolean call(Assignment assignment) {
-                        return assignment.getIdentityIds().contains(currentIdentityId) &&
-                                assignment.getDeadline() <= deadline.getTime();
-                    }
-                });
+                .filter(assignment -> assignment.getIdentityIds().contains(currentIdentityId) &&
+                        assignment.getDeadline() <= deadline.getTime());
     }
 
     public Observable<Assignment> observeAssignment(@NonNull String assignmentId) {

@@ -23,15 +23,12 @@ import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -85,39 +82,16 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
         firebaseUser = currentUser;
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<User>>() {
-                    @Override
-                    public Observable<User> call(final User user) {
-                        return userRepo.observeIdentity(user.getCurrentIdentity())
-                                .doOnNext(new Action1<Identity>() {
-                                    @Override
-                                    public void call(Identity identity) {
-                                        currentIdentity = identity;
-                                        currentIdentityId = identity.getId();
-                                        setupCurrentGroupCategory();
-                                    }
-                                })
-                                .map(new Func1<Identity, User>() {
-                                    @Override
-                                    public User call(Identity identity) {
-                                        return user;
-                                    }
-                                });
-                    }
-                })
-                .flatMap(new Func1<User, Observable<List<Identity>>>() {
-                    @Override
-                    public Observable<List<Identity>> call(User user) {
-                        return Observable.from(user.getIdentitiesIds())
-                                .flatMap(new Func1<String, Observable<Identity>>() {
-                                    @Override
-                                    public Observable<Identity> call(final String identityId) {
-                                        return userRepo.getIdentity(identityId).toObservable();
-                                    }
-                                })
-                                .toList();
-                    }
-                })
+                .flatMap(user -> userRepo.observeIdentity(user.getCurrentIdentity())
+                        .doOnNext(identity -> {
+                            currentIdentity = identity;
+                            currentIdentityId = identity.getId();
+                            setupCurrentGroupCategory();
+                        })
+                        .map(identity -> user))
+                .flatMap(user -> Observable.from(user.getIdentitiesIds())
+                        .flatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
+                        .toList())
                 .subscribe(new IndefiniteSubscriber<List<Identity>>() {
                     @Override
                     public void onError(Throwable e) {

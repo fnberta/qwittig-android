@@ -44,11 +44,9 @@ public class LeaveGroupDialogFragment extends BaseDialogFragment<LeaveGroupDialo
         final int message = getArguments().getInt(KEY_MESSAGE);
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder.setMessage(message)
-                .setPositiveButton(R.string.dialog_positive_leave, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        activity.onLeaveGroupSelected();
-                        dismiss();
-                    }
+                .setPositiveButton(R.string.dialog_positive_leave, (dialog, id) -> {
+                    activity.onLeaveGroupSelected();
+                    dismiss();
                 })
                 .setNegativeButton(android.R.string.no, null);
         return dialogBuilder.create();

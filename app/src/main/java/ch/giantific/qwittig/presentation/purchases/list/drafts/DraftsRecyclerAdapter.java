@@ -54,12 +54,7 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDra
     @Override
     public void scrollToPosition(final int position) {
         // override to let RecyclerView layout its items first
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                recyclerView.scrollToPosition(position);
-            }
-        });
+        recyclerView.post(() -> recyclerView.scrollToPosition(position));
     }
 
     @Override

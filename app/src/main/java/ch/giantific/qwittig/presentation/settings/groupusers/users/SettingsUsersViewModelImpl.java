@@ -22,16 +22,11 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserItemModel;
-import rx.Observable;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -134,33 +129,14 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
-                    }
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
+                .doOnNext(identity -> {
+                    currentIdentity = identity;
+                    setGroupName(identity.getGroupName());
+                    items.clear();
                 })
-                .doOnNext(new Action1<Identity>() {
-                    @Override
-                    public void call(Identity identity) {
-                        currentIdentity = identity;
-                        setGroupName(identity.getGroupName());
-                        items.clear();
-                    }
-                })
-                .flatMap(new Func1<Identity, Observable<RxChildEvent<Identity>>>() {
-                    @Override
-                    public Observable<RxChildEvent<Identity>> call(Identity identity) {
-                        return groupRepo.observeGroupIdentityChildren(identity.getGroup());
-                    }
-                })
-                .map(new Func1<RxChildEvent<Identity>, SettingsUsersUserItemModel>() {
-                    @Override
-                    public SettingsUsersUserItemModel call(RxChildEvent<Identity> event) {
-                        return new SettingsUsersUserItemModel(event.getEventType(),
-                                event.getValue());
-                    }
-                })
+                .flatMap(identity -> groupRepo.observeGroupIdentityChildren(identity.getGroup()))
+                .map(event -> new SettingsUsersUserItemModel(event.getEventType(), event.getValue()))
                 .subscribe(this)
         );
     }

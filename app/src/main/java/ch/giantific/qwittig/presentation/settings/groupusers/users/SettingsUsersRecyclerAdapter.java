@@ -73,26 +73,23 @@ public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUs
             super(binding);
 
             binding.tbAddUsersUser.inflateMenu(R.menu.menu_settings_users_user);
-            binding.tbAddUsersUser.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    final int id = item.getItemId();
-                    switch (id) {
-                        case R.id.action_settings_users_user_invite:
-                            listener.onInviteClick(getAdapterPosition());
-                            return true;
-                        case R.id.action_settings_users_user_edit_nickname:
-                            listener.onEditNicknameClick(getAdapterPosition());
-                            return true;
-                        case R.id.action_settings_users_user_edit_avatar:
-                            listener.onEditAvatarClick(getAdapterPosition());
-                            return true;
-                        case R.id.action_settings_users_user_remove:
-                            listener.onRemoveClick(getAdapterPosition());
-                            return true;
-                        default:
-                            return false;
-                    }
+            binding.tbAddUsersUser.setOnMenuItemClickListener(item -> {
+                final int id = item.getItemId();
+                switch (id) {
+                    case R.id.action_settings_users_user_invite:
+                        listener.onInviteClick(getAdapterPosition());
+                        return true;
+                    case R.id.action_settings_users_user_edit_nickname:
+                        listener.onEditNicknameClick(getAdapterPosition());
+                        return true;
+                    case R.id.action_settings_users_user_edit_avatar:
+                        listener.onEditAvatarClick(getAdapterPosition());
+                        return true;
+                    case R.id.action_settings_users_user_remove:
+                        listener.onRemoveClick(getAdapterPosition());
+                        return true;
+                    default:
+                        return false;
                 }
             });
         }

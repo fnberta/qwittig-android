@@ -81,12 +81,7 @@ public class NicknamePromptDialogFragment extends BaseDialogFragment<NicknamePro
                 .setMessage(R.string.dialog_change_nickname_message)
                 .setView(binding.getRoot())
                 .setPositiveButton(android.R.string.yes, null)
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                .setNegativeButton(android.R.string.no, (dialog, which) -> dialog.cancel());
 
         return dialogBuilder.create();
     }
@@ -100,17 +95,14 @@ public class NicknamePromptDialogFragment extends BaseDialogFragment<NicknamePro
         final AlertDialog dialog = (AlertDialog) getDialog();
         if (dialog != null) {
             final Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-            positiveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    nickname = binding.etDialogNickname.getText().toString();
-                    if (!TextUtils.isEmpty(nickname)) {
-                        binding.tilDialogNickname.setErrorEnabled(false);
-                        activity.onValidNicknameEntered(nickname, position);
-                        dismiss();
-                    } else {
-                        binding.tilDialogNickname.setError(getString(R.string.error_nickname));
-                    }
+            positiveButton.setOnClickListener(v -> {
+                nickname = binding.etDialogNickname.getText().toString();
+                if (!TextUtils.isEmpty(nickname)) {
+                    binding.tilDialogNickname.setErrorEnabled(false);
+                    activity.onValidNicknameEntered(nickname, position);
+                    dismiss();
+                } else {
+                    binding.tilDialogNickname.setError(getString(R.string.error_nickname));
                 }
             });
         }

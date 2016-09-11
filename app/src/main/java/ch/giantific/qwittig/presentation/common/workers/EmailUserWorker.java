@@ -169,7 +169,7 @@ public class EmailUserWorker extends BaseWorker<Void, EmailUserWorkerListener> {
         activity.setEmailUserStream(observable.toSingle(), WORKER_TAG);
     }
 
-    @IntDef({EmailUserAction.DELETE, EmailUserAction.REQUEST_RESET_PW})
+    @IntDef({EmailUserAction.DELETE, EmailUserAction.REQUEST_RESET_PW, EmailUserAction.CHANGE_EMAIL_PW})
     @Retention(RetentionPolicy.SOURCE)
     public @interface EmailUserAction {
         int DELETE = 1;

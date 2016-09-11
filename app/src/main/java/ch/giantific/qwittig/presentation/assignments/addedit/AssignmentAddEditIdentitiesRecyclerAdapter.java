@@ -89,16 +89,13 @@ public class AssignmentAddEditIdentitiesRecyclerAdapter extends BaseRecyclerAdap
             super(binding);
 
             final AssignmentIdentityRow assignmentIdentityRow = this;
-            binding.ivReorder.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, @NonNull MotionEvent event) {
-                    if (MotionEventCompat.getActionMasked(event) ==
-                            MotionEvent.ACTION_DOWN) {
-                        listener.onStartDrag(assignmentIdentityRow);
-                    }
-
-                    return false;
+            binding.ivReorder.setOnTouchListener((v, event) -> {
+                if (MotionEventCompat.getActionMasked(event) ==
+                        MotionEvent.ACTION_DOWN) {
+                    listener.onStartDrag(assignmentIdentityRow);
                 }
+
+                return false;
             });
         }
     }

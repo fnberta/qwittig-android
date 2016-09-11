@@ -87,13 +87,10 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     private void setupNavDrawer() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                selectedNavDrawerItem = menuItem.getItemId();
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            }
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            selectedNavDrawerItem = menuItem.getItemId();
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
         });
         navigationViewMenu = navigationView.getMenu();
 

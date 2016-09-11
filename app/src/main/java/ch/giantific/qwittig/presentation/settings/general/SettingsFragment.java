@@ -137,48 +137,36 @@ public class SettingsFragment extends PreferenceFragmentCompat
         etPreferenceGroupName = (EditTextPreference)
                 findPreference(PREF_GROUP_NAME);
         preferenceGroupLeave = findPreference(PREF_GROUP_LEAVE);
-        preferenceGroupLeave.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                settingsViewModel.onLeaveGroupClick();
-                return true;
-            }
+        preferenceGroupLeave.setOnPreferenceClickListener(preference -> {
+            settingsViewModel.onLeaveGroupClick();
+            return true;
         });
 
         final Preference prefProfile = findPreference(PREF_PROFILE);
-        prefProfile.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                final Intent intent = new Intent(activity, SettingsProfileActivity.class);
-                final ActivityOptionsCompat activityOptionsCompat =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-                activity.startActivityForResult(intent, Navigator.INTENT_REQUEST_SETTINGS_PROFILE,
-                        activityOptionsCompat.toBundle());
-                return true;
-            }
+        prefProfile.setOnPreferenceClickListener(preference -> {
+            final Intent intent = new Intent(activity, SettingsProfileActivity.class);
+            final ActivityOptionsCompat activityOptionsCompat =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
+            activity.startActivityForResult(intent, Navigator.INTENT_REQUEST_SETTINGS_PROFILE,
+                    activityOptionsCompat.toBundle());
+            return true;
         });
         final Preference prefGroupNew = findPreference(PREF_GROUP_ADD_NEW);
-        prefGroupNew.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
-                final ActivityOptionsCompat activityOptionsCompat =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-                activity.startActivityForResult(intent, Navigator.INTENT_REQUEST_SETTINGS_ADD_GROUP,
-                        activityOptionsCompat.toBundle());
-                return true;
-            }
+        prefGroupNew.setOnPreferenceClickListener(preference -> {
+            final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
+            final ActivityOptionsCompat activityOptionsCompat =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
+            activity.startActivityForResult(intent, Navigator.INTENT_REQUEST_SETTINGS_ADD_GROUP,
+                    activityOptionsCompat.toBundle());
+            return true;
         });
         final Preference prefGroupAddUser = findPreference(PREF_GROUP_USERS);
-        prefGroupAddUser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                final Intent intent = new Intent(activity, SettingsUsersActivity.class);
-                final ActivityOptionsCompat activityOptionsCompat =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-                activity.startActivity(intent, activityOptionsCompat.toBundle());
-                return true;
-            }
+        prefGroupAddUser.setOnPreferenceClickListener(preference -> {
+            final Intent intent = new Intent(activity, SettingsUsersActivity.class);
+            final ActivityOptionsCompat activityOptionsCompat =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
+            activity.startActivity(intent, activityOptionsCompat.toBundle());
+            return true;
         });
     }
 
@@ -293,18 +281,15 @@ public class SettingsFragment extends PreferenceFragmentCompat
         pref.setSummary(pref.getEntry());
 
         // Update the summary with currently selected value
-        pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object o) {
-                int index = pref.findIndexOfValue(o.toString());
+        pref.setOnPreferenceChangeListener((preference, o) -> {
+            int index = pref.findIndexOfValue(o.toString());
 
-                if (index >= 0) {
-                    preference.setSummary(pref.getEntries()[index]);
-                } else {
-                    preference.setSummary(null);
-                }
-                return true;
+            if (index >= 0) {
+                preference.setSummary(pref.getEntries()[index]);
+            } else {
+                preference.setSummary(null);
             }
+            return true;
         });
     }
 

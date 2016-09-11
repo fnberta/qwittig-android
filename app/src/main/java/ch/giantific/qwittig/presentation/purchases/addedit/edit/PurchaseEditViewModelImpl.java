@@ -82,18 +82,8 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
     @Override
     protected void loadPurchase(@NonNull FirebaseUser currentUser) {
         getSubscriptions().add(getInitialChain(currentUser)
-                .flatMap(new Func1<List<Identity>, Single<Purchase>>() {
-                    @Override
-                    public Single<Purchase> call(List<Identity> identities) {
-                        return getPurchase();
-                    }
-                })
-                .doOnSuccess(new Action1<Purchase>() {
-                    @Override
-                    public void call(Purchase purchase) {
-                        editPurchase = purchase;
-                    }
-                })
+                .flatMap(identities -> getPurchase())
+                .doOnSuccess(purchase -> editPurchase = purchase)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {

@@ -29,7 +29,6 @@ import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.AssignmentHistory;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsHeaderItem;
 import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsHistoryItem;
 import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsItemModel;
@@ -38,8 +37,6 @@ import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link AssignmentDetailsViewModel} interface.
@@ -151,74 +148,42 @@ public class AssignmentDetailsViewModelImpl extends ViewModelBaseImpl<Assignment
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .doOnNext(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        final String identityId = user.getCurrentIdentity();
-                        if (!TextUtils.isEmpty(currentIdentityId)
-                                && !Objects.equals(currentIdentityId, identityId)) {
-                            navigator.finish();
-                        }
+                .doOnNext(user -> {
+                    final String identityId = user.getCurrentIdentity();
+                    if (!TextUtils.isEmpty(currentIdentityId)
+                            && !Objects.equals(currentIdentityId, identityId)) {
+                        navigator.finish();
+                    }
 
-                        currentIdentityId = identityId;
-                    }
+                    currentIdentityId = identityId;
                 })
-                .flatMap(new Func1<User, Observable<Assignment>>() {
-                    @Override
-                    public Observable<Assignment> call(User user) {
-                        return assignmentRepo.observeAssignment(assignmentId);
-                    }
-                })
-                .doOnNext(new Action1<Assignment>() {
-                    @Override
-                    public void call(Assignment assignmentObj) {
-                        assignment = assignmentObj;
+                .flatMap(user -> assignmentRepo.observeAssignment(assignmentId))
+                .doOnNext(assignment -> {
+                    this.assignment = assignment;
 
-                        updateToolbarHeader();
-                        items.clear();
-                        items.add(new AssignmentDetailsHeaderItem(R.string.header_assignment_history));
-                    }
+                    updateToolbarHeader();
+                    items.clear();
+                    items.add(new AssignmentDetailsHeaderItem(R.string.header_assignment_history));
                 })
-                .flatMap(new Func1<Assignment, Observable<List<Identity>>>() {
-                    @Override
-                    public Observable<List<Identity>> call(Assignment assignment) {
-                        return Observable.from(assignment.getIdentityIdsSorted())
-                                .concatMap(new Func1<String, Observable<Identity>>() {
-                                    @Override
-                                    public Observable<Identity> call(String identityId) {
-                                        return userRepo.getIdentity(identityId).toObservable();
-                                    }
-                                })
-                                .toList();
-                    }
+                .flatMap(assignment1 -> Observable.from(assignment1.getIdentityIdsSorted())
+                        .concatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
+                        .toList())
+                .doOnNext(identities -> {
+                    updateIdentities(identities);
+                    checkIdentitiesActive(identities);
                 })
-                .doOnNext(new Action1<List<Identity>>() {
-                    @Override
-                    public void call(List<Identity> identities) {
-                        updateIdentities(identities);
-                        checkIdentitiesActive(identities);
-                    }
-                })
-                .flatMap(new Func1<List<Identity>, Observable<List<AssignmentDetailsHistoryItem>>>() {
-                    @Override
-                    public Observable<List<AssignmentDetailsHistoryItem>> call(final List<Identity> identities) {
-                        return assignmentRepo.getAssignmentHistory(assignmentId)
-                                .map(new Func1<AssignmentHistory, AssignmentDetailsHistoryItem>() {
-                                    @Override
-                                    public AssignmentDetailsHistoryItem call(AssignmentHistory assignmentHistory) {
-                                        final String identityId = assignmentHistory.getIdentity();
-                                        for (Identity identity : identities) {
-                                            if (Objects.equals(identityId, identity.getId())) {
-                                                return new AssignmentDetailsHistoryItem(assignmentHistory, identity);
-                                            }
-                                        }
+                .flatMap(identities -> assignmentRepo.getAssignmentHistory(assignmentId)
+                        .map(assignmentHistory -> {
+                            final String identityId = assignmentHistory.getIdentity();
+                            for (Identity identity : identities) {
+                                if (Objects.equals(identityId, identity.getId())) {
+                                    return new AssignmentDetailsHistoryItem(assignmentHistory, identity);
+                                }
+                            }
 
-                                        return null;
-                                    }
-                                })
-                                .toSortedList();
-                    }
-                })
+                            return null;
+                        })
+                        .toSortedList())
                 .subscribe(new IndefiniteSubscriber<List<AssignmentDetailsHistoryItem>>() {
                     @Override
                     public void onError(Throwable e) {

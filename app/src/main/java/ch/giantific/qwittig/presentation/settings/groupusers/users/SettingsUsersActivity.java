@@ -96,12 +96,7 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
             case Navigator.INTENT_REQUEST_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
-                        @Override
-                        public void onAvatarSaved(@NonNull String path) {
-                            usersViewModel.onNewAvatarTaken(path);
-                        }
-                    });
+                    AvatarUtils.saveImageLocal(this, imageUri, path -> usersViewModel.onNewAvatarTaken(path));
                 }
         }
     }

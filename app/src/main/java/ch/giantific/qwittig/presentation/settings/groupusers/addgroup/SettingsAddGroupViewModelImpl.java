@@ -24,13 +24,10 @@ import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link SettingsAddGroupViewModel}.
@@ -107,30 +104,10 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<String>>() {
-                    @Override
-                    public Observable<String> call(final User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity())
-                                .doOnSuccess(new Action1<Identity>() {
-                                    @Override
-                                    public void call(Identity identity) {
-                                        currentIdentity = identity;
-                                    }
-                                })
-                                .flatMapObservable(new Func1<Identity, Observable<String>>() {
-                                    @Override
-                                    public Observable<String> call(Identity identity) {
-                                        return Observable.from(user.getIdentitiesIds());
-                                    }
-                                });
-                    }
-                })
-                .flatMap(new Func1<String, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(String identityId) {
-                        return userRepo.observeIdentity(identityId);
-                    }
-                })
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity())
+                        .doOnSuccess(identity -> currentIdentity = identity)
+                        .flatMapObservable(identity -> Observable.from(user.getIdentitiesIds())))
+                .flatMap(userRepo::observeIdentity)
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {

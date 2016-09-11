@@ -20,11 +20,9 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
@@ -33,7 +31,6 @@ import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link PurchasesViewModel}.
@@ -71,12 +68,7 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchaseItemMo
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
-                    }
-                })
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -100,30 +92,15 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchaseItemMo
 
     private void addDataListener(@NonNull final String identityId) {
         setDataListenerSub(purchaseRepo.observePurchaseChildren(currentGroupId, identityId, false)
-                .filter(new Func1<RxChildEvent<Purchase>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Purchase> purchaseRxChildEvent) {
-                        return initialDataLoaded;
-                    }
-                })
-                .flatMap(new Func1<RxChildEvent<Purchase>, Observable<PurchaseItemModel>>() {
-                    @Override
-                    public Observable<PurchaseItemModel> call(final RxChildEvent<Purchase> event) {
-                        return getItemModel(event.getValue(), event.getEventType(), identityId);
-                    }
-                })
+                .filter(purchaseRxChildEvent -> initialDataLoaded)
+                .flatMap(event -> getItemModel(event.getValue(), event.getEventType(), identityId))
                 .subscribe(this)
         );
     }
 
     private void loadInitialData(@NonNull final String identityId) {
         setInitialDataSub(purchaseRepo.getPurchases(currentGroupId, identityId, false)
-                .flatMap(new Func1<Purchase, Observable<PurchaseItemModel>>() {
-                    @Override
-                    public Observable<PurchaseItemModel> call(final Purchase purchase) {
-                        return getItemModel(purchase, EventType.NONE, identityId);
-                    }
-                })
+                .flatMap(purchase -> getItemModel(purchase, EventType.NONE, identityId))
                 .toList()
                 .subscribe(new Subscriber<List<PurchaseItemModel>>() {
                     @Override
@@ -150,13 +127,8 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchaseItemMo
                                                        final int eventType,
                                                        @NonNull final String currentIdentityId) {
         return userRepo.getIdentity(purchase.getBuyer())
-                .map(new Func1<Identity, PurchaseItemModel>() {
-                    @Override
-                    public PurchaseItemModel call(Identity buyer) {
-                        return new PurchaseItemModel(eventType, purchase, buyer, currentIdentityId,
-                                moneyFormatter, dateFormatter);
-                    }
-                })
+                .map(buyer -> new PurchaseItemModel(eventType, purchase, buyer, currentIdentityId,
+                        moneyFormatter, dateFormatter))
                 .toObservable();
     }
 

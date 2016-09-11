@@ -19,20 +19,16 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftItemModel;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link DraftsViewModel}.
@@ -99,12 +95,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftItemModel, D
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
-                    }
-                })
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -127,19 +118,11 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftItemModel, D
 
     private void addDataListener(@NonNull String identityId) {
         setDataListenerSub(purchaseRepo.observePurchaseChildren(currentGroupId, identityId, true)
-                .filter(new Func1<RxChildEvent<Purchase>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Purchase> purchaseRxChildEvent) {
-                        return initialDataLoaded;
-                    }
-                })
-                .map(new Func1<RxChildEvent<Purchase>, DraftItemModel>() {
-                    @Override
-                    public DraftItemModel call(RxChildEvent<Purchase> event) {
-                        final Purchase draft = event.getValue();
-                        return getItemModel(event.getValue(), event.getEventType(),
-                                draftsSelected.contains(draft.getId()));
-                    }
+                .filter(purchaseRxChildEvent -> initialDataLoaded)
+                .map(event -> {
+                    final Purchase draft = event.getValue();
+                    return getItemModel(event.getValue(), event.getEventType(),
+                            draftsSelected.contains(draft.getId()));
                 })
                 .subscribe(this)
         );
@@ -147,12 +130,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftItemModel, D
 
     private void loadInitialData(@NonNull String identityId) {
         setInitialDataSub(purchaseRepo.getPurchases(currentGroupId, identityId, true)
-                .map(new Func1<Purchase, DraftItemModel>() {
-                    @Override
-                    public DraftItemModel call(Purchase draft) {
-                        return getItemModel(draft, EventType.NONE, draftsSelected.contains(draft.getId()));
-                    }
-                })
+                .map(draft -> getItemModel(draft, EventType.NONE, draftsSelected.contains(draft.getId())))
                 .toList()
                 .subscribe(new Subscriber<List<DraftItemModel>>() {
                     @Override

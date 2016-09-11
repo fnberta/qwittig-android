@@ -25,9 +25,7 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Article;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -37,8 +35,6 @@ import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDe
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link PurchaseDetailsViewModel}.
@@ -210,84 +206,44 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
         super.onUserLoggedIn(currentUser);
 
         getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .doOnNext(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        final String identityId = user.getCurrentIdentity();
-                        if (!TextUtils.isEmpty(currentIdentityId)
-                                && !Objects.equals(currentIdentityId, identityId)) {
-                            navigator.finish();
-                        }
+                .doOnNext(user -> {
+                    final String identityId = user.getCurrentIdentity();
+                    if (!TextUtils.isEmpty(currentIdentityId)
+                            && !Objects.equals(currentIdentityId, identityId)) {
+                        navigator.finish();
+                    }
 
-                        currentIdentityId = identityId;
-                    }
+                    currentIdentityId = identityId;
                 })
-                .flatMap(new Func1<User, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(final User user) {
-                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable()
-                                .flatMap(new Func1<Identity, Observable<Identity>>() {
-                                    @Override
-                                    public Observable<Identity> call(final Identity identity) {
-                                        if (TextUtils.isEmpty(purchaseGroupId)
-                                                || Objects.equals(purchaseGroupId, identity.getGroup())) {
-                                            return Observable.just(identity);
-                                        }
+                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable()
+                        .flatMap(identity -> {
+                            if (TextUtils.isEmpty(purchaseGroupId)
+                                    || Objects.equals(purchaseGroupId, identity.getGroup())) {
+                                return Observable.just(identity);
+                            }
 
-                                        return userRepo.switchGroup(user, purchaseGroupId)
-                                                .flatMap(new Func1<Identity, Observable<Identity>>() {
-                                                    @Override
-                                                    public Observable<Identity> call(Identity identity) {
-                                                        return Observable.never();
-                                                    }
-                                                });
-                                    }
-                                });
-                    }
+                            return userRepo.switchGroup(user, purchaseGroupId)
+                                    .flatMap(identity1 -> Observable.never());
+                        }))
+                .doOnNext(identity -> {
+                    final String currency = identity.getGroupCurrency();
+                    moneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
                 })
-                .doOnNext(new Action1<Identity>() {
-                    @Override
-                    public void call(Identity identity) {
-                        final String currency = identity.getGroupCurrency();
-                        moneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
-                    }
-                })
-                .flatMap(new Func1<Identity, Observable<Purchase>>() {
-                    @Override
-                    public Observable<Purchase> call(final Identity identity) {
-                        return purchaseRepo.observePurchase(purchaseId)
-                                .doOnNext(new Action1<Purchase>() {
-                                    @Override
-                                    public void call(Purchase purchase) {
-                                        foreignMoneyFormatter = MoneyUtils.getMoneyFormatter(purchase.getCurrency(), true, true);
-                                        final String currentIdentityId = identity.getId();
-                                        updateReadBy(purchase, currentIdentityId);
-                                        updateActionBarMenu(purchase, identity.getGroupCurrency(), currentIdentityId);
-                                        setPurchaseDetails(purchase, currentIdentityId);
-                                    }
-                                });
-                    }
-                })
-                .flatMap(new Func1<Purchase, Observable<List<PurchaseDetailsIdentityItemModel>>>() {
-                    @Override
-                    public Observable<List<PurchaseDetailsIdentityItemModel>> call(final Purchase purchase) {
-                        return Observable.from(purchase.getIdentitiesIds())
-                                .flatMap(new Func1<String, Observable<Identity>>() {
-                                    @Override
-                                    public Observable<Identity> call(String identityId) {
-                                        return userRepo.getIdentity(identityId).toObservable();
-                                    }
-                                })
-                                .map(new Func1<Identity, PurchaseDetailsIdentityItemModel>() {
-                                    @Override
-                                    public PurchaseDetailsIdentityItemModel call(Identity identity) {
-                                        final boolean isBuyer = Objects.equals(purchase.getBuyer(), identity.getId());
-                                        return new PurchaseDetailsIdentityItemModel(identity, isBuyer);
-                                    }
-                                })
-                                .toList();
-                    }
-                })
+                .flatMap(identity -> purchaseRepo.observePurchase(purchaseId)
+                        .doOnNext(purchase -> {
+                            foreignMoneyFormatter = MoneyUtils.getMoneyFormatter(purchase.getCurrency(), true, true);
+                            final String currentIdentityId1 = identity.getId();
+                            updateReadBy(purchase, currentIdentityId1);
+                            updateActionBarMenu(purchase, identity.getGroupCurrency(), currentIdentityId1);
+                            setPurchaseDetails(purchase, currentIdentityId1);
+                        }))
+                .flatMap(purchase -> Observable.from(purchase.getIdentitiesIds())
+                        .flatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
+                        .map(identity -> {
+                            final boolean isBuyer = Objects.equals(purchase.getBuyer(), identity.getId());
+                            return new PurchaseDetailsIdentityItemModel(identity, isBuyer);
+                        })
+                        .toList())
                 .subscribe(new IndefiniteSubscriber<List<PurchaseDetailsIdentityItemModel>>() {
                     @Override
                     public void onError(Throwable e) {

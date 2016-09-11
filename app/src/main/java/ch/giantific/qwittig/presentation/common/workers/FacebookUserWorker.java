@@ -112,12 +112,7 @@ public class FacebookUserWorker extends BaseWorker<Void, GoogleUserWorkerListene
                 final String token = args.getString(KEY_TOKEN, "");
                 final AuthCredential authCredential = FacebookAuthProvider.getCredential(token);
                 return userRepo.unlinkFacebook()
-                        .flatMap(new Func1<Void, Single<Void>>() {
-                            @Override
-                            public Single<Void> call(Void aVoid) {
-                                return userRepo.deleteUser(firebaseUser, authCredential);
-                            }
-                        })
+                        .flatMap(aVoid -> userRepo.deleteUser(firebaseUser, authCredential))
                         .toObservable();
             }
             case FacebookUserAction.UNLINK: {
@@ -127,12 +122,7 @@ public class FacebookUserWorker extends BaseWorker<Void, GoogleUserWorkerListene
                 final AuthCredential oldCredential = FacebookAuthProvider.getCredential(token);
                 final AuthCredential newCredential = EmailAuthProvider.getCredential(email, password);
                 return userRepo.linkUserWithCredential(firebaseUser, oldCredential, newCredential)
-                        .flatMap(new Func1<AuthResult, Single<Void>>() {
-                            @Override
-                            public Single<Void> call(AuthResult authResult) {
-                                return userRepo.unlinkFacebook();
-                            }
-                        })
+                        .flatMap(authResult -> userRepo.unlinkFacebook())
                         .toObservable();
             }
             default:

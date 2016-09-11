@@ -121,12 +121,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             final TutorialOverlayCameraBinding tutBinding =
                     TutorialOverlayCameraBinding.inflate(getLayoutInflater(), binding.flCameraMain, false);
             binding.flCameraMain.addView(tutBinding.svTutCamera);
-            tutBinding.fabTutCameraDone.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    binding.flCameraMain.removeView(tutBinding.svTutCamera);
-                }
-            });
+            tutBinding.fabTutCameraDone.setOnClickListener(v -> binding.flCameraMain.removeView(tutBinding.svTutCamera));
         }
     }
 
@@ -204,14 +199,11 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         int id = v.getId();
         switch (id) {
             case R.id.fab_camera_capture:
-                mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                    @Override
-                    public void onAutoFocus(boolean success, Camera camera) {
-                        if (success) {
-                            mCamera.takePicture(null, null, mPicture);
-                        } else {
-                            Timber.w("autoFocus failed");
-                        }
+                mCamera.autoFocus((success, camera) -> {
+                    if (success) {
+                        mCamera.takePicture(null, null, mPicture);
+                    } else {
+                        Timber.w("autoFocus failed");
                     }
                 });
                 break;

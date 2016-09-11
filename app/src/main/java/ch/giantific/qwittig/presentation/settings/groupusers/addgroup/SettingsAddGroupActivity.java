@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -100,12 +99,7 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
             case Navigator.INTENT_REQUEST_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
-                        @Override
-                        public void onAvatarSaved(@NonNull String path) {
-                            usersViewModel.onNewAvatarTaken(path);
-                        }
-                    });
+                    AvatarUtils.saveImageLocal(this, imageUri, path -> usersViewModel.onNewAvatarTaken(path));
                 }
         }
     }

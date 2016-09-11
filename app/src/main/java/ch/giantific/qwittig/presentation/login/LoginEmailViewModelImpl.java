@@ -22,14 +22,11 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.login.LoginWorker.LoginType;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link LoginEmailViewModel}.
@@ -131,45 +128,29 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
                                    @NonNull final String workerTag,
                                    @LoginType final int type) {
         getSubscriptions().add(single
-                .flatMap(new Func1<FirebaseUser, Single<Boolean>>() {
-                    @Override
-                    public Single<Boolean> call(final FirebaseUser firebaseUser) {
-                        final String userId = firebaseUser.getUid();
-                        if (!TextUtils.isEmpty(identityId)) {
-                            return userRepo.getIdentity(identityId)
-                                    .doOnSuccess(new Action1<Identity>() {
-                                        @Override
-                                        public void call(Identity identity) {
-                                            groupRepo.joinGroup(userId, identityId, identity.getGroup());
-                                        }
-                                    })
-                                    .map(new Func1<Identity, Boolean>() {
-                                        @Override
-                                        public Boolean call(Identity identity) {
-                                            return type == LoginType.SIGN_UP_EMAIL;
-                                        }
-                                    });
-                        }
-
-                        if (type == LoginType.SIGN_UP_EMAIL) {
-                            return Single.just(true)
-                                    .doOnSuccess(new Action1<Boolean>() {
-                                        @Override
-                                        public void call(Boolean isUserNew) {
-                                            final String email = firebaseUser.getEmail();
-                                            final String defaultNickname = !TextUtils.isEmpty(email)
-                                                    ? email.substring(0, email.indexOf("@"))
-                                                    : "";
-                                            groupRepo.createGroup(userId,
-                                                    configHelper.getDefaultGroupName(),
-                                                    configHelper.getDefaultGroupCurrency(),
-                                                    defaultNickname, null);
-                                        }
-                                    });
-                        }
-
-                        return Single.just(false);
+                .flatMap(firebaseUser -> {
+                    final String userId = firebaseUser.getUid();
+                    if (!TextUtils.isEmpty(identityId)) {
+                        return userRepo.getIdentity(identityId)
+                                .doOnSuccess(identity -> groupRepo.joinGroup(userId, identityId, identity.getGroup()))
+                                .map(identity -> type == LoginType.SIGN_UP_EMAIL);
                     }
+
+                    if (type == LoginType.SIGN_UP_EMAIL) {
+                        return Single.just(true)
+                                .doOnSuccess(isUserNew -> {
+                                    final String email1 = firebaseUser.getEmail();
+                                    final String defaultNickname = !TextUtils.isEmpty(email1)
+                                            ? email1.substring(0, email1.indexOf("@"))
+                                            : "";
+                                    groupRepo.createGroup(userId,
+                                            configHelper.getDefaultGroupName(),
+                                            configHelper.getDefaultGroupCurrency(),
+                                            defaultNickname, null);
+                                });
+                    }
+
+                    return Single.just(false);
                 })
                 .subscribe(new SingleSubscriber<Boolean>() {
                     @Override

@@ -93,13 +93,7 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
     }
 
     private void setUpNavigation() {
-        final AssignmentDetailsActivity activity = this;
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavUtils.navigateUpFromSameTask(activity);
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> NavUtils.navigateUpFromSameTask(this));
     }
 
     private void addDetailsFragment() {

@@ -85,12 +85,7 @@ public class EmailReAuthenticateDialogFragment extends BaseDialogFragment<EmailR
         dialogBuilder.setMessage(messageRes)
                 .setView(binding.getRoot())
                 .setPositiveButton(R.string.dialog_positive_authenticate, null)
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                .setNegativeButton(android.R.string.no, (dialog, which) -> dialog.cancel());
 
         return dialogBuilder.create();
     }
@@ -104,12 +99,7 @@ public class EmailReAuthenticateDialogFragment extends BaseDialogFragment<EmailR
         AlertDialog dialog = (AlertDialog) getDialog();
         if (dialog != null) {
             Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-            positiveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    validateInput();
-                }
-            });
+            positiveButton.setOnClickListener(v -> validateInput());
         }
     }
 

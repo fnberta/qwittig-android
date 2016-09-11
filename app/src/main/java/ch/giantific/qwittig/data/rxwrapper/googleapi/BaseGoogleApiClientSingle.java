@@ -18,7 +18,6 @@ import ch.giantific.qwittig.data.rxwrapper.googleapi.exceptions.GoogleApiConnect
 import ch.giantific.qwittig.data.rxwrapper.googleapi.exceptions.GoogleApiConnectionSuspendedException;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
 
 /**
@@ -41,12 +40,9 @@ public abstract class BaseGoogleApiClientSingle<T> implements Single.OnSubscribe
             singleSubscriber.onError(e);
         }
 
-        singleSubscriber.add(Subscriptions.create(new Action0() {
-                    @Override
-                    public void call() {
-                        if (apiClient.isConnected() || apiClient.isConnecting()) {
-                            apiClient.disconnect();
-                        }
+        singleSubscriber.add(Subscriptions.create(() -> {
+                    if (apiClient.isConnected() || apiClient.isConnecting()) {
+                        apiClient.disconnect();
                     }
                 })
         );

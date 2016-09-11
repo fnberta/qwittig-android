@@ -38,11 +38,9 @@ public class DeleteAccountDialogFragment extends BaseDialogFragment<DeleteAccoun
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder.setMessage(R.string.dialog_account_delete_message)
-                .setPositiveButton(R.string.dialog_positive_delete, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        activity.onDeleteAccountSelected();
-                        dismiss();
-                    }
+                .setPositiveButton(R.string.dialog_positive_delete, (dialog, id) -> {
+                    activity.onDeleteAccountSelected();
+                    dismiss();
                 })
                 .setNegativeButton(android.R.string.no, null);
         return dialogBuilder.create();
