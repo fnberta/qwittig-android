@@ -18,7 +18,7 @@ import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
 public interface LoginEmailViewModel extends ViewModel<LoginEmailViewModel.ViewListener>, LoadingViewModel,
         LoginWorkerListener, EmailUserWorkerListener, EmailPromptDialogFragment.DialogInteractionListener {
 
-    void setIdentityId(@NonNull String identityId);
+    void setJoinIdentityId(@NonNull String joinIdentityId);
 
     @Bindable
     boolean isSignUp();

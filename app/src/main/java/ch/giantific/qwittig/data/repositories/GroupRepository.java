@@ -128,19 +128,28 @@ public class GroupRepository {
         messaging.subscribeToTopic(groupId);
     }
 
-    public void joinGroup(@NonNull final String userId,
-                          @NonNull String identityId,
-                          @NonNull String groupId) {
+    public void joinGroup(@NonNull Identity joinIdentity,
+                          @NonNull String userId,
+                          @Nullable String currentNickname,
+                          @Nullable String currentAvatar) {
         final String queueKey = databaseRef.child(Constants.PATH_PUSH_QUEUE).push().getKey();
+        final String joinIdentityId = joinIdentity.getId();
+        final String joinGroupId = joinIdentity.getGroup();
         final Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + identityId, true);
-        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, identityId);
-        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_USER, userId);
-        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_INVITATION_LINK, null);
-        childUpdates.put(Constants.PATH_PUSH_QUEUE + "/" + queueKey, new GroupJoinQueue(groupId, identityId).toMap());
+        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + joinIdentityId, true);
+        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, joinIdentityId);
+        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + joinIdentityId + "/" + Identity.PATH_USER, userId);
+        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + joinIdentityId + "/" + Identity.PATH_INVITATION_LINK, null);
+        if (!TextUtils.isEmpty(currentNickname)) {
+            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + joinIdentityId + "/" + Identity.PATH_NICKNAME, currentNickname);
+        }
+        if (!TextUtils.isEmpty(currentAvatar)) {
+            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + joinIdentityId + "/" + Identity.PATH_AVATAR, currentAvatar);
+        }
+        childUpdates.put(Constants.PATH_PUSH_QUEUE + "/" + queueKey, new GroupJoinQueue(joinGroupId, joinIdentityId).toMap());
 
         databaseRef.updateChildren(childUpdates);
-        messaging.subscribeToTopic(groupId);
+        messaging.subscribeToTopic(joinGroupId);
     }
 
     public Single<String> leaveGroup(@NonNull final Identity identity) {

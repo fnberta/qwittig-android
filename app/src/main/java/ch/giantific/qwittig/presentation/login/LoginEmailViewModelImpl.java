@@ -19,9 +19,8 @@ import java.util.Objects;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
-import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.domain.usecases.AfterLoginUseCase;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.login.LoginWorker.LoginType;
@@ -36,9 +35,8 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
 
     private static final String STATE_SIGN_UP = "STATE_SIGN_UP";
 
-    private final RemoteConfigHelper configHelper;
-    private final GroupRepository groupRepo;
-    private String identityId;
+    private final AfterLoginUseCase afterLoginUseCase;
+    private String joinIdentityId;
     private boolean signUp;
     private String email;
     private String password;
@@ -48,13 +46,11 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     public LoginEmailViewModelImpl(@Nullable Bundle savedState,
                                    @NonNull Navigator navigator,
                                    @NonNull RxBus<Object> eventBus,
-                                   @NonNull RemoteConfigHelper configHelper,
                                    @NonNull UserRepository userRepository,
-                                   @NonNull GroupRepository groupRepo) {
+                                   @NonNull AfterLoginUseCase afterLoginUseCase) {
         super(savedState, navigator, eventBus, userRepository);
-        this.configHelper = configHelper;
 
-        this.groupRepo = groupRepo;
+        this.afterLoginUseCase = afterLoginUseCase;
 
         if (savedState != null) {
             signUp = savedState.getBoolean(STATE_SIGN_UP);
@@ -70,9 +66,8 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
         outState.putBoolean(STATE_SIGN_UP, signUp);
     }
 
-    @Override
-    public void setIdentityId(@NonNull String identityId) {
-        this.identityId = identityId;
+    public void setJoinIdentityId(@NonNull String joinIdentityId) {
+        this.joinIdentityId = joinIdentityId;
     }
 
     @Override
@@ -124,41 +119,19 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     }
 
     @Override
-    public void setUserLoginStream(@NonNull Single<FirebaseUser> single,
+    public void setUserLoginStream(@NonNull Single<FirebaseUser> loginResult,
                                    @NonNull final String workerTag,
                                    @LoginType final int type) {
-        getSubscriptions().add(single
-                .flatMap(firebaseUser -> {
-                    final String userId = firebaseUser.getUid();
-                    if (!TextUtils.isEmpty(identityId)) {
-                        return userRepo.getIdentity(identityId)
-                                .doOnSuccess(identity -> groupRepo.joinGroup(userId, identityId, identity.getGroup()))
-                                .map(identity -> type == LoginType.SIGN_UP_EMAIL);
-                    }
-
-                    if (type == LoginType.SIGN_UP_EMAIL) {
-                        return Single.just(true)
-                                .doOnSuccess(isUserNew -> {
-                                    final String email1 = firebaseUser.getEmail();
-                                    final String defaultNickname = !TextUtils.isEmpty(email1)
-                                            ? email1.substring(0, email1.indexOf("@"))
-                                            : "";
-                                    groupRepo.createGroup(userId,
-                                            configHelper.getDefaultGroupName(),
-                                            configHelper.getDefaultGroupCurrency(),
-                                            defaultNickname, null);
-                                });
-                    }
-
-                    return Single.just(false);
-                })
+        afterLoginUseCase.setLoginResult(loginResult);
+        afterLoginUseCase.setJoinIdentityId(joinIdentityId);
+        getSubscriptions().add(afterLoginUseCase.execute()
                 .subscribe(new SingleSubscriber<Boolean>() {
                     @Override
                     public void onSuccess(Boolean isUserNew) {
                         view.removeWorker(workerTag);
 
                         if (isUserNew) {
-                            view.showProfileScreen(!TextUtils.isEmpty(identityId));
+                            view.showProfileScreen(!TextUtils.isEmpty(joinIdentityId));
                         } else {
                             navigator.finish(Activity.RESULT_OK);
                         }

@@ -51,7 +51,7 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailV
         super.onActivityCreated(savedInstanceState);
 
         final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
-        viewModel.setIdentityId(identityId);
+        viewModel.setJoinIdentityId(identityId);
         viewModel.attachView(this);
         binding.setViewModel(viewModel);
     }

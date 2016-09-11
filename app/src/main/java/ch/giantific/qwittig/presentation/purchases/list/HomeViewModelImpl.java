@@ -43,6 +43,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     private final GroupRepository groupRepo;
     private final PurchaseRepository purchaseRepo;
     private Subscription groupUsersSubscription;
+    private Identity currentIdentity;
     private String currentUserId;
     private boolean draftsAvailable;
     private String ocrPurchaseId;
@@ -105,6 +106,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         getSubscriptions().add(userRepo.observeUser(currentUserId)
                 .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
                 .doOnNext(identity -> {
+                    currentIdentity = identity;
                     // listen to group identities, otherwise we wouldn't catch newly added users
                     observeGroupIdentities(identity.getGroup());
                 })
@@ -157,7 +159,8 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                 .subscribe(new SingleSubscriber<Identity>() {
                     @Override
                     public void onSuccess(Identity identity) {
-                        groupRepo.joinGroup(currentUserId, identityId, identity.getGroup());
+                        groupRepo.joinGroup(identity, currentUserId, currentIdentity.getNickname(),
+                                currentIdentity.getAvatar());
                     }
 
                     @Override

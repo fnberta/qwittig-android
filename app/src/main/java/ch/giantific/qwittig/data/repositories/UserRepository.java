@@ -327,11 +327,6 @@ public class UserRepository {
         return false;
     }
 
-    public Single<Boolean> isUserNew(@NonNull String userId) {
-        return RxFirebaseDatabase.checkForChild(databaseRef.child(User.BASE_PATH).child(userId), User.PATH_IDENTITIES)
-                .map(hasChild -> !hasChild);
-    }
-
     public void signOut(@NonNull FirebaseUser firebaseUser) {
         for (UserInfo userInfo : firebaseUser.getProviderData()) {
             if (Objects.equals(userInfo.getProviderId(), FacebookAuthProvider.PROVIDER_ID)) {
@@ -371,5 +366,9 @@ public class UserRepository {
 
     public void updateToken(@NonNull String userId, @NonNull String token) {
         databaseRef.child(User.BASE_PATH).child(userId).child(User.PATH_TOKENS).child(token).setValue(true);
+    }
+
+    public String getNicknameFromEmail(@Nullable String email) {
+        return !TextUtils.isEmpty(email) ? email.substring(0, email.indexOf("@")) : "";
     }
 }
