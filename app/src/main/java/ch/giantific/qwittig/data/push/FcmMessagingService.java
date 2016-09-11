@@ -87,6 +87,10 @@ public class FcmMessagingService extends FirebaseMessagingService {
 
     private void handleMessage(@NonNull Map<String, String> data,
                                @NonNull String currentUserId) {
+        if (!data.containsKey(PUSH_TYPE)) {
+            return;
+        }
+
         final String type = data.get(PUSH_TYPE);
         switch (type) {
             case PUSH_TYPE_OCR_PROCESSED: {
@@ -107,7 +111,7 @@ public class FcmMessagingService extends FirebaseMessagingService {
                 final Intent intent = new Intent(this, FinanceActivity.class);
                 final NumberFormat moneyFormatter =
                         MoneyUtils.getMoneyFormatter(data.get(PUSH_CURRENCY), true, true);
-                final String amount = moneyFormatter.format(data.get(PUSH_AMOUNT));
+                final String amount = moneyFormatter.format(Double.valueOf(data.get(PUSH_AMOUNT)));
                 final String nickname = data.get(PUSH_NICKNAME);
                 final Notification notification =
                         buildNotification(getString(R.string.push_compensation_remind_title),
@@ -120,7 +124,7 @@ public class FcmMessagingService extends FirebaseMessagingService {
                 final Intent intent = new Intent(this, FinanceActivity.class);
                 final NumberFormat moneyFormatter =
                         MoneyUtils.getMoneyFormatter(data.get(PUSH_CURRENCY), true, true);
-                final String amount = moneyFormatter.format(data.get(PUSH_AMOUNT));
+                final String amount = moneyFormatter.format(Double.valueOf(data.get(PUSH_AMOUNT)));
                 final String nickname = data.get(PUSH_NICKNAME);
                 final Notification notification =
                         buildNotification(getString(R.string.push_compensation_payment_done_title),

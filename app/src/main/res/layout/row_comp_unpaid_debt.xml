@@ -48,7 +48,7 @@
                 layout="@layout/include_compensation_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/iv_avatar"
+                android:layout_toEndOf="@id/iv_comp_avatar"
                 app:itemModel="@{itemModel}"
                 />
 
@@ -57,7 +57,7 @@
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_below="@id/ll_header"-->
-            <!--android:layout_toEndOf="@id/iv_avatar"-->
+            <!--android:layout_toEndOf="@id/iv_comp_avatar"-->
             <!--android:text="@{@string/button_remind_paid(itemModel.compUsername)}"-->
             <!--android:textColor="?attr/colorAccent"-->
             <!--android:visibility="@{itemModel.userPending ? View.GONE : View.VISIBLE}"-->

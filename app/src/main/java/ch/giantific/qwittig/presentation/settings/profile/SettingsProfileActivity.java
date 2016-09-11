@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
@@ -68,6 +69,8 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         final ActivitySettingsProfileBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_settings_profile);
         binding.setViewModel(profileViewModel);
+        // workaround bug in design support lib, TODO: remove when 24.2.1 is released
+        ViewCompat.setOnApplyWindowInsetsListener(binding.flAvatar, (v, insets) -> insets.consumeSystemWindowInsets());
 
         supportPostponeEnterTransition();
 

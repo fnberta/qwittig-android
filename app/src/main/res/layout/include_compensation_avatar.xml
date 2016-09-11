@@ -18,7 +18,7 @@
     </data>
 
     <ImageView
-        android:id="@id/iv_avatar"
+        android:id="@+id/iv_comp_avatar"
         android:contentDescription="@string/user_avatar"
         android:scaleType="centerCrop"
         app:avatarSquare="@{itemModel.avatar}"
