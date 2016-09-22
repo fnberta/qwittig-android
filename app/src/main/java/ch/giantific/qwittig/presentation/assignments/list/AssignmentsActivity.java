@@ -129,7 +129,7 @@ public class AssignmentsActivity extends BaseNavDrawerActivity<AssignmentsSubcom
             case Navigator.INTENT_REQUEST_ASSIGNMENT_DETAILS:
                 switch (resultCode) {
                     case AssignmentDetailsResult.DELETED:
-                        assignmentsViewModel.onAssignmentDeleted(data.getStringExtra(Navigator.INTENT_OBJECT_ID));
+                        assignmentsViewModel.onAssignmentDeleted(data.getStringExtra(Navigator.INTENT_STRING_EXTRA));
                         break;
                 }
                 break;

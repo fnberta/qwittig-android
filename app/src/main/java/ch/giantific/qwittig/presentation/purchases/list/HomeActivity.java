@@ -39,7 +39,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
-import ch.giantific.qwittig.presentation.camera.CameraActivity;
+import ch.giantific.qwittig.presentation.camera.CameraViewModel.CameraResult;
 import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -79,7 +79,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
 
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
-    private NotificationManagerCompat notificationManager;
     @Inject
     HomeViewModel homeViewModel;
     @Inject
@@ -88,6 +87,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     DraftsViewModel draftsViewModel;
     @Inject
     GoogleApiClientDelegate googleApiDelegate;
+    private NotificationManagerCompat notificationManager;
     private DraftsFragment draftsFragment;
     private ActivityHomeBinding binding;
     private HomeTabsAdapter tabsAdapter;
@@ -211,7 +211,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                         showMessage(R.string.toast_changes_saved_as_draft);
                         break;
                     case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DRAFT_DELETED:
-                        draftsViewModel.onDraftDeleted(data.getStringExtra(Navigator.INTENT_OBJECT_ID));
+                        draftsViewModel.onDraftDeleted(data.getStringExtra(Navigator.INTENT_STRING_EXTRA));
                         break;
                     case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DISCARDED:
                         showMessage(R.string.toast_purchase_discarded);
@@ -221,20 +221,20 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
             case Navigator.INTENT_REQUEST_PURCHASE_DETAILS:
                 switch (resultCode) {
                     case PurchaseDetailsResult.PURCHASE_DELETED:
-                        purchasesViewModel.onPurchaseDeleted(data.getStringExtra(Navigator.INTENT_OBJECT_ID));
+                        purchasesViewModel.onPurchaseDeleted(data.getStringExtra(Navigator.INTENT_STRING_EXTRA));
                         break;
                 }
                 break;
             case Navigator.INTENT_REQUEST_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        final String imagePath = data.getStringExtra(CameraActivity.INTENT_EXTRA_IMAGE_PATH);
+                        final String imagePath = data.getStringExtra(Navigator.INTENT_STRING_EXTRA);
                         encodeReceipt(imagePath);
                         break;
                     case Activity.RESULT_CANCELED:
                         homeViewModel.onReceiptImageDiscarded();
                         break;
-                    case CameraActivity.RESULT_ERROR:
+                    case CameraResult.ERROR:
                         homeViewModel.onReceiptImageFailed();
                 }
                 break;

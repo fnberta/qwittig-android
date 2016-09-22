@@ -153,6 +153,10 @@
             android:label="@string/title_activity_camera"
             android:screenOrientation="portrait"/>
         <activity
+            android:name=".presentation.camera.CameraActivity2"
+            android:label="@string/title_activity_camera"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".presentation.intro.AppIntroActivity"
             android:theme="@style/Theme.Intro"/>
         <activity

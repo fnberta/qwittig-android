@@ -17,6 +17,7 @@ public class SharedPrefsHelper {
 
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
+    private static final String FIRST_CAMERA_RUN = "FIRST_CAMERA_RUN";
 
     private final SharedPreferences sharedPrefs;
 
@@ -45,5 +46,14 @@ public class SharedPrefsHelper {
         final long currentTime = System.currentTimeMillis();
         editor.putLong(EXCHANGE_RATE_LAST_FETCHED_TIME, currentTime);
         editor.apply();
+    }
+
+    public boolean isFirstCameraRun() {
+        final boolean isFirstRun = sharedPrefs.getBoolean(FIRST_CAMERA_RUN, true);
+        if (isFirstRun) {
+            sharedPrefs.edit().putBoolean(FIRST_CAMERA_RUN, false).apply();
+        }
+
+        return isFirstRun;
     }
 }

@@ -379,5 +379,6 @@
     <string name="header_stats_pie_stores">Aufgeteilt nach Geschäften</string>
     <string name="header_stats_pie_identities">Aufgeteilt nach Käufern</string>
     <string name="toast_remind_pending">%1$s kann nicht erinnert werden, da er/sie nicht zu einem echten Nutzer gehört</string>
+    <string name="camera_image_save_failed">Speichern des Bildes fehlgeschlagen. Bitte versuche es noch einmal.</string>
 
 </resources>

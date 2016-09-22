@@ -5,27 +5,34 @@
 package ch.giantific.qwittig.presentation.camera;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.view.OrientationEventListener;
 import android.view.View;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityCameraBinding;
 import ch.giantific.qwittig.databinding.TutorialOverlayCameraBinding;
+import ch.giantific.qwittig.presentation.camera.di.CameraComponent;
+import ch.giantific.qwittig.presentation.camera.di.CameraViewModelModule;
+import ch.giantific.qwittig.presentation.camera.di.DaggerCameraComponent;
+import ch.giantific.qwittig.presentation.common.BaseActivity;
+import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.utils.CameraUtils;
+import rx.Single;
 import timber.log.Timber;
 
 /**
@@ -40,95 +47,60 @@ import timber.log.Timber;
  * <p/>
  *
  * @see CameraPreview
- * Subclass of {@link AppCompatActivity}.
  */
 @SuppressWarnings("deprecation")
-public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
+public class CameraActivity extends BaseActivity<CameraComponent>
+        implements CameraViewModel.ViewListener {
 
-    public static final String INTENT_EXTRA_IMAGE_PATH = "INTENT_EXTRA_IMAGE_PATH";
-    public static final int RESULT_ERROR = 2;
-    private static final int INTENT_REQUEST_IMAGE = 1;
-    private static final String PREF_FIRST_CAMERA_RUN = "PREF_FIRST_CAMERA_RUN";
-
-    private ActivityCameraBinding binding;
-    private File file;
-    @NonNull
-    private final Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+    @Inject
+    CameraViewModel cameraViewModel;
+    private final Camera.PictureCallback pictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(@NonNull byte[] data, Camera camera) {
-            final File imageFile;
-            try {
-                imageFile = createImageFile();
-                final FileOutputStream fos = new FileOutputStream(imageFile);
-                fos.write(data);
-                fos.close();
-            } catch (IOException e) {
-                showErrorMessage();
-                return;
-            }
-
-            file = imageFile;
-            toggleDoneVisibility();
+            cameraViewModel.onPictureTaken(data);
         }
     };
-    private Camera mCamera;
-    private CameraPreview mPreview;
-
-    private File createImageFile() throws IOException {
-        return CameraUtils.createImageFile(this);
-    }
-
-    private void showErrorMessage() {
-        Toast.makeText(this, "Failed to capture the image. Please try again",
-                Toast.LENGTH_LONG).show();
-    }
-
-    private void toggleDoneVisibility() {
-        if (binding.fabCameraCapture.getVisibility() == View.VISIBLE) {
-            binding.fabCameraCapture.setVisibility(View.GONE);
-            binding.ivCameraBottomRedo.setVisibility(View.VISIBLE);
-            binding.ivCameraBottomDone.setVisibility(View.VISIBLE);
-        } else {
-            binding.fabCameraCapture.setVisibility(View.VISIBLE);
-            binding.ivCameraBottomRedo.setVisibility(View.GONE);
-            binding.ivCameraBottomDone.setVisibility(View.GONE);
-        }
-    }
+    private ActivityCameraBinding binding;
+    private TutorialOverlayCameraBinding tutBinding;
+    private Camera camera;
+    private CameraPreview preview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_camera);
+        binding.setViewModel(cameraViewModel);
+        cameraViewModel.attachView(this);
 
         try {
             loadCamera();
         } catch (Exception e) {
-            setResult(RESULT_ERROR);
-            finish();
+            cameraViewModel.onCameraLoadFailed();
             return;
         }
+        preview = new CameraPreview(this, camera);
+        binding.flCameraPreview.addView(preview);
+    }
 
-        // Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this, mCamera);
-        binding.flCameraPreview.addView(mPreview);
+    @Override
+    protected void injectDependencies(@Nullable Bundle savedInstanceState) {
+        DaggerCameraComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(this))
+                .navigatorModule(new NavigatorModule(this))
+                .cameraViewModelModule(new CameraViewModelModule(savedInstanceState))
+                .build()
+                .inject(this);
+    }
 
-        binding.fabCameraCapture.setOnClickListener(this);
-        binding.ivCameraBottomDone.setOnClickListener(this);
-        binding.ivCameraBottomRedo.setOnClickListener(this);
-        binding.tvCameraPickImage.setOnClickListener(this);
-
-        if (isFirstRun()) {
-            final TutorialOverlayCameraBinding tutBinding =
-                    TutorialOverlayCameraBinding.inflate(getLayoutInflater(), binding.flCameraMain, false);
-            binding.flCameraMain.addView(tutBinding.svTutCamera);
-            tutBinding.fabTutCameraDone.setOnClickListener(v -> binding.flCameraMain.removeView(tutBinding.svTutCamera));
-        }
+    @Override
+    protected List<ViewModel> getViewModels() {
+        return Arrays.asList(new ViewModel[]{cameraViewModel});
     }
 
     private void loadCamera() throws Exception {
-        mCamera = CameraUtils.getCameraInstance();
+        camera = CameraUtils.getCameraInstance();
 
-        final Camera.Parameters params = mCamera.getParameters();
+        final Camera.Parameters params = camera.getParameters();
         final List<String> focusModes = params.getSupportedFocusModes();
         if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
@@ -138,7 +110,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         }
         setRotation(params, 0);
-        mCamera.setParameters(params);
+        camera.setParameters(params);
     }
 
     @NonNull
@@ -157,14 +129,11 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         return params;
     }
 
-    private boolean isFirstRun() {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        final boolean isFirstRun = prefs.getBoolean(PREF_FIRST_CAMERA_RUN, true);
-        if (isFirstRun) {
-            prefs.edit().putBoolean(PREF_FIRST_CAMERA_RUN, false).apply();
-        }
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-        return isFirstRun;
+        cameraViewModel.onViewVisible();
     }
 
     @Override
@@ -173,13 +142,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         setImmersiveMode();
 
-        if (mCamera == null) {
+        if (camera == null) {
             try {
                 loadCamera();
-                mPreview.setCamera(mCamera);
+                preview.setCamera(camera);
             } catch (Exception e) {
-                setResult(RESULT_CANCELED);
-                finish();
+                cameraViewModel.onCameraLoadFailed();
             }
         }
     }
@@ -195,88 +163,20 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onClick(@NonNull View v) {
-        int id = v.getId();
-        switch (id) {
-            case R.id.fab_camera_capture:
-                mCamera.autoFocus((success, camera) -> {
-                    if (success) {
-                        mCamera.takePicture(null, null, mPicture);
-                    } else {
-                        Timber.w("autoFocus failed");
-                    }
-                });
-                break;
-            case R.id.iv_camera_bottom_redo:
-                if (!file.delete()) {
-                    Timber.w("failed to delete file");
-                }
-                file = null;
-                showPreview();
-                break;
-            case R.id.iv_camera_bottom_done:
-                finishCapture();
-                break;
-            case R.id.tv_camera_pick_image:
-                showImagePicker();
-                break;
-        }
-    }
-
-    private void showPreview() {
-        mCamera.cancelAutoFocus();
-        mCamera.startPreview();
-        toggleDoneVisibility();
-    }
-
-    private void finishCapture() {
-        if (file == null) {
-            setResult(RESULT_CANCELED);
-            finish();
-            return;
-        }
-
-        final Intent intent = new Intent();
-        intent.putExtra(INTENT_EXTRA_IMAGE_PATH, file.getAbsolutePath());
-        setResult(RESULT_OK, intent);
-        finish();
-    }
-
-    private void showImagePicker() {
-        final Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, INTENT_REQUEST_IMAGE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case INTENT_REQUEST_IMAGE: {
-                if (resultCode == RESULT_OK) {
-                    final Uri imageUri = data.getData();
-                    final Intent intent = new Intent();
-                    intent.putExtra(INTENT_EXTRA_IMAGE_PATH, imageUri.toString());
-                    setResult(RESULT_OK, intent);
-                    finish();
-                }
-            }
-        }
-    }
-
-    @Override
     protected void onPause() {
-        super.onPause();
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
 
-        releaseCamera();
+        super.onPause();
     }
 
-    private void releaseCamera() {
-        if (mCamera != null) {
-            mCamera.release();
-            mCamera = null;
-        }
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        cameraViewModel.onViewGone();
     }
 
     @Override
@@ -284,5 +184,55 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         setResult(RESULT_CANCELED);
 
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case Navigator.INTENT_REQUEST_IMAGE_PICK: {
+                if (resultCode == RESULT_OK) {
+                    final Uri imageUri = data.getData();
+                    cameraViewModel.onGalleryImageChosen(imageUri.toString());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void showTutorial() {
+        tutBinding = TutorialOverlayCameraBinding.inflate(getLayoutInflater(), binding.flCameraMain, false);
+        tutBinding.setViewModel(cameraViewModel);
+        binding.flCameraMain.addView(tutBinding.svTutCamera);
+        tutBinding.fabTutCameraDone.setOnClickListener(v -> binding.flCameraMain.removeView(tutBinding.svTutCamera));
+    }
+
+    @Override
+    public void hideTutorial() {
+        binding.flCameraMain.removeView(tutBinding.svTutCamera);
+    }
+
+    @Override
+    public void captureImage() {
+        camera.cancelAutoFocus();
+        camera.autoFocus((success, camera) -> {
+            if (success) {
+                this.camera.takePicture(null, null, pictureCallback);
+            } else {
+                Timber.w("autoFocus failed");
+            }
+        });
+    }
+
+    @Override
+    public Single<File> createImageFile() {
+        return Single.fromCallable(() -> CameraUtils.createImageFile(this));
+    }
+
+    @Override
+    public void showPreview() {
+        camera.cancelAutoFocus();
+        camera.startPreview();
     }
 }

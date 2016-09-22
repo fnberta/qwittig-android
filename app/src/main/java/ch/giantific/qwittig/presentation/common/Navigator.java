@@ -14,6 +14,7 @@ import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddActivi
 import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentEditActivity;
 import ch.giantific.qwittig.presentation.assignments.list.AssignmentsActivity;
 import ch.giantific.qwittig.presentation.camera.CameraActivity;
+import ch.giantific.qwittig.presentation.camera.CameraActivity2;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
 import ch.giantific.qwittig.presentation.intro.AppIntroActivity;
@@ -39,7 +40,7 @@ public class Navigator {
     public static final String INTENT_ASSIGNMENT_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_ASSIGNMENT_ID";
     public static final String INTENT_OCR_DATA_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_DATA_ID";
     public static final String INTENT_OCR_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_PURCHASE_ID";
-    public static final String INTENT_OBJECT_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OBJECT_ID";
+    public static final String INTENT_STRING_EXTRA = BuildConfig.APPLICATION_ID + ".intents.INTENT_STRING_EXTRA";
     public static final int INTENT_REQUEST_LOGIN = 1;
     public static final int INTENT_REQUEST_SETTINGS = 2;
     public static final int INTENT_REQUEST_PURCHASE_MODIFY = 3;
@@ -58,9 +59,9 @@ public class Navigator {
         this.activity = activity;
     }
 
-    public void finish(int result, @NonNull String objectId) {
+    public void finish(int result, @NonNull String stringExtra) {
         final Intent data = new Intent();
-        data.putExtra(INTENT_OBJECT_ID, objectId);
+        data.putExtra(INTENT_STRING_EXTRA, stringExtra);
         activity.setResult(result, data);
         ActivityCompat.finishAfterTransition(activity);
     }

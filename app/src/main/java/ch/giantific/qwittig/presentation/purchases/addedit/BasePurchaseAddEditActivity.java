@@ -31,7 +31,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
-import ch.giantific.qwittig.presentation.camera.CameraActivity;
+import ch.giantific.qwittig.presentation.camera.CameraViewModel.CameraResult;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -166,10 +166,10 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
             case Navigator.INTENT_REQUEST_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        final String imagePath = data.getStringExtra(CameraActivity.INTENT_EXTRA_IMAGE_PATH);
+                        final String imagePath = data.getStringExtra(Navigator.INTENT_STRING_EXTRA);
                         addEditViewModel.onReceiptImageTaken(imagePath);
                         break;
-                    case CameraActivity.RESULT_ERROR:
+                    case CameraResult.ERROR:
                         addEditViewModel.onReceiptImageTakeFailed();
                         break;
                 }
