@@ -69,7 +69,7 @@ public class RxFirebaseAuth {
 
     @NonNull
     public static Observable<FirebaseUser> observeAuthState(@NonNull final FirebaseAuth firebaseAuth) {
-        return Observable.fromAsync(new AuthStateAsyncEmitter(firebaseAuth), AsyncEmitter.BackpressureMode.LATEST);
+        return Observable.fromEmitter(new AuthStateAsyncEmitter(firebaseAuth), AsyncEmitter.BackpressureMode.LATEST);
     }
 
 }
