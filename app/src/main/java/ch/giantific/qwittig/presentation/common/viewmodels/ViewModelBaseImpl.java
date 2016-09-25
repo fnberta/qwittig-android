@@ -36,7 +36,6 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
     protected T view;
     protected boolean loading;
     private CompositeSubscription subscriptions = new CompositeSubscription();
-    private int authStateCounter = 0;
 
     public ViewModelBaseImpl(@Nullable Bundle savedState,
                              @NonNull Navigator navigator,
@@ -87,18 +86,13 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
 
     @Override
     public final void onViewVisible() {
-        authStateCounter = 0;
         getSubscriptions().add(userRepo.observeAuthStatus()
                 .subscribe(new IndefiniteSubscriber<FirebaseUser>() {
                     @Override
                     public void onNext(FirebaseUser currentUser) {
                         if (currentUser != null) {
-                            if (authStateCounter == 0) {
-                                onUserLoggedIn(currentUser);
-                                authStateCounter++;
-                            }
+                            onUserLoggedIn(currentUser);
                         } else {
-                            authStateCounter = 0;
                             onUserNotLoggedIn();
                         }
                     }
