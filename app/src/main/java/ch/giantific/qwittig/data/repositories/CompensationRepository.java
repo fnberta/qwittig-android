@@ -54,7 +54,7 @@ public class CompensationRepository {
                                                      boolean getPaid) {
         final String pathPaid = getPaid ? Compensation.BASE_PATH_PAID : Compensation.BASE_PATH_UNPAID;
         final Query query = databaseRef.child(Compensation.BASE_PATH).child(pathPaid).orderByChild(Compensation.PATH_GROUP).equalTo(groupId);
-        return RxFirebaseDatabase.observeValuesOnce(query, Compensation.class)
+        return RxFirebaseDatabase.observeValueListOnce(query, Compensation.class)
                 .filter(compensation -> Objects.equals(compensation.getDebtor(), currentIdentityId)
                         || Objects.equals(compensation.getCreditor(), currentIdentityId));
     }

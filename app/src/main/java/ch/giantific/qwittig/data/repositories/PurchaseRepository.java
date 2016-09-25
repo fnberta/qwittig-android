@@ -92,7 +92,7 @@ public class PurchaseRepository {
         final Query query = getDrafts
                 ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId).orderByChild(Purchase.PATH_GROUP).equalTo(groupId)
                 : databaseRef.child(Purchase.BASE_PATH_PURCHASES).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
-        return RxFirebaseDatabase.observeValuesOnce(query, Purchase.class)
+        return RxFirebaseDatabase.observeValueListOnce(query, Purchase.class)
                 .filter(purchase -> getDrafts
                         || Objects.equals(purchase.getBuyer(), currentIdentityId)
                         || purchase.getIdentitiesIds().contains(currentIdentityId));
@@ -117,7 +117,7 @@ public class PurchaseRepository {
                                                  @NonNull final String currentIdentityId) {
         final Query query = databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId)
                 .orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
-        return RxFirebaseDatabase.observeValues(query, Purchase.class)
+        return RxFirebaseDatabase.observeValueList(query, Purchase.class)
                 .map(drafts -> !drafts.isEmpty());
     }
 
@@ -205,7 +205,7 @@ public class PurchaseRepository {
 
     public Observable<List<OcrData>> observeOcrData(@NonNull String currentUserId, boolean processed) {
         final Query query = databaseRef.child(OcrData.BASE_PATH).child(currentUserId).orderByChild(OcrData.PATH_PROCESSED).equalTo(processed);
-        return RxFirebaseDatabase.observeValues(query, OcrData.class);
+        return RxFirebaseDatabase.observeValueList(query, OcrData.class);
     }
 
     public Single<OcrData> getOcrData(@NonNull String ocrDataId, @NonNull String userId) {

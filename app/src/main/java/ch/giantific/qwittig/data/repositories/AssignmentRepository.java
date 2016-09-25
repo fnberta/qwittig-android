@@ -58,7 +58,7 @@ public class AssignmentRepository {
                                                  @NonNull final String currentIdentityId,
                                                  @NonNull final Date deadline) {
         final Query query = databaseRef.child(Assignment.BASE_PATH).orderByChild(Assignment.PATH_GROUP).equalTo(groupId);
-        return RxFirebaseDatabase.observeValuesOnce(query, Assignment.class)
+        return RxFirebaseDatabase.observeValueListOnce(query, Assignment.class)
                 .filter(assignment -> assignment.getIdentityIds().contains(currentIdentityId) &&
                         assignment.getDeadline() <= deadline.getTime());
     }
@@ -134,7 +134,7 @@ public class AssignmentRepository {
 
     public Observable<AssignmentHistory> getAssignmentHistory(@NonNull String assignmentId) {
         final Query query = databaseRef.child(AssignmentHistory.BASE_PATH).child(assignmentId);
-        return RxFirebaseDatabase.observeValuesOnce(query, AssignmentHistory.class);
+        return RxFirebaseDatabase.observeValueListOnce(query, AssignmentHistory.class);
     }
 
     public void remindResponsible(@NonNull String assignmentId) {

@@ -22,7 +22,6 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.SortedListCallback;
 import ch.giantific.qwittig.presentation.common.itemmodels.ChildItemModel;
 import rx.Observer;
-import rx.Subscription;
 import timber.log.Timber;
 
 /**
@@ -35,8 +34,6 @@ public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends 
     private final SortedListCallback<T> listCallback;
     protected ListInteraction listInteraction;
     protected boolean initialDataLoaded;
-    private Subscription initialDataSub;
-    private Subscription dataListenerSub;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
                                  @NonNull Navigator navigator,
@@ -140,23 +137,5 @@ public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends 
         }
 
         throw new IllegalArgumentException("id not found");
-    }
-
-    protected final void setDataListenerSub(@NonNull Subscription sub) {
-        if (initialDataSub != null && !initialDataSub.isUnsubscribed()) {
-            initialDataSub.unsubscribe();
-        }
-
-        initialDataSub = sub;
-        getSubscriptions().add(sub);
-    }
-
-    protected final void setInitialDataSub(@NonNull Subscription sub) {
-        if (dataListenerSub != null && !dataListenerSub.isUnsubscribed()) {
-            dataListenerSub.unsubscribe();
-        }
-
-        dataListenerSub = sub;
-        getSubscriptions().add(sub);
     }
 }

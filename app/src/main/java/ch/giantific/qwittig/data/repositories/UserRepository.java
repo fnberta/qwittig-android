@@ -36,6 +36,7 @@ import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.jobs.UploadAvatarJob;
 import ch.giantific.qwittig.data.rest.DeleteUserData;
 import ch.giantific.qwittig.data.rest.UserIdToken;
+import ch.giantific.qwittig.data.rxwrapper.firebase.DataMapper;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseAuth;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseStorage;
@@ -107,6 +108,11 @@ public class UserRepository {
         return RxFirebaseDatabase.observeValueOnce(query, User.class);
     }
 
+    public Observable<String> observeCurrentIdentityId(@NonNull String userId) {
+        final Query query = databaseRef.child(User.BASE_PATH).child(userId).child(User.PATH_CURRENT_IDENTITY);
+        return RxFirebaseDatabase.observeValue(query, DataMapper.map(String.class));
+    }
+
     public Observable<Identity> observeIdentity(@NonNull String identityId) {
         final Query query = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).child(identityId);
         return RxFirebaseDatabase.observeValue(query, Identity.class);
@@ -121,19 +127,20 @@ public class UserRepository {
         databaseRef.child(User.BASE_PATH).child(userId).child(User.PATH_CURRENT_IDENTITY).setValue(newCurrentIdentityId);
     }
 
-    public Observable<Identity> switchGroup(@NonNull final User user,
+    public Observable<Identity> switchGroup(@NonNull final String userId,
                                             @NonNull final String newGroupId) {
-        return Observable.from(user.getIdentitiesIds())
+        return getUser(userId)
+                .flatMapObservable(user -> Observable.from(user.getIdentitiesIds()))
                 .flatMap(identityId -> getIdentity(identityId).toObservable())
                 .filter(identity -> Objects.equals(identity.getGroup(), newGroupId))
-                .doOnNext(identity -> updateCurrentIdentity(user.getId(), identity.getId()));
+                .doOnNext(identity -> updateCurrentIdentity(userId, identity.getId()));
     }
 
     public Single<Void> updateEmailPassword(@NonNull final FirebaseUser firebaseUser,
                                             @NonNull AuthCredential authCredential,
                                             @Nullable final String email,
                                             @Nullable final String password) {
-        return RxFirebaseUser.reauthenticate(firebaseUser, authCredential)
+        return RxFirebaseUser.reAuthenticate(firebaseUser, authCredential)
                 .flatMap(aVoid -> {
                     if (!TextUtils.isEmpty(email)) {
                         return RxFirebaseUser.updateEmail(firebaseUser, email);
@@ -168,7 +175,7 @@ public class UserRepository {
                             childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE
                                             + "/" + identityId + "/" + Identity.PATH_AVATAR,
                                     !TextUtils.isEmpty(avatar)
-                                            ? avatar : null);
+                                    ? avatar : null);
                         }
                     }
                     databaseRef.updateChildren(childUpdates);
@@ -281,7 +288,7 @@ public class UserRepository {
     public Single<Void> unlinkGoogle(@NonNull final Context context,
                                      @NonNull final FirebaseUser firebaseUser,
                                      @NonNull AuthCredential authCredential) {
-        return RxFirebaseUser.reauthenticate(firebaseUser, authCredential)
+        return RxFirebaseUser.reAuthenticate(firebaseUser, authCredential)
                 .flatMapObservable(aVoid -> Observable.from(firebaseUser.getProviderData()))
                 .map(UserInfo::getProviderId)
                 .first(providerId -> Objects.equals(providerId, GoogleAuthProvider.PROVIDER_ID))
@@ -342,13 +349,13 @@ public class UserRepository {
     public Single<AuthResult> linkUserWithCredential(@NonNull final FirebaseUser firebaseUser,
                                                      @NonNull AuthCredential oldCredential,
                                                      @NonNull final AuthCredential newCredential) {
-        return RxFirebaseUser.reauthenticate(firebaseUser, oldCredential)
+        return RxFirebaseUser.reAuthenticate(firebaseUser, oldCredential)
                 .flatMap(aVoid -> RxFirebaseUser.linkWithCredential(firebaseUser, newCredential));
     }
 
     public Single<Void> deleteUser(@NonNull final FirebaseUser firebaseUser,
                                    @NonNull AuthCredential authCredential) {
-        return RxFirebaseUser.reauthenticate(firebaseUser, authCredential)
+        return RxFirebaseUser.reAuthenticate(firebaseUser, authCredential)
                 .flatMap(aVoid -> RxFirebaseUser.getToken(firebaseUser, false))
                 .flatMap(getTokenResult -> {
                     final String idToken = getTokenResult.getToken();

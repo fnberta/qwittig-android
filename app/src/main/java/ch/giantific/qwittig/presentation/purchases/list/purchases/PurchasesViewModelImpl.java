@@ -67,8 +67,8 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchaseItemMo
     protected void onUserLoggedIn(@NonNull final FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -83,23 +83,26 @@ public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchaseItemMo
                             items.clear();
                         }
                         currentGroupId = groupId;
-                        addDataListener(identityId);
-                        loadInitialData(identityId);
+                        addDataListener(identityId, groupId);
+                        loadInitialData(identityId, groupId);
                     }
                 })
         );
     }
 
-    private void addDataListener(@NonNull final String identityId) {
-        setDataListenerSub(purchaseRepo.observePurchaseChildren(currentGroupId, identityId, false)
+    private void addDataListener(@NonNull final String identityId, @NonNull String groupId) {
+        getSubscriptions().add(purchaseRepo.observePurchaseChildren(groupId, identityId, false)
                 .filter(purchaseRxChildEvent -> initialDataLoaded)
+                .takeWhile(purchaseRxChildEvent ->
+                        Objects.equals(purchaseRxChildEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemModel(event.getValue(), event.getEventType(), identityId))
                 .subscribe(this)
         );
     }
 
-    private void loadInitialData(@NonNull final String identityId) {
-        setInitialDataSub(purchaseRepo.getPurchases(currentGroupId, identityId, false)
+    private void loadInitialData(@NonNull final String identityId, @NonNull String groupId) {
+        getSubscriptions().add(purchaseRepo.getPurchases(groupId, identityId, false)
+                .takeWhile(purchase -> Objects.equals(purchase.getGroup(), currentGroupId))
                 .flatMap(purchase -> getItemModel(purchase, EventType.NONE, identityId))
                 .toList()
                 .subscribe(new Subscriber<List<PurchaseItemModel>>() {

@@ -57,8 +57,8 @@ public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderV
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(user -> userRepo.observeIdentity(user.getCurrentIdentity()))
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .flatMap(userRepo::observeIdentity)
                 .doOnNext(identity -> moneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(), true, true))
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override

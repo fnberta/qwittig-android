@@ -147,17 +147,16 @@ public class AssignmentDetailsViewModelImpl extends ViewModelBaseImpl<Assignment
     protected void onUserLoggedIn(@NonNull final FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .doOnNext(user -> {
-                    final String identityId = user.getCurrentIdentity();
-                    if (!TextUtils.isEmpty(currentIdentityId)
-                            && !Objects.equals(currentIdentityId, identityId)) {
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .doOnNext(currentIdentityId -> {
+                    if (!TextUtils.isEmpty(this.currentIdentityId)
+                            && !Objects.equals(this.currentIdentityId, currentIdentityId)) {
                         navigator.finish();
                     }
 
-                    currentIdentityId = identityId;
+                    this.currentIdentityId = currentIdentityId;
                 })
-                .flatMap(user -> assignmentRepo.observeAssignment(assignmentId))
+                .flatMap(currentIdentityId -> assignmentRepo.observeAssignment(assignmentId))
                 .doOnNext(assignment -> {
                     this.assignment = assignment;
 

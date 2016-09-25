@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
+import java.util.Objects;
 
 import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
 import ch.giantific.qwittig.BR;
@@ -28,7 +29,6 @@ import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.SingleSubscriber;
-import rx.Subscription;
 import timber.log.Timber;
 
 /**
@@ -42,7 +42,6 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     private final GroupRepository groupRepo;
     private final PurchaseRepository purchaseRepo;
-    private Subscription groupUsersSubscription;
     private Identity currentIdentity;
     private String currentUserId;
     private boolean draftsAvailable;
@@ -103,8 +102,8 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         super.onUserLoggedIn(currentUser);
 
         currentUserId = currentUser.getUid();
-        getSubscriptions().add(userRepo.observeUser(currentUserId)
-                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUserId)
+                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable())
                 .doOnNext(identity -> {
                     currentIdentity = identity;
                     // listen to group identities, otherwise we wouldn't catch newly added users
@@ -138,12 +137,11 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     private void observeGroupIdentities(@NonNull String groupId) {
-        if (groupUsersSubscription != null && !groupUsersSubscription.isUnsubscribed()) {
-            groupUsersSubscription.unsubscribe();
-        }
-
-        groupUsersSubscription = groupRepo.observeGroupIdentityChildren(groupId).subscribe();
-        getSubscriptions().add(groupUsersSubscription);
+        getSubscriptions().add(groupRepo.observeGroupIdentityChildren(groupId)
+                .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(),
+                        currentIdentity.getGroup()))
+                .subscribe()
+        );
     }
 
     @Override

@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.ProviderQueryResult;
 
-import ch.giantific.qwittig.data.rxwrapper.firebase.emitters.AuthStateAsyncEmitter;
+import ch.giantific.qwittig.data.rxwrapper.firebase.emitters.AuthStateEmitter;
 import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToTaskOnCompleteOnSubscribe;
 import rx.AsyncEmitter;
 import rx.Observable;
@@ -69,7 +69,7 @@ public class RxFirebaseAuth {
 
     @NonNull
     public static Observable<FirebaseUser> observeAuthState(@NonNull final FirebaseAuth firebaseAuth) {
-        return Observable.fromEmitter(new AuthStateAsyncEmitter(firebaseAuth), AsyncEmitter.BackpressureMode.LATEST);
+        return Observable.fromEmitter(new AuthStateEmitter(firebaseAuth), AsyncEmitter.BackpressureMode.LATEST);
     }
 
 }

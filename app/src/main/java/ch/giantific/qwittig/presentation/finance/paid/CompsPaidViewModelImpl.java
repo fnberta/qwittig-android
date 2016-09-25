@@ -68,7 +68,7 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompPaidItemMo
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
                 .flatMap(this::getMatchingIdentity)
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
@@ -83,37 +83,41 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompPaidItemMo
                             items.clear();
                         }
                         currentGroupId = groupId;
-                        addDataListener(identityId);
-                        loadInitialData(identityId);
+                        addDataListener(identityId, groupId);
+                        loadInitialData(identityId, groupId);
                     }
                 })
         );
     }
 
-    private Observable<Identity> getMatchingIdentity(final User user) {
-        return userRepo.getIdentity(user.getCurrentIdentity())
+    private Observable<Identity> getMatchingIdentity(@NonNull String currentIdentityId) {
+        return userRepo.getIdentity(currentIdentityId)
                 .flatMapObservable(identity -> {
                     if (TextUtils.isEmpty(compGroupId)
                             || Objects.equals(compGroupId, identity.getGroup())) {
                         return Observable.just(identity);
                     }
 
-                    return userRepo.switchGroup(user, compGroupId)
+                    // switch group and return Observable.never(), change in currentIdentity will
+                    // trigger chain to start again from the top
+                    return userRepo.switchGroup(currentIdentityId, compGroupId)
                             .doOnNext(newIdentity -> compGroupId = newIdentity.getGroup())
                             .flatMap(newIdentity -> Observable.never());
                 });
     }
 
-    private void addDataListener(@NonNull final String identityId) {
-        setDataListenerSub(compsRepo.observeCompensationChildren(currentGroupId, identityId, true)
+    private void addDataListener(@NonNull final String identityId, @NonNull String groupId) {
+        getSubscriptions().add(compsRepo.observeCompensationChildren(groupId, identityId, true)
                 .filter(compensationRxChildEvent -> initialDataLoaded)
+                .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemModel(event.getValue(), event.getEventType(), identityId))
                 .subscribe(this)
         );
     }
 
-    private void loadInitialData(@NonNull final String identityId) {
-        setInitialDataSub(compsRepo.getCompensations(currentGroupId, identityId, true)
+    private void loadInitialData(@NonNull final String identityId, @NonNull String groupId) {
+        getSubscriptions().add(compsRepo.getCompensations(groupId, identityId, true)
+                .takeWhile(compensation -> Objects.equals(compensation.getGroup(), currentGroupId))
                 .flatMap(compensation -> getItemModel(compensation, EventType.NONE, identityId))
                 .toList()
                 .subscribe(new Subscriber<List<CompPaidItemModel>>() {

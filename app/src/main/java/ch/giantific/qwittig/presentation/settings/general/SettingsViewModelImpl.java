@@ -81,14 +81,14 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         super.onUserLoggedIn(currentUser);
 
         firebaseUser = currentUser;
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(user -> userRepo.observeIdentity(user.getCurrentIdentity())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .doOnNext(currentIdentityId -> this.currentIdentityId = currentIdentityId)
+                .flatMap(currentIdentityId -> userRepo.observeIdentity(currentIdentityId)
                         .doOnNext(identity -> {
                             currentIdentity = identity;
-                            currentIdentityId = identity.getId();
                             setupCurrentGroupCategory();
-                        })
-                        .map(identity -> user))
+                        }))
+                .flatMap(identity -> userRepo.getUser(identity.getUser()).toObservable())
                 .flatMap(user -> Observable.from(user.getIdentitiesIds())
                         .flatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
                         .toList())
@@ -192,9 +192,9 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
                     @Override
                     public void onSuccess(List<Identity> identities) {
                         final int message = identities.size() == 1 &&
-                                Objects.equals(identities.get(0).getId(), currentIdentity.getId())
-                                ? R.string.dialog_group_leave_delete_message
-                                : R.string.dialog_group_leave_message;
+                                                    Objects.equals(identities.get(0).getId(), currentIdentity.getId())
+                                            ? R.string.dialog_group_leave_delete_message
+                                            : R.string.dialog_group_leave_message;
                         view.showLeaveGroupDialog(message);
                     }
 

@@ -103,10 +103,11 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId)
                         .doOnSuccess(identity -> currentIdentity = identity)
-                        .flatMapObservable(identity -> Observable.from(user.getIdentitiesIds())))
+                        .flatMap(identity -> userRepo.getUser(identity.getUser()))
+                        .flatMapObservable(user -> Observable.from(user.getIdentitiesIds())))
                 .flatMap(userRepo::observeIdentity)
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override

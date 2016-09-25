@@ -94,8 +94,8 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftItemModel, D
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -109,16 +109,17 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftItemModel, D
                             items.clear();
                         }
                         currentGroupId = groupId;
-                        addDataListener(identityId);
-                        loadInitialData(identityId);
+                        addDataListener(identityId, groupId);
+                        loadInitialData(identityId, groupId);
                     }
                 })
         );
     }
 
-    private void addDataListener(@NonNull String identityId) {
-        setDataListenerSub(purchaseRepo.observePurchaseChildren(currentGroupId, identityId, true)
-                .filter(purchaseRxChildEvent -> initialDataLoaded)
+    private void addDataListener(@NonNull String identityId, @NonNull String groupId) {
+        getSubscriptions().add(purchaseRepo.observePurchaseChildren(groupId, identityId, true)
+                .filter(childEvent -> initialDataLoaded)
+                .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .map(event -> {
                     final Purchase draft = event.getValue();
                     return getItemModel(event.getValue(), event.getEventType(),
@@ -128,8 +129,9 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftItemModel, D
         );
     }
 
-    private void loadInitialData(@NonNull String identityId) {
-        setInitialDataSub(purchaseRepo.getPurchases(currentGroupId, identityId, true)
+    private void loadInitialData(@NonNull String identityId, @NonNull String groupId) {
+        getSubscriptions().add(purchaseRepo.getPurchases(groupId, identityId, true)
+                .takeWhile(purchase -> Objects.equals(purchase.getGroup(), currentGroupId))
                 .map(draft -> getItemModel(draft, EventType.NONE, draftsSelected.contains(draft.getId())))
                 .toList()
                 .subscribe(new Subscriber<List<DraftItemModel>>() {

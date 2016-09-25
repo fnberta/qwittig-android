@@ -205,24 +205,23 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .doOnNext(user -> {
-                    final String identityId = user.getCurrentIdentity();
-                    if (!TextUtils.isEmpty(currentIdentityId)
-                            && !Objects.equals(currentIdentityId, identityId)) {
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .doOnNext(currentIdentityId -> {
+                    if (!TextUtils.isEmpty(this.currentIdentityId)
+                            && !Objects.equals(this.currentIdentityId, currentIdentityId)) {
                         navigator.finish();
                     }
 
-                    currentIdentityId = identityId;
+                    this.currentIdentityId = currentIdentityId;
                 })
-                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable()
+                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable()
                         .flatMap(identity -> {
                             if (TextUtils.isEmpty(purchaseGroupId)
                                     || Objects.equals(purchaseGroupId, identity.getGroup())) {
                                 return Observable.just(identity);
                             }
 
-                            return userRepo.switchGroup(user, purchaseGroupId)
+                            return userRepo.switchGroup(identity.getUser(), purchaseGroupId)
                                     .flatMap(identity1 -> Observable.never());
                         }))
                 .doOnNext(identity -> {

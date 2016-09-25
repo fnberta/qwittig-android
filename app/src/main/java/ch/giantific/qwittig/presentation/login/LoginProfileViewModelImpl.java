@@ -118,8 +118,8 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {

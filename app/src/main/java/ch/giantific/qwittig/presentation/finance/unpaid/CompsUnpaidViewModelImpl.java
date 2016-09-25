@@ -85,8 +85,8 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompUnpaidIt
     protected void onUserLoggedIn(@NonNull final FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -100,23 +100,25 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompUnpaidIt
                             items.clear();
                         }
                         currentGroupId = groupId;
-                        addDataListener(identityId);
-                        loadInitialData(identityId);
+                        addDataListener(identityId, groupId);
+                        loadInitialData(identityId, groupId);
                     }
                 })
         );
     }
 
-    private void addDataListener(@NonNull final String identityId) {
-        setDataListenerSub(compsRepo.observeCompensationChildren(currentGroupId, identityId, false)
+    private void addDataListener(@NonNull final String identityId, @NonNull String groupId) {
+        getSubscriptions().add(compsRepo.observeCompensationChildren(groupId, identityId, false)
                 .filter(compensationRxChildEvent -> initialDataLoaded)
+                .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemModel(event.getValue(), event.getEventType(), identityId))
                 .subscribe(this)
         );
     }
 
-    private void loadInitialData(@NonNull final String identityId) {
-        getSubscriptions().add(compsRepo.getCompensations(currentGroupId, identityId, false)
+    private void loadInitialData(@NonNull final String identityId, @NonNull String groupId) {
+        getSubscriptions().add(compsRepo.getCompensations(groupId, identityId, false)
+                .takeWhile(compensation -> Objects.equals(compensation.getGroup(), currentGroupId))
                 .flatMap(compensation -> getItemModel(compensation, EventType.NONE, identityId))
                 .toList()
                 .subscribe(new Subscriber<List<CompUnpaidItemModel>>() {

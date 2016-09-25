@@ -91,8 +91,8 @@ public class AssignmentsViewModelImpl extends ListViewModelBaseImpl<AssignmentIt
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()).toObservable())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable())
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
@@ -111,15 +111,17 @@ public class AssignmentsViewModelImpl extends ListViewModelBaseImpl<AssignmentIt
     }
 
     private void addDataListener() {
-        setDataListenerSub(assignmentRepo.observeAssignmentChildren(currentGroupId, currentIdentityId, deadline.getDate())
+        getSubscriptions().add(assignmentRepo.observeAssignmentChildren(currentGroupId, currentIdentityId, deadline.getDate())
                 .filter(childEvent -> initialDataLoaded)
+                .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemModel(event.getValue(), event.getEventType(), currentIdentityId))
                 .subscribe(this)
         );
     }
 
     private void loadInitialData() {
-        setInitialDataSub(assignmentRepo.getAssignments(currentGroupId, currentIdentityId, deadline.getDate())
+        getSubscriptions().add(assignmentRepo.getAssignments(currentGroupId, currentIdentityId, deadline.getDate())
+                        .takeWhile(assignment -> Objects.equals(assignment.getGroup(), currentGroupId))
                         .flatMap(assignment -> getItemModel(assignment, EventType.NONE, currentIdentityId))
                         .toList()
                         .subscribe(new Subscriber<List<AssignmentItemModel>>() {

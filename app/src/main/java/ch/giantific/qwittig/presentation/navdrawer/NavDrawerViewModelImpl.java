@@ -95,14 +95,14 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     protected void onUserLoggedIn(@NonNull final FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
-                .flatMap(user -> userRepo.observeIdentity(user.getCurrentIdentity())
+        getSubscriptions().add(userRepo.observeCurrentIdentityId(currentUser.getUid())
+                .flatMap(currentIdentityId -> userRepo.observeIdentity(currentIdentityId)
                         .doOnNext(identity -> {
                             currentIdentity = identity;
                             setNickname(identity.getNickname());
                             setAvatar(identity.getAvatar());
-                        })
-                        .map(identity -> user))
+                        }))
+                .flatMap(identity -> userRepo.getUser(identity.getUser()).toObservable())
                 .flatMap(user -> Observable.from(user.getIdentitiesIds())
                         .flatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
                         .toList())

@@ -41,7 +41,7 @@ public class RxFirebaseUser {
     }
 
     @NonNull
-    public static Single<Void> reauthenticate(@NonNull final FirebaseUser firebaseUser,
+    public static Single<Void> reAuthenticate(@NonNull final FirebaseUser firebaseUser,
                                               @NonNull final AuthCredential credential) {
         return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(firebaseUser.reauthenticate(credential)));
     }
