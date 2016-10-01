@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -145,9 +144,7 @@ public class AssignmentEditPresenter extends AssignmentAddPresenter {
         }
 
         if (res != -1) {
-            final int selected = Arrays.asList(timeFrames).indexOf(res);
-            viewModel.setTimeFrame(res);
-            viewModel.setSelectedTimeFrame(selected);
+            viewModel.setTimeFrame(res, true);
         }
     }
 

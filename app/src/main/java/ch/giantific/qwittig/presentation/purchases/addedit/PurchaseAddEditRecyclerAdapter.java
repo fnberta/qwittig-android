@@ -210,7 +210,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
             super(binding);
 
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
-                    R.layout.spinner_item_title, presenter.getSupportedCurrencies());
+                    R.layout.spinner_item_title, presenter.getViewModel().getSupportedCurrencies());
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             binding.spCurrency.setAdapter(adapter);
         }

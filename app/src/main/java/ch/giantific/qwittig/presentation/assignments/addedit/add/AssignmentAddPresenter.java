@@ -18,7 +18,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -56,13 +55,6 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
     protected final ArrayList<AssignmentAddEditIdentityItemViewModel> items;
     protected final AssignmentRepository assignmentRepo;
     protected final DateFormat dateFormatter;
-    protected final int[] timeFrames = new int[]{
-            R.string.time_frame_daily,
-            R.string.time_frame_weekly,
-            R.string.time_frame_monthly,
-            R.string.time_frame_yearly,
-            R.string.time_frame_as_needed,
-            R.string.time_frame_one_time};
     private final GroupRepository groupRepo;
     protected ListInteraction listInteraction;
     private String currentGroupId;
@@ -109,11 +101,6 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
     @Override
     public void setListDragInteraction(@NonNull ListDragInteraction listDragInteraction) {
         this.listDragInteraction = listDragInteraction;
-    }
-
-    @Override
-    public int[] getTimeFrames() {
-        return timeFrames;
     }
 
     @Override
@@ -244,7 +231,9 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
     @Override
     public void onTimeFrameSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final int timeFrame = (int) parent.getItemAtPosition(position);
-        viewModel.setTimeFrame(timeFrame);
+        if (viewModel.getTimeFrame() != timeFrame) {
+            viewModel.setTimeFrame(timeFrame, false);
+        }
     }
 
     @Override

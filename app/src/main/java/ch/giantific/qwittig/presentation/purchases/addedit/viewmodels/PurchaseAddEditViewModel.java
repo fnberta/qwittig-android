@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.util.Date;
+import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewModel;
@@ -37,10 +38,10 @@ public class PurchaseAddEditViewModel extends BaseObservable
             return new PurchaseAddEditViewModel[size];
         }
     };
+    private final List<String> supportedCurrencies;
     private boolean loading;
     private String receipt;
     private String currency;
-    private int currencySelected;
     private String note;
     private Date date;
     private String dateFormatted;
@@ -51,9 +52,11 @@ public class PurchaseAddEditViewModel extends BaseObservable
     private String totalFormatted;
     private String myShare;
 
-    public PurchaseAddEditViewModel(boolean loading,
+    public PurchaseAddEditViewModel(@NonNull List<String> supportedCurrencies,
+                                    boolean loading,
                                     @NonNull Date date,
                                     @NonNull String dateFormatted) {
+        this.supportedCurrencies = supportedCurrencies;
         this.loading = loading;
         this.date = date;
         this.dateFormatted = dateFormatted;
@@ -61,10 +64,10 @@ public class PurchaseAddEditViewModel extends BaseObservable
     }
 
     private PurchaseAddEditViewModel(Parcel in) {
+        this.supportedCurrencies = in.createStringArrayList();
         this.loading = in.readByte() != 0;
         this.receipt = in.readString();
         this.currency = in.readString();
-        this.currencySelected = in.readInt();
         this.note = in.readString();
         long tmpDate = in.readLong();
         this.date = tmpDate == -1 ? null : new Date(tmpDate);
@@ -75,6 +78,10 @@ public class PurchaseAddEditViewModel extends BaseObservable
         this.total = in.readDouble();
         this.totalFormatted = in.readString();
         this.myShare = in.readString();
+    }
+
+    public List<String> getSupportedCurrencies() {
+        return supportedCurrencies;
     }
 
     @Override
@@ -187,21 +194,18 @@ public class PurchaseAddEditViewModel extends BaseObservable
     }
 
     @Override
-    public void setCurrency(@NonNull String currency) {
+    public void setCurrency(@NonNull String currency, boolean notify) {
         this.currency = currency;
         notifyPropertyChanged(BR.currency);
+        if (notify) {
+            notifyPropertyChanged(BR.currencySelected);
+        }
     }
 
     @Override
     @Bindable
     public int getCurrencySelected() {
-        return currencySelected;
-    }
-
-    @Override
-    public void setCurrencySelected(int currencySelected) {
-        this.currencySelected = currencySelected;
-        notifyPropertyChanged(BR.currencySelected);
+        return supportedCurrencies.indexOf(currency);
     }
 
     @Override
@@ -237,10 +241,10 @@ public class PurchaseAddEditViewModel extends BaseObservable
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringList(this.supportedCurrencies);
         dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
         dest.writeString(this.receipt);
         dest.writeString(this.currency);
-        dest.writeInt(this.currencySelected);
         dest.writeString(this.note);
         dest.writeLong(this.date != null ? this.date.getTime() : -1);
         dest.writeString(this.dateFormatted);

@@ -68,7 +68,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     protected final ArrayList<BasePurchaseAddEditItemViewModel> items;
     protected final NumberFormat exchangeRateFormatter;
     protected final DateFormat dateFormatter;
-    protected final List<String> supportedCurrencies;
     private final GroupRepository groupRepo;
     protected List<Identity> identities;
     protected ListInteraction listInteraction;
@@ -89,7 +88,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         this.purchaseRepo = purchaseRepo;
         this.configHelper = configHelper;
 
-        supportedCurrencies = Arrays.asList(configHelper.getSupportedCurrencyCodes());
         dateFormatter = DateUtils.getDateFormatter(false);
         exchangeRateFormatter = MoneyUtils.getExchangeRateFormatter();
 
@@ -98,8 +96,9 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
             items = savedState.getParcelableArrayList(STATE_ROW_ITEMS);
             fetchingExchangeRates = savedState.getBoolean(STATE_FETCHING_RATES);
         } else {
+            final List<String> currencies = Arrays.asList(configHelper.getSupportedCurrencyCodes());
             final Date date = new Date();
-            viewModel = new PurchaseAddEditViewModel(false, date, dateFormatter.format(date));
+            viewModel = new PurchaseAddEditViewModel(currencies, false, date, dateFormatter.format(date));
             items = new ArrayList<>();
             initFixedRows();
         }
@@ -135,11 +134,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     }
 
     @Override
-    public List<String> getSupportedCurrencies() {
-        return supportedCurrencies;
-    }
-
-    @Override
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
@@ -169,16 +163,22 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         return userRepo.getUser(currentUser.getUid())
                 .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()))
                 .doOnSuccess(identity -> {
-                    Timber.d("initialChain");
                     currentIdentity = identity;
 
+                    // if first run, set initial currency to group currency
                     if (TextUtils.isEmpty(viewModel.getCurrency())) {
-                        viewModel.setCurrency(identity.getGroupCurrency());
+                        viewModel.setCurrency(identity.getGroupCurrency(), true);
                     }
 
-                    final String currency = viewModel.getCurrency();
-                    viewModel.setCurrencySelected(supportedCurrencies.indexOf(currency));
-                    moneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
+                    // create money formatter
+                    moneyFormatter = MoneyUtils.getMoneyFormatter(viewModel.getCurrency(), false, true);
+
+                    // if first run, set initial total and my share
+                    if (viewModel.getTotal() == 0.0d && TextUtils.isEmpty(viewModel.getMyShare())) {
+                        final String formatted = moneyFormatter.format(0);
+                        viewModel.setTotal(0, formatted);
+                        viewModel.setMyShare(formatted);
+                    }
                 })
                 .flatMapObservable(identity -> groupRepo.getGroupIdentities(identity.getGroup(), true))
                 .toSortedList()
@@ -310,9 +310,9 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
         moneyFormatter = MoneyUtils.getMoneyFormatter(newCurrency, false, true);
         // update my share currency field
-        viewModel.setCurrency(newCurrency);
+        viewModel.setCurrency(newCurrency, false);
         // get new exchange rate
-//        this.view.loadFetchExchangeRatesWorker(currentIdentity.getGroupCurrency(), newCurrency);
+        this.view.loadFetchExchangeRatesWorker(currentIdentity.getGroupCurrency(), newCurrency);
 
         // TODO: once we support currencies with other than 2 decimal values, update items, total and myShare
     }

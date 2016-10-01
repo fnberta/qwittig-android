@@ -9,7 +9,9 @@ import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.SparseIntArray;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import ch.giantific.qwittig.BR;
@@ -34,12 +36,18 @@ public class AssignmentAddEditViewModel extends BaseObservable
             return new AssignmentAddEditViewModel[size];
         }
     };
+    private final int[] timeFrames = new int[]{
+            R.string.time_frame_daily,
+            R.string.time_frame_weekly,
+            R.string.time_frame_monthly,
+            R.string.time_frame_yearly,
+            R.string.time_frame_as_needed,
+            R.string.time_frame_one_time};
     private boolean empty;
     private Date deadline;
     private String deadlineFormatted;
     private String title;
     private int timeFrame;
-    private int selectedTimeFrame;
 
     public AssignmentAddEditViewModel(@NonNull Date deadline,
                                       @NonNull String deadlineFormatted) {
@@ -54,7 +62,10 @@ public class AssignmentAddEditViewModel extends BaseObservable
         this.deadlineFormatted = in.readString();
         this.title = in.readString();
         this.timeFrame = in.readInt();
-        this.selectedTimeFrame = in.readInt();
+    }
+
+    public int[] getTimeFrames() {
+        return timeFrames;
     }
 
     @Override
@@ -96,9 +107,12 @@ public class AssignmentAddEditViewModel extends BaseObservable
         return timeFrame;
     }
 
-    public void setTimeFrame(int timeFrame) {
+    public void setTimeFrame(int timeFrame, boolean notify) {
         this.timeFrame = timeFrame;
         notifyPropertyChanged(BR.asNeeded);
+        if (notify) {
+            notifyPropertyChanged(BR.selectedTimeFrame);
+        }
     }
 
     @Bindable
@@ -108,12 +122,14 @@ public class AssignmentAddEditViewModel extends BaseObservable
 
     @Bindable
     public int getSelectedTimeFrame() {
-        return selectedTimeFrame;
-    }
+        for (int i = 0; i < timeFrames.length; i++) {
+            final int timeFrame = timeFrames[i];
+            if (this.timeFrame == timeFrame) {
+                return i;
+            }
+        }
 
-    public void setSelectedTimeFrame(int selectedTimeFrame) {
-        this.selectedTimeFrame = selectedTimeFrame;
-        notifyPropertyChanged(BR.selectedTimeFrame);
+        return -1;
     }
 
     @Override
@@ -128,6 +144,5 @@ public class AssignmentAddEditViewModel extends BaseObservable
         dest.writeString(this.deadlineFormatted);
         dest.writeString(this.title);
         dest.writeInt(this.timeFrame);
-        dest.writeInt(this.selectedTimeFrame);
     }
 }

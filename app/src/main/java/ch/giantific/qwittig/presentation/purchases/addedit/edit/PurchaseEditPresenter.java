@@ -112,9 +112,7 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
         final Date date = purchase.getDateDate();
         viewModel.setDate(date, dateFormatter.format(date));
         final String currency = purchase.getCurrency();
-        final int selected = supportedCurrencies.indexOf(currency);
-        viewModel.setCurrency(currency);
-        viewModel.setCurrencySelected(selected);
+        viewModel.setCurrency(currency, true);
         final double exchangeRate = purchase.getExchangeRate();
         viewModel.setExchangeRate(exchangeRate, exchangeRateFormatter.format(exchangeRate));
         viewModel.setReceipt(purchase.getReceipt());

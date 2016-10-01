@@ -95,7 +95,8 @@ public abstract class BaseAssignmentAddEditFragment<T> extends BaseFragment<T, A
     private AssignmentAddEditIdentitiesRecyclerAdapter setupRecyclerView() {
         binding.rvAssignmentIdentities.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvAssignmentIdentities.setHasFixedSize(true);
-        final AssignmentAddEditIdentitiesRecyclerAdapter adapter = new AssignmentAddEditIdentitiesRecyclerAdapter(presenter);
+        final AssignmentAddEditIdentitiesRecyclerAdapter adapter =
+                new AssignmentAddEditIdentitiesRecyclerAdapter(presenter);
         binding.rvAssignmentIdentities.setAdapter(adapter);
 
         return adapter;
@@ -104,7 +105,7 @@ public abstract class BaseAssignmentAddEditFragment<T> extends BaseFragment<T, A
     private void setupTimeFrameSpinner() {
         final StringResSpinnerAdapter timeFrameAdapter =
                 new StringResSpinnerAdapter(getActivity(), R.layout.spinner_item,
-                        presenter.getTimeFrames());
+                        presenter.getViewModel().getTimeFrames());
         binding.spAssignmentTimeFrame.setAdapter(timeFrameAdapter);
     }
 

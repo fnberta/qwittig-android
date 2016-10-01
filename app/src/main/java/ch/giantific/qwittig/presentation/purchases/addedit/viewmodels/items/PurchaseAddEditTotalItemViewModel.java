@@ -28,12 +28,10 @@ public interface PurchaseAddEditTotalItemViewModel extends Observable {
     @Bindable
     String getCurrency();
 
-    void setCurrency(@NonNull String currency);
+    void setCurrency(@NonNull String currency, boolean notify);
 
     @Bindable
     int getCurrencySelected();
-
-    void setCurrencySelected(int currencySelected);
 
     double getExchangeRate();
 

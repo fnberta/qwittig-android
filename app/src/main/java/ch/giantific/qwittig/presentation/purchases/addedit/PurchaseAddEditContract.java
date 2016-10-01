@@ -9,7 +9,6 @@ import android.widget.AdapterView;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
-import java.util.List;
 
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
@@ -39,8 +38,6 @@ public interface PurchaseAddEditContract {
         PurchaseAddEditViewModel getViewModel();
 
         void setListInteraction(@NonNull ListInteraction listInteraction);
-
-        List<String> getSupportedCurrencies();
 
         void onDateClick(View view);
 

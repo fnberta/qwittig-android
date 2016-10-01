@@ -14,8 +14,8 @@ import android.widget.AdapterView;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.AssignmentAddEditViewModel;
+import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListDragInteraction;
 import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
@@ -39,8 +39,6 @@ public interface AssignmentAddEditContract {
         void setListInteraction(@NonNull ListInteraction listInteraction);
 
         void setListDragInteraction(@NonNull ListDragInteraction listDragInteraction);
-
-        int[] getTimeFrames();
 
         /**
          * Checks whether the user has made an changes to the data on the screen. If yes shows a
