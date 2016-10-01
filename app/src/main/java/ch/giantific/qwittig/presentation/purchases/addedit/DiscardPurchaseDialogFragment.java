@@ -12,7 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.BaseDialogFragment;
 
 /**
  * Provides a dialog that asks the user if he wants to discard a purchase or save it as a draft.

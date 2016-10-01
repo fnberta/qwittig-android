@@ -13,7 +13,12 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditDateItemModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditDateItemViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.Presenter"
             />
     </data>
 
@@ -26,10 +31,10 @@
         android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
         android:drawableStart="@drawable/ic_event_black_24dp"
         android:gravity="center_vertical"
+        android:onClick="@{presenter::onDateClick}"
         android:paddingEnd="@dimen/key_line_1"
         android:paddingStart="@dimen/key_line_1"
-        android:text="@{viewModel.date}"
-        android:onClick="@{viewModel::onDateClick}"
+        android:text="@{viewModel.dateFormatted}"
         tools:text="27. November 2014"
         />
 

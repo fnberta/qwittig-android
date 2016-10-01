@@ -7,27 +7,22 @@ package ch.giantific.qwittig.presentation.purchases.details;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.FragmentPurchaseDetailsBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
 
 
 /**
  * Displays all items of a purchase, the users involved the total price and the share of the
  * current user. The store and date of the purchase are displayed in the hosting activity.
- * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
  *
  * @see PurchaseDetailsActivity
  */
-public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDetailsSubcomponent, PurchaseDetailsViewModel, BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
+public class PurchaseDetailsFragment extends BaseFragment<PurchaseDetailsSubcomponent, PurchaseDetailsContract.Presenter, BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
 
     private FragmentPurchaseDetailsBinding binding;
 
@@ -46,9 +41,10 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        final PurchaseDetailsRecyclerAdapter adapter = setupRecyclerView();
         setupIdentitiesList();
-        viewModel.setListInteraction(recyclerAdapter);
-        binding.setViewModel(viewModel);
+        presenter.setListInteraction(adapter);
+        binding.setViewModel(presenter.getViewModel());
     }
 
     @Override
@@ -56,23 +52,27 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
         component.inject(this);
     }
 
+    private PurchaseDetailsRecyclerAdapter setupRecyclerView() {
+        binding.rvPurchaseDetails.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvPurchaseDetails.setHasFixedSize(true);
+        final PurchaseDetailsRecyclerAdapter adapter = new PurchaseDetailsRecyclerAdapter(presenter);
+        binding.rvPurchaseDetails.setAdapter(adapter);
+
+        return adapter;
+    }
+
     private void setupIdentitiesList() {
         binding.rvPurchaseDetailsIdentities.setHasFixedSize(true);
         binding.rvPurchaseDetailsIdentities.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.HORIZONTAL, false));
         final PurchaseDetailsIdentitiesRecyclerAdapter adapter =
-                new PurchaseDetailsIdentitiesRecyclerAdapter(viewModel);
+                new PurchaseDetailsIdentitiesRecyclerAdapter(presenter);
         binding.rvPurchaseDetailsIdentities.setAdapter(adapter);
-        viewModel.setIdentitiesListInteraction(adapter);
+        presenter.setIdentitiesListInteraction(adapter);
     }
 
     @Override
-    protected RecyclerView getRecyclerView() {
+    protected View getSnackbarView() {
         return binding.rvPurchaseDetails;
-    }
-
-    @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchaseDetailsRecyclerAdapter(viewModel);
     }
 }

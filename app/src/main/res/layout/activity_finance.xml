@@ -12,7 +12,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.finance.BalanceHeaderViewModel"
+            type="ch.giantific.qwittig.presentation.finance.FinanceHeaderViewModel"
             />
     </data>
 

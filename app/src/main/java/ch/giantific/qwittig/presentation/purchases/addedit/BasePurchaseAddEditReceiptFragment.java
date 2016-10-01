@@ -15,14 +15,14 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseShowReceiptBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 
 /**
  * Shows the receipt image taken by the user when adding a new purchase.
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAddEditViewModel> extends BaseFragment<T, S, BaseFragment.ActivityListener<T>> {
+public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAddEditContract.Presenter> extends BaseFragment<T, S, BaseFragment.ActivityListener<T>> {
 
     private FragmentPurchaseShowReceiptBinding binding;
 
@@ -48,7 +48,7 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        binding.setViewModel(viewModel);
+        binding.setViewModel(presenter.getViewModel());
     }
 
     @Override
@@ -56,7 +56,7 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
         menu.clear();
         inflater.inflate(R.menu.menu_purchase_edit_receipt_fragment, menu);
 
-        if (viewModel.isReceiptAvailable()) {
+        if (presenter.getViewModel().isReceiptAvailable()) {
             menu.findItem(R.id.action_purchase_edit_receipt_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_edit_receipt_delete).setVisible(true);
         } else {
@@ -70,10 +70,10 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
             case R.id.action_purchase_edit_receipt_add:
                 // fall through
             case R.id.action_purchase_edit_receipt_edit:
-                viewModel.onAddEditReceiptImageMenuClick();
+                presenter.onAddEditReceiptImageMenuClick();
                 return true;
             case R.id.action_purchase_edit_receipt_delete:
-                viewModel.onDeleteReceiptMenuClick();
+                presenter.onDeleteReceiptMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

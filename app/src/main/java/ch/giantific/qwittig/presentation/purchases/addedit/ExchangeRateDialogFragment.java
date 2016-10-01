@@ -14,7 +14,7 @@ import android.text.TextUtils;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.DialogExchangeRateManualBinding;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.BaseDialogFragment;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**

@@ -12,8 +12,8 @@
     <data>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompUnpaidItemModel"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel"
             />
     </data>
 
@@ -21,7 +21,7 @@
         android:id="@+id/iv_comp_avatar"
         android:contentDescription="@string/user_avatar"
         android:scaleType="centerCrop"
-        app:avatarSquare="@{itemModel.avatar}"
+        app:avatarSquare="@{viewModel.avatar}"
         app:fallback="@{@drawable/ic_account_box_black_80dp}"
         tools:src="@drawable/ic_account_box_black_80dp"
         />

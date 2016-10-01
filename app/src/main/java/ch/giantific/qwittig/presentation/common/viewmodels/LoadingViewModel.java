@@ -16,5 +16,5 @@ public interface LoadingViewModel extends Observable {
     @Bindable
     boolean isLoading();
 
-    void setLoading(boolean isLoading);
+    void setLoading(boolean loading);
 }

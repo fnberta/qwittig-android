@@ -1,111 +1,157 @@
 package ch.giantific.qwittig.presentation.stats;
 
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.support.annotation.IntDef;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.view.View;
-import android.widget.AdapterView;
 
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.Date;
-
-import ch.giantific.qwittig.data.rest.StatsResult;
+import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.stats.models.ChartCurrencyFormatter;
-import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
-import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
-import rx.Observable;
+import ch.giantific.qwittig.presentation.stats.formatters.ChartCurrencyFormatter;
+import ch.giantific.qwittig.presentation.stats.formatters.DateAxisFormatter;
 
 /**
- * Created by fabio on 14.08.16.
+ * Created by fabio on 29.09.16.
  */
-public interface StatsViewModel extends ViewModel<StatsViewModel.ViewListener>,
-        LoadingViewModel {
 
-    void setType(@NonNull StatsTypeItem type);
+public class StatsViewModel extends BaseObservable implements Parcelable, LoadingViewModel {
 
-    void setPeriod(@NonNull StatsPeriodItem statsPeriod);
+    public static final Parcelable.Creator<StatsViewModel> CREATOR = new Parcelable.Creator<StatsViewModel>() {
+        @Override
+        public StatsViewModel createFromParcel(Parcel source) {
+            return new StatsViewModel(source);
+        }
 
-    Date getStartDate();
+        @Override
+        public StatsViewModel[] newArray(int size) {
+            return new StatsViewModel[size];
+        }
+    };
+    private boolean loading;
+    private boolean empty;
+    private PieData storesData;
+    private PieData identitiesData;
+    private BarData timeData;
+    private String pieTotal;
+    private String barAverage;
+    private ChartCurrencyFormatter chartCurrencyFormatter;
+    private AxisValueFormatter barXAxisFormatter;
 
-    Date getEndDate();
-
-    @Bindable
-    boolean isEmpty();
-
-    void setEmpty(boolean empty);
-
-    @Bindable
-    String getPieTotal();
-
-    void setPieTotal(float pieTotal);
-
-    @Bindable
-    PieData getStoresData();
-
-    void setStoresData(@NonNull PieData pieData);
-
-    @Bindable
-    PieData getIdentitiesData();
-
-    void setIdentitiesData(@NonNull PieData pieData);
-
-    @Bindable
-    String getBarAverage();
-
-    void setBarAverage(float barAverage);
-
-    @Bindable
-    BarData getTimeData();
-
-    void setTimeData(@NonNull BarData barData);
-
-    @Bindable
-    AxisValueFormatter getBarXAxisFormatter();
-
-    void setBarXAxisFormatter(@NonNull String unit);
-
-    @Bindable
-    ChartCurrencyFormatter getChartCurrencyFormatter();
-
-    void setChartCurrencyFormatter(@NonNull ChartCurrencyFormatter formatter);
-
-    void onDataLoaded(@Nullable Observable<StatsResult> data);
-
-    void onTypeSelected(AdapterView<?> parent, View view, int position, long id);
-
-    void onPeriodSelected(AdapterView<?> parent, View view, int position, long id);
-
-    @IntDef({StatsType.GROUP, StatsType.USER})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface StatsType {
-        int GROUP = 1;
-        int USER = 2;
+    public StatsViewModel(boolean loading) {
+        this.empty = true;
+        this.loading = loading;
     }
 
-    @IntDef({StatsPeriod.THIS_MONTH, StatsPeriod.LAST_MONTH, StatsPeriod.THIS_YEAR,
-            StatsPeriod.CUSTOM})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface StatsPeriod {
-        int THIS_MONTH = 1;
-        int LAST_MONTH = 2;
-        int THIS_YEAR = 3;
-        int CUSTOM = 4;
+    private StatsViewModel(Parcel in) {
+        this.loading = in.readByte() != 0;
+        this.empty = in.readByte() != 0;
     }
 
-    /**
-     * Defines the interaction with the attached view.
-     */
-    interface ViewListener extends ViewModel.ViewListener {
-        void reloadData();
+    @Override
+    @Bindable
+    public boolean isLoading() {
+        return loading;
+    }
 
-        int[] getStatsColors();
+    @Override
+    public void setLoading(boolean loading) {
+        this.loading = loading;
+        notifyPropertyChanged(BR.loading);
+    }
+
+    @Bindable
+    public boolean isEmpty() {
+        return empty;
+    }
+
+    public void setEmpty(boolean empty) {
+        this.empty = empty;
+        notifyPropertyChanged(BR.empty);
+    }
+
+    @Bindable
+    public String getPieTotal() {
+        return pieTotal;
+    }
+
+    public void setPieTotal(@NonNull String pieTotal) {
+        this.pieTotal = pieTotal;
+        notifyPropertyChanged(BR.pieTotal);
+    }
+
+    @Bindable
+    public PieData getStoresData() {
+        return storesData;
+    }
+
+    public void setStoresData(@NonNull PieData pieData) {
+        storesData = pieData;
+        notifyPropertyChanged(BR.storesData);
+    }
+
+    @Bindable
+    public PieData getIdentitiesData() {
+        return identitiesData;
+    }
+
+    public void setIdentitiesData(@NonNull PieData pieData) {
+        identitiesData = pieData;
+        notifyPropertyChanged(BR.identitiesData);
+    }
+
+    @Bindable
+    public String getBarAverage() {
+        return barAverage;
+    }
+
+    public void setBarAverage(@NonNull String barAverage) {
+        this.barAverage = barAverage;
+        notifyPropertyChanged(BR.barAverage);
+    }
+
+    @Bindable
+    public BarData getTimeData() {
+        return timeData;
+    }
+
+    public void setTimeData(@NonNull BarData barData) {
+        timeData = barData;
+        notifyPropertyChanged(BR.timeData);
+    }
+
+    @Bindable
+    public AxisValueFormatter getBarXAxisFormatter() {
+        return barXAxisFormatter;
+    }
+
+    public void setBarXAxisFormatter(@NonNull final String unit) {
+        barXAxisFormatter = new DateAxisFormatter(unit);
+        notifyPropertyChanged(BR.barXAxisFormatter);
+    }
+
+    @Bindable
+    public ChartCurrencyFormatter getChartCurrencyFormatter() {
+        return chartCurrencyFormatter;
+    }
+
+    public void setChartCurrencyFormatter(@NonNull ChartCurrencyFormatter chartCurrencyFormatter) {
+        this.chartCurrencyFormatter = chartCurrencyFormatter;
+        notifyPropertyChanged(BR.chartCurrencyFormatter);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.empty ? (byte) 1 : (byte) 0);
     }
 }

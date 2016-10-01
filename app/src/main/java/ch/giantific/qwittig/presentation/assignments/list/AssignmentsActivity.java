@@ -23,13 +23,13 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityAssignmentsBinding;
-import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditViewModel.AssignmentResult;
-import ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsViewModel.AssignmentDetailsResult;
+import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditContract.AssignmentResult;
+import ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsContract.AssignmentDetailsResult;
+import ch.giantific.qwittig.presentation.assignments.list.di.AssignmentsPresenterModule;
 import ch.giantific.qwittig.presentation.assignments.list.di.AssignmentsSubcomponent;
-import ch.giantific.qwittig.presentation.assignments.list.di.AssignmentsViewModelModule;
 import ch.giantific.qwittig.presentation.assignments.list.models.AssignmentDeadline;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 
@@ -45,7 +45,7 @@ import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 public class AssignmentsActivity extends BaseNavDrawerActivity<AssignmentsSubcomponent> {
 
     @Inject
-    AssignmentsViewModel assignmentsViewModel;
+    AssignmentsContract.Presenter presenter;
     private ActivityAssignmentsBinding binding;
     private AssignmentDeadline[] deadlines;
 
@@ -53,7 +53,7 @@ public class AssignmentsActivity extends BaseNavDrawerActivity<AssignmentsSubcom
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_assignments);
-        binding.setViewModel(assignmentsViewModel);
+        binding.setPresenter(presenter);
 
         checkNavDrawerItem(R.id.nav_assignments);
 
@@ -81,13 +81,13 @@ public class AssignmentsActivity extends BaseNavDrawerActivity<AssignmentsSubcom
                 AssignmentDeadline.newYearInstance(getString(R.string.deadline_year))
         };
 
-        component = navComp.plus(new AssignmentsViewModelModule(savedInstanceState, deadlines[0]));
+        component = navComp.plus(new AssignmentsPresenterModule(savedInstanceState, deadlines[0]));
         component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{assignmentsViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     private void showFab() {
@@ -126,14 +126,14 @@ public class AssignmentsActivity extends BaseNavDrawerActivity<AssignmentsSubcom
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_ASSIGNMENT_DETAILS:
+            case Navigator.RC_ASSIGNMENT_DETAILS:
                 switch (resultCode) {
                     case AssignmentDetailsResult.DELETED:
-                        assignmentsViewModel.onAssignmentDeleted(data.getStringExtra(Navigator.INTENT_STRING_EXTRA));
+                        presenter.onAssignmentDeleted(data.getStringExtra(Navigator.EXTRA_GENERIC_STRING));
                         break;
                 }
                 break;
-            case Navigator.INTENT_REQUEST_ASSIGNMENT_NEW:
+            case Navigator.RC_ASSIGNMENT_NEW:
                 switch (resultCode) {
                     case AssignmentResult.SAVED:
                         showMessage(R.string.toast_assignment_added_new);

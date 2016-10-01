@@ -16,7 +16,7 @@ import android.widget.Button;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.DialogPromptNicknameBinding;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.BaseDialogFragment;
 
 /**
  * Provides a dialog that allows the user to enter his/her email address in order to request a

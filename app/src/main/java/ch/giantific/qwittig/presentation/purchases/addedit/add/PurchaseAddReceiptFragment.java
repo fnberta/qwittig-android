@@ -6,17 +6,18 @@ package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
 
 /**
  * Shows the receipt image taken by the user when adding a new purchase.
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class PurchaseAddReceiptFragment extends BasePurchaseAddEditReceiptFragment<PurchaseAddComponent, PurchaseAddEditViewModel> {
+public class PurchaseAddReceiptFragment extends BasePurchaseAddEditReceiptFragment<PurchaseAddComponent, PurchaseAddEditContract.Presenter> {
 
     public PurchaseAddReceiptFragment() {
         // required empty constructor

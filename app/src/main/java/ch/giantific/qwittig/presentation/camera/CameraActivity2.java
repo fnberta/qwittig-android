@@ -24,26 +24,26 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityCamera2Binding;
 import ch.giantific.qwittig.databinding.TutorialOverlayCameraBinding;
 import ch.giantific.qwittig.presentation.camera.di.CameraComponent;
-import ch.giantific.qwittig.presentation.camera.di.CameraViewModelModule;
+import ch.giantific.qwittig.presentation.camera.di.CameraPresenterModule;
 import ch.giantific.qwittig.presentation.camera.di.DaggerCameraComponent;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.utils.CameraUtils;
 import rx.Single;
 
 public class CameraActivity2 extends BaseActivity<CameraComponent>
-        implements CameraViewModel.ViewListener {
+        implements CameraContract.ViewListener {
 
     @Inject
-    CameraViewModel cameraViewModel;
+    CameraContract.Presenter presenter;
     private final CameraView.Callback callback = new CameraView.Callback() {
         @Override
         public void onPictureTaken(CameraView cameraView, byte[] data) {
             super.onPictureTaken(cameraView, data);
 
-            cameraViewModel.onPictureTaken(data);
+            presenter.onPictureTaken(data);
         }
     };
     private ActivityCamera2Binding binding;
@@ -53,8 +53,9 @@ public class CameraActivity2 extends BaseActivity<CameraComponent>
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_camera2);
-        binding.setViewModel(cameraViewModel);
-        cameraViewModel.attachView(this);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
+        presenter.attachView(this);
 
         binding.camera.addCallback(callback);
     }
@@ -64,21 +65,21 @@ public class CameraActivity2 extends BaseActivity<CameraComponent>
         DaggerCameraComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .cameraViewModelModule(new CameraViewModelModule(savedInstanceState))
+                .cameraPresenterModule(new CameraPresenterModule(savedInstanceState))
                 .build()
                 .inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{cameraViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        cameraViewModel.onViewVisible();
+        presenter.onViewVisible();
     }
 
     @Override
@@ -109,7 +110,7 @@ public class CameraActivity2 extends BaseActivity<CameraComponent>
     protected void onStop() {
         super.onStop();
 
-        cameraViewModel.onViewGone();
+        presenter.onViewGone();
     }
 
     @Override
@@ -123,16 +124,16 @@ public class CameraActivity2 extends BaseActivity<CameraComponent>
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == Navigator.INTENT_REQUEST_IMAGE_PICK && resultCode == RESULT_OK) {
+        if (requestCode == Navigator.RC_IMAGE_PICK && resultCode == RESULT_OK) {
             final Uri imageUri = data.getData();
-            cameraViewModel.onGalleryImageChosen(imageUri.toString());
+            presenter.onGalleryImageChosen(imageUri.toString());
         }
     }
 
     @Override
     public void showTutorial() {
         tutBinding = TutorialOverlayCameraBinding.inflate(getLayoutInflater(), binding.flCameraMain, false);
-        tutBinding.setViewModel(cameraViewModel);
+        tutBinding.setPresenter(presenter);
         binding.flCameraMain.addView(tutBinding.svTutCamera);
         tutBinding.fabTutCameraDone.setOnClickListener(v -> binding.flCameraMain.removeView(tutBinding.svTutCamera));
     }

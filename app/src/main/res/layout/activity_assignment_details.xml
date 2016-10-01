@@ -14,7 +14,12 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsViewModel"
+            type="ch.giantific.qwittig.presentation.assignments.details.viewmodels.AssignmentDetailsViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsContract.Presenter"
             />
     </data>
 
@@ -105,7 +110,7 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginTop="@dimen/fab_margin_toolbar_x4"
-                android:onClick="@{viewModel::onFabDoneClick}"
+                android:onClick="@{presenter::onDoneClick}"
                 android:src="@drawable/ic_done_black_24dp"
                 android:visibility="@{viewModel.responsible ? View.VISIBLE : View.GONE}"
                 tools:visibility="visible"

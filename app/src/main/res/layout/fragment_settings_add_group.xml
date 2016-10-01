@@ -14,6 +14,11 @@
             name="viewModel"
             type="ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupViewModel"
             />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupContract.Presenter"
+            />
     </data>
 
     <ScrollView
@@ -65,7 +70,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_group_name"
                         android:inputType="text|textCapSentences"
-                        android:onTextChanged="@{viewModel::onNameChanged}"
+                        android:onTextChanged="@{presenter::onNameChanged}"
                         />
                 </android.support.design.widget.TextInputLayout>
 
@@ -93,7 +98,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
-                    android:onItemSelected="@{viewModel::onCurrencySelected}"
+                    android:onItemSelected="@{presenter::onCurrencySelected}"
                     />
             </LinearLayout>
 
@@ -123,7 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="@dimen/key_line_1"
-                android:onClick="@{viewModel::onFabCreateClick}"
+                android:onClick="@{presenter::onCreateClick}"
                 android:src="@drawable/ic_arrow_forward_black_24dp"
                 />
         </LinearLayout>

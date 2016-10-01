@@ -5,21 +5,20 @@
 package ch.giantific.qwittig.presentation.login.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.login.LoginAccountsFragment;
-import ch.giantific.qwittig.presentation.login.LoginAccountsViewModel;
 import ch.giantific.qwittig.presentation.login.LoginActivity;
-import ch.giantific.qwittig.presentation.login.LoginEmailFragment;
-import ch.giantific.qwittig.presentation.login.LoginEmailViewModel;
-import ch.giantific.qwittig.presentation.login.LoginFirstGroupFragment;
-import ch.giantific.qwittig.presentation.login.LoginFirstGroupViewModel;
-import ch.giantific.qwittig.presentation.login.LoginInvitationFragment;
-import ch.giantific.qwittig.presentation.login.LoginInvitationViewModel;
-import ch.giantific.qwittig.presentation.login.LoginProfileFragment;
-import ch.giantific.qwittig.presentation.login.LoginProfileViewModel;
+import ch.giantific.qwittig.presentation.login.accounts.LoginAccountsContract;
+import ch.giantific.qwittig.presentation.login.accounts.LoginAccountsFragment;
+import ch.giantific.qwittig.presentation.login.email.LoginEmailContract;
+import ch.giantific.qwittig.presentation.login.email.LoginEmailFragment;
+import ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupContract;
+import ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupFragment;
+import ch.giantific.qwittig.presentation.login.invitation.LoginInvitationContract;
+import ch.giantific.qwittig.presentation.login.invitation.LoginInvitationFragment;
+import ch.giantific.qwittig.presentation.login.profile.LoginProfileContract;
+import ch.giantific.qwittig.presentation.login.profile.LoginProfileFragment;
 import dagger.Component;
 
 /**
@@ -27,10 +26,10 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {NavigatorModule.class, GoogleApiClientDelegateModule.class,
-                RepositoriesModule.class, LoginAccountsViewModelModule.class,
-                LoginEmailViewModelModule.class, LoginInvitationViewModelModule.class,
-                LoginProfileViewModelModule.class, LoginFirstGroupViewModelModule.class})
+        modules = {LoginAccountsPresenterModule.class, LoginEmailPresenterModule.class,
+                LoginInvitationPresenterModule.class, LoginProfilePresenterModule.class,
+                LoginFirstGroupPresenterModule.class, NavigatorModule.class,
+                GoogleApiClientDelegateModule.class})
 public interface LoginComponent {
 
     void inject(LoginActivity loginActivity);
@@ -45,13 +44,13 @@ public interface LoginComponent {
 
     void inject(LoginFirstGroupFragment loginFirstGroupFragment);
 
-    LoginAccountsViewModel getLoginAccountsViewModel();
+    LoginAccountsContract.Presenter getLoginAccountsPresenter();
 
-    LoginEmailViewModel getLoginEmailViewModel();
+    LoginEmailContract.Presenter getLoginEmailPresenter();
 
-    LoginInvitationViewModel getLoginInvitationViewModel();
+    LoginInvitationContract.Presenter getLoginInvitationPresenter();
 
-    LoginProfileViewModel getLoginProfileViewModel();
+    LoginProfileContract.Presenter getLoginProfilePresenter();
 
-    LoginFirstGroupViewModel getLoginFirstGroupViewModel();
+    LoginFirstGroupContract.Presenter getLoginFirstGroupPresenter();
 }

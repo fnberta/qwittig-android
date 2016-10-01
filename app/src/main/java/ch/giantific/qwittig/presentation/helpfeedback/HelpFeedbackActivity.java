@@ -16,10 +16,10 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.helpfeedback.di.DaggerHelpFeedbackComponent;
 import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackComponent;
-import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackViewModelModule;
+import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackPresenterModule;
 
 /**
  * Hosts {@link HelpFeedbackFragment} that shows the user a list of help and feedback actions.
@@ -29,7 +29,7 @@ import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackViewModelMo
 public class HelpFeedbackActivity extends BaseActivity<HelpFeedbackComponent> {
 
     @Inject
-    HelpFeedbackViewModel helpFeedbackViewModel;
+    HelpFeedbackContract.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +48,13 @@ public class HelpFeedbackActivity extends BaseActivity<HelpFeedbackComponent> {
         component = DaggerHelpFeedbackComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .helpFeedbackViewModelModule(new HelpFeedbackViewModelModule(savedInstanceState))
+                .helpFeedbackPresenterModule(new HelpFeedbackPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{helpFeedbackViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 }

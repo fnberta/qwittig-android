@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.common.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
@@ -18,8 +17,7 @@ import dagger.Component;
  * Defines the dependencies for headless worker fragments.
  */
 @PerActivity
-@Component(dependencies = {ApplicationComponent.class},
-        modules = {RepositoriesModule.class})
+@Component(dependencies = {ApplicationComponent.class})
 public interface WorkerComponent {
 
     void inject(RatesWorker ratesWorker);

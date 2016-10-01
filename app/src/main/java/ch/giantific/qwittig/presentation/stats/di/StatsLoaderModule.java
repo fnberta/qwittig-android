@@ -26,8 +26,8 @@ public class StatsLoaderModule {
     }
 
     @Provides
-    StatsLoader providesStatsLoader(@NonNull UserRepository userRepository,
-                                    @NonNull StatsRepository statsRepository) {
-        return new StatsLoader(context, userRepository, statsRepository);
+    StatsLoader providesStatsLoader(@NonNull UserRepository userRepo,
+                                    @NonNull StatsRepository statsRepo) {
+        return new StatsLoader(context, userRepo, statsRepo);
     }
 }

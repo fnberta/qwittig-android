@@ -14,13 +14,13 @@
         <import type="android.view.View"/>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleItem"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleItemViewModel"
             />
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel"
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.Presenter"
             />
     </data>
 
@@ -41,8 +41,8 @@
             android:layout_marginStart="@dimen/key_line_1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/header_users"
-            android:onClick="@{() -> viewModel.onToggleIdentitiesClick(itemModel)}"
-            app:articleIdentities="@{itemModel.identities}"
+            android:onClick="@{() -> presenter.onToggleIdentitiesClick(viewModel)}"
+            app:articleIdentities="@{viewModel.identities}"
             />
 
         <LinearLayout
@@ -57,7 +57,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="7"
-                android:error="@{!itemModel.validate ? null : itemModel.nameComplete ? null : @string/error_item_name}"
+                android:error="@{!viewModel.validate ? null : viewModel.nameComplete ? null : @string/error_article_name}"
                 android:theme="@style/AppTheme.PrimaryAsAccent"
                 >
 
@@ -65,11 +65,11 @@
                     android:id="@+id/et_purchase_add_item_name"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:hint="@string/hint_item_name"
+                    android:hint="@string/hint_article_name"
                     android:imeOptions="actionNext"
                     android:inputType="text|textCapSentences"
-                    android:onTextChanged="@{itemModel::onNameChanged}"
-                    android:text="@{itemModel.name}"
+                    android:onTextChanged="@{viewModel::onNameChanged}"
+                    android:text="@{viewModel.name}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/normal_space"
                 android:layout_weight="3"
-                android:error="@{!itemModel.validate ? null : itemModel.priceComplete ? null : @string/error_item_price}"
+                android:error="@{!viewModel.validate ? null : viewModel.priceComplete ? null : @string/error_article_price}"
                 android:theme="@style/AppTheme.PrimaryAsAccent"
                 >
 
@@ -88,13 +88,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="end"
-                    android:hint="@string/hint_item_price"
+                    android:hint="@string/hint_article_price"
                     android:inputType="numberDecimal"
                     android:maxLength="9"
-                    android:onFocusChange="@{itemModel::onPriceFocusChange}"
-                    android:onTextChanged="@{itemModel::onPriceChanged}"
+                    android:onFocusChange="@{viewModel::onPriceFocusChange}"
+                    android:onTextChanged="@{viewModel::onPriceChanged}"
                     android:selectAllOnFocus="true"
-                    android:text="@{itemModel.price}"
+                    android:text="@{viewModel.price}"
                     />
 
             </android.support.design.widget.TextInputLayout>

@@ -13,9 +13,9 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import ch.giantific.qwittig.databinding.RowPurchaseAddEditArticleIdentityBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleIdentity;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 
 /**
  * Provides an adapter for a {@link RecyclerView} showing a list of users.
@@ -25,12 +25,14 @@ import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAd
 public class PurchaseAddEditArticleIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<PurchaseAddEditArticleIdentitiesRecyclerAdapter.ItemUserRow>
         implements PurchaseAddEditArticleIdentitiesClickListener {
 
-    private final PurchaseAddEditViewModel viewModel;
-    private final List<PurchaseAddEditArticleIdentity> identities;
+    private final PurchaseAddEditContract.Presenter presenter;
+    private final List<PurchaseAddEditArticleIdentityItemViewModel> identities;
 
-    public PurchaseAddEditArticleIdentitiesRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel,
-                                                           @NonNull List<PurchaseAddEditArticleIdentity> identities) {
-        this.viewModel = viewModel;
+    public PurchaseAddEditArticleIdentitiesRecyclerAdapter(@NonNull PurchaseAddEditContract.Presenter presenter,
+                                                           @NonNull List<PurchaseAddEditArticleIdentityItemViewModel> identities) {
+        super();
+
+        this.presenter = presenter;
         this.identities = identities;
     }
 
@@ -45,8 +47,8 @@ public class PurchaseAddEditArticleIdentitiesRecyclerAdapter extends BaseRecycle
     @Override
     public void onBindViewHolder(ItemUserRow holder, int position) {
         final RowPurchaseAddEditArticleIdentityBinding binding = holder.getBinding();
-        final PurchaseAddEditArticleIdentity addEditPurchaseItemUsersUser = identities.get(position);
-        binding.setItemModel(addEditPurchaseItemUsersUser);
+        final PurchaseAddEditArticleIdentityItemViewModel viewModel = identities.get(position);
+        binding.setViewModel(viewModel);
         binding.executePendingBindings();
     }
 
@@ -57,21 +59,21 @@ public class PurchaseAddEditArticleIdentitiesRecyclerAdapter extends BaseRecycle
 
     @Override
     public void onItemRowIdentityClick(int position) {
-        final PurchaseAddEditArticleIdentity user = identities.get(position);
-        user.setSelected(!user.isSelected());
+        final PurchaseAddEditArticleIdentityItemViewModel viewModel = identities.get(position);
+        viewModel.setSelected(!viewModel.isSelected());
         notifyItemChanged(position);
 
         // notify main view model because total and my share values need to be updated
-        viewModel.onArticleRowIdentityClick();
+        presenter.onArticleRowIdentityClick();
     }
 
     @Override
     public void onItemRowIdentityLongClick(int position) {
-        final PurchaseAddEditArticleIdentity identity = identities.get(position);
-        identity.setSelected(!identity.isSelected());
+        final PurchaseAddEditArticleIdentityItemViewModel viewModel = identities.get(position);
+        viewModel.setSelected(!viewModel.isSelected());
         notifyItemChanged(position);
 
-        viewModel.onArticleRowIdentityLongClick(identity);
+        presenter.onArticleRowIdentityLongClick(viewModel);
     }
 
     /**

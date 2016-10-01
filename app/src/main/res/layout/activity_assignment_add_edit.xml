@@ -12,7 +12,12 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditViewModel"
+            type="ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.AssignmentAddEditViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditContract.Presenter"
             />
     </data>
 
@@ -80,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/normal_space"
-            android:onClick="@{viewModel::onFabSaveAssignmentClick}"
+            android:onClick="@{presenter::onSaveAssignmentClick}"
             android:src="@drawable/ic_save_black_24dp"
             app:layout_anchor="@id/appbar"
             app:layout_anchorGravity="bottom|end"

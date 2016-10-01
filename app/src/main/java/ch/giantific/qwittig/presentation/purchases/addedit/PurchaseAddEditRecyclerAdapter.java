@@ -19,19 +19,19 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddEditAddRowBinding;
-import ch.giantific.qwittig.databinding.RowPurchaseAddEditDateBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddEditArticleBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddEditArticleIdentitiesBinding;
+import ch.giantific.qwittig.databinding.RowPurchaseAddEditDateBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddEditStoreBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddEditTotalBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleIdentity;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditHeaderItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleIdentitiesItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel.ViewType;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentitiesItemViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleItemViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditHeaderItemViewModel;
 
 
 /**
@@ -42,10 +42,12 @@ import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAd
  */
 public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final PurchaseAddEditViewModel viewModel;
+    private final PurchaseAddEditContract.Presenter presenter;
 
-    public PurchaseAddEditRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel) {
-        this.viewModel = viewModel;
+    public PurchaseAddEditRecyclerAdapter(@NonNull PurchaseAddEditContract.Presenter presenter) {
+        super();
+
+        this.presenter = presenter;
     }
 
     @Override
@@ -53,40 +55,40 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
         final Context context = parent.getContext();
         final LayoutInflater inflater = LayoutInflater.from(context);
         switch (viewType) {
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 final RowGenericHeaderBinding binding =
                         RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.DATE: {
+            case ViewType.DATE: {
                 final RowPurchaseAddEditDateBinding binding =
                         RowPurchaseAddEditDateBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.STORE: {
+            case ViewType.STORE: {
                 final RowPurchaseAddEditStoreBinding binding =
                         RowPurchaseAddEditStoreBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.ARTICLE: {
+            case ViewType.ARTICLE: {
                 final RowPurchaseAddEditArticleBinding binding =
                         RowPurchaseAddEditArticleBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.IDENTITIES: {
+            case ViewType.IDENTITIES: {
                 final RowPurchaseAddEditArticleIdentitiesBinding binding =
                         RowPurchaseAddEditArticleIdentitiesBinding.inflate(inflater, parent, false);
-                return new ArticleIdentitiesRow(context, binding, viewModel);
+                return new ArticleIdentitiesRow(context, binding, presenter);
             }
-            case Type.ADD_ROW: {
+            case ViewType.ADD_ROW: {
                 final RowPurchaseAddEditAddRowBinding binding =
                         RowPurchaseAddEditAddRowBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.TOTAL: {
+            case ViewType.TOTAL: {
                 final RowPurchaseAddEditTotalBinding binding =
                         RowPurchaseAddEditTotalBinding.inflate(inflater, parent, false);
-                return new TotalRow(context, binding, viewModel);
+                return new TotalRow(context, binding, presenter);
             }
             default:
                 return super.onCreateViewHolder(parent, viewType);
@@ -96,68 +98,71 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final PurchaseAddEditItemModel itemModel = viewModel.getItemAtPosition(position);
+        final BasePurchaseAddEditItemViewModel viewModel = presenter.getItemAtPosition(position);
         final int type = getItemViewType(position);
         switch (type) {
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 final BindingRow<RowGenericHeaderBinding> row = (BindingRow<RowGenericHeaderBinding>) holder;
                 final RowGenericHeaderBinding binding = row.getBinding();
 
-                final PurchaseAddEditHeaderItem headerRow = (PurchaseAddEditHeaderItem) itemModel;
-                binding.setItemModel(headerRow);
+                final PurchaseAddEditHeaderItemViewModel headerViewModel = (PurchaseAddEditHeaderItemViewModel) viewModel;
+                binding.setViewModel(headerViewModel);
                 binding.executePendingBindings();
                 break;
             }
-            case Type.DATE: {
+            case ViewType.DATE: {
                 final BindingRow<RowPurchaseAddEditDateBinding> row =
                         (BindingRow<RowPurchaseAddEditDateBinding>) holder;
                 final RowPurchaseAddEditDateBinding binding = row.getBinding();
 
-                binding.setViewModel(viewModel);
+                binding.setPresenter(presenter);
+                binding.setViewModel(presenter.getViewModel());
                 binding.executePendingBindings();
                 break;
             }
-            case Type.STORE: {
+            case ViewType.STORE: {
                 final BindingRow<RowPurchaseAddEditStoreBinding> row =
                         (BindingRow<RowPurchaseAddEditStoreBinding>) holder;
                 final RowPurchaseAddEditStoreBinding binding = row.getBinding();
 
-                binding.setViewModel(viewModel);
+                binding.setViewModel(presenter.getViewModel());
                 binding.executePendingBindings();
                 break;
             }
-            case Type.ARTICLE: {
-                final BindingRow<RowPurchaseAddEditArticleBinding> row = (BindingRow<RowPurchaseAddEditArticleBinding>) holder;
+            case ViewType.ARTICLE: {
+                final BindingRow<RowPurchaseAddEditArticleBinding> row =
+                        (BindingRow<RowPurchaseAddEditArticleBinding>) holder;
                 final RowPurchaseAddEditArticleBinding binding = row.getBinding();
 
-                final PurchaseAddEditArticleItem articleItem = (PurchaseAddEditArticleItem) itemModel;
-                binding.setItemModel(articleItem);
-                binding.setViewModel(viewModel);
+                binding.setViewModel((PurchaseAddEditArticleItemViewModel) viewModel);
+                binding.setPresenter(presenter);
                 binding.executePendingBindings();
                 break;
             }
-            case Type.IDENTITIES: {
+            case ViewType.IDENTITIES: {
                 final ArticleIdentitiesRow row = (ArticleIdentitiesRow) holder;
 
-                final PurchaseAddEditArticleIdentitiesItem identitiesItem = (PurchaseAddEditArticleIdentitiesItem) itemModel;
-                row.setIdentities(identitiesItem.getIdentities());
+                final PurchaseAddEditArticleIdentitiesItemViewModel identitiesViewModel =
+                        (PurchaseAddEditArticleIdentitiesItemViewModel) viewModel;
+                row.setIdentities(identitiesViewModel.getIdentities());
                 break;
             }
-            case Type.ADD_ROW: {
+            case ViewType.ADD_ROW: {
                 final BindingRow<RowPurchaseAddEditAddRowBinding> row =
                         (BindingRow<RowPurchaseAddEditAddRowBinding>) holder;
                 final RowPurchaseAddEditAddRowBinding binding = row.getBinding();
 
-                binding.setItemModel(itemModel);
+                binding.setPresenter(presenter);
                 binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
-            case Type.TOTAL: {
+            case ViewType.TOTAL: {
                 final TotalRow row = (TotalRow) holder;
                 final RowPurchaseAddEditTotalBinding binding = row.getBinding();
 
-                binding.setViewModel(viewModel);
+                binding.setPresenter(presenter);
+                binding.setViewModel(presenter.getViewModel());
                 binding.executePendingBindings();
                 break;
             }
@@ -166,32 +171,32 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return viewModel.getItemViewType(position);
+        return presenter.getItemAtPosition(position).getViewType();
     }
 
     private static class ArticleIdentitiesRow extends BindingRow<RowPurchaseAddEditArticleIdentitiesBinding> {
 
         private final PurchaseAddEditArticleIdentitiesRecyclerAdapter recyclerAdapter;
-        private final List<PurchaseAddEditArticleIdentity> identities = new ArrayList<>();
+        private final List<PurchaseAddEditArticleIdentityItemViewModel> identities = new ArrayList<>();
 
-        public ArticleIdentitiesRow(@NonNull Context context,
-                                    @NonNull RowPurchaseAddEditArticleIdentitiesBinding binding,
-                                    @NonNull PurchaseAddEditViewModel viewModel) {
+        ArticleIdentitiesRow(@NonNull Context context,
+                             @NonNull RowPurchaseAddEditArticleIdentitiesBinding binding,
+                             @NonNull PurchaseAddEditContract.Presenter presenter) {
             super(binding);
 
             binding.rvPurchaseAddItemUsers.setHasFixedSize(true);
             binding.rvPurchaseAddItemUsers.setLayoutManager(new LinearLayoutManager(context,
                     LinearLayoutManager.HORIZONTAL, false));
-            recyclerAdapter = new PurchaseAddEditArticleIdentitiesRecyclerAdapter(viewModel, identities);
+            recyclerAdapter = new PurchaseAddEditArticleIdentitiesRecyclerAdapter(presenter, identities);
             binding.rvPurchaseAddItemUsers.setAdapter(recyclerAdapter);
         }
 
-        public void setIdentities(@NonNull PurchaseAddEditArticleIdentity[] identities) {
+        public void setIdentities(@NonNull PurchaseAddEditArticleIdentityItemViewModel[] identities) {
             this.identities.clear();
             this.identities.addAll(Arrays.asList(identities));
             recyclerAdapter.notifyDataSetChanged();
@@ -200,12 +205,12 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
 
     private static class TotalRow extends BindingRow<RowPurchaseAddEditTotalBinding> {
 
-        public TotalRow(@NonNull Context context, @NonNull RowPurchaseAddEditTotalBinding binding,
-                        @NonNull PurchaseAddEditViewModel viewModel) {
+        TotalRow(@NonNull Context context, @NonNull RowPurchaseAddEditTotalBinding binding,
+                 @NonNull PurchaseAddEditContract.Presenter presenter) {
             super(binding);
 
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
-                    R.layout.spinner_item_title, viewModel.getSupportedCurrencies());
+                    R.layout.spinner_item_title, presenter.getSupportedCurrencies());
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             binding.spCurrency.setAdapter(adapter);
         }

@@ -139,12 +139,12 @@
             android:parentActivityName=".presentation.assignments.list.AssignmentsActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode"/>
         <activity
-            android:name=".presentation.assignments.addedit.AssignmentAddActivity"
+            android:name=".presentation.assignments.addedit.add.AssignmentAddActivity"
             android:label="@string/title_activity_assignment_add"
             android:parentActivityName=".presentation.assignments.list.AssignmentsActivity"
             android:theme="@style/AppTheme.SlideBottom"/>
         <activity
-            android:name=".presentation.assignments.addedit.AssignmentEditActivity"
+            android:name=".presentation.assignments.addedit.edit.AssignmentEditActivity"
             android:label="@string/title_activity_assignment_edit"
             android:parentActivityName=".presentation.assignments.details.AssignmentDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd"/>

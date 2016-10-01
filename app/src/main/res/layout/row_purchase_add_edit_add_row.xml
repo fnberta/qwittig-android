@@ -8,13 +8,13 @@
     <data>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel"
             />
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel"
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.Presenter"
             />
     </data>
 
@@ -32,8 +32,8 @@
             android:layout_marginBottom="@dimen/small_space"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginStart="@dimen/key_line_2"
-            android:onClick="@{() -> viewModel.onAddRowClick(itemModel)}"
-            android:text="@string/button_add_item"
+            android:onClick="@{() -> presenter.onAddRowClick(viewModel)}"
+            android:text="@string/button_add_article"
             />
 
         <View

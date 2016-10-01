@@ -23,15 +23,15 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.rest.StatsResult;
 import ch.giantific.qwittig.databinding.ActivityStatsBinding;
-import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.presentation.stats.StatsViewModel.StatsPeriod;
-import ch.giantific.qwittig.presentation.stats.StatsViewModel.StatsType;
+import ch.giantific.qwittig.presentation.stats.StatsContract.StatsPeriod;
+import ch.giantific.qwittig.presentation.stats.StatsContract.StatsType;
 import ch.giantific.qwittig.presentation.stats.di.StatsLoaderModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsPresenterModule;
 import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
-import ch.giantific.qwittig.presentation.stats.di.StatsViewModelModule;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import rx.Observable;
@@ -47,10 +47,10 @@ import rx.Observable;
  */
 public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
         implements LoaderManager.LoaderCallbacks<Observable<StatsResult>>,
-        StatsViewModel.ViewListener {
+        StatsContract.ViewListener {
 
     @Inject
-    StatsViewModel statsViewModel;
+    StatsContract.Presenter presenter;
     private ActivityStatsBinding binding;
 
     @Override
@@ -102,10 +102,10 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
 
     private void setupTabs() {
         final StatsTypeItem type = (StatsTypeItem) binding.spStatsType.getSelectedItem();
-        statsViewModel.setType(type);
+        presenter.setType(type);
         final StatsPeriodItem period = (StatsPeriodItem) binding.spStatsPeriod.getSelectedItem();
-        statsViewModel.setPeriod(period);
-        binding.setViewModel(statsViewModel);
+        presenter.setPeriod(period);
+        binding.setPresenter(presenter);
 
         final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
         tabsAdapter.addInitialFragment(new StatsPieFragment(), getString(R.string.tab_stats_pie));
@@ -116,29 +116,29 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        component = navComp.plus(new StatsViewModelModule(savedInstanceState),
+        component = navComp.plus(new StatsPresenterModule(savedInstanceState),
                 new StatsLoaderModule(this));
         component.inject(this);
-        statsViewModel.attachView(this);
+        presenter.attachView(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{statsViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     @Override
     public Loader<Observable<StatsResult>> onCreateLoader(int id, Bundle args) {
         final StatsLoader loader = component.getStatsLoader();
-        loader.setStartDate(statsViewModel.getStartDate());
-        loader.setEndDAte(statsViewModel.getEndDate());
+        loader.setStartDate(presenter.getStartDate());
+        loader.setEndDAte(presenter.getEndDate());
         return loader;
     }
 
     @Override
     public void onLoadFinished(Loader<Observable<StatsResult>> loader,
                                Observable<StatsResult> data) {
-        statsViewModel.onDataLoaded(data);
+        presenter.onDataLoaded(data);
     }
 
     @Override

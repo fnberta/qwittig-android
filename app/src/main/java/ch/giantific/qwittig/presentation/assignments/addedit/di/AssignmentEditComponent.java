@@ -5,10 +5,9 @@
 package ch.giantific.qwittig.presentation.assignments.addedit.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentEditActivity;
-import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentEditFragment;
+import ch.giantific.qwittig.presentation.assignments.addedit.edit.AssignmentEditActivity;
+import ch.giantific.qwittig.presentation.assignments.addedit.edit.AssignmentEditFragment;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import dagger.Component;
 
@@ -17,7 +16,7 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {AssignmentEditViewModelModule.class, RepositoriesModule.class, NavigatorModule.class})
+        modules = {AssignmentEditPresenterModule.class, NavigatorModule.class})
 public interface AssignmentEditComponent {
 
     void inject(AssignmentEditActivity assignmentEditActivity);

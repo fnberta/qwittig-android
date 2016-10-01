@@ -14,7 +14,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsViewModel"
+            type="ch.giantific.qwittig.presentation.assignments.details.viewmodels.AssignmentDetailsViewModel"
             />
     </data>
 

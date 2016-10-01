@@ -16,13 +16,13 @@
         <import type="android.view.View"/>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItem"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentItemViewModel"
             />
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.assignments.list.AssignmentsViewModel"
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.assignments.list.AssignmentsContract.Presenter"
             />
     </data>
 
@@ -32,7 +32,7 @@
         android:layout_marginEnd="@dimen/small_space"
         android:layout_marginStart="@dimen/small_space"
         android:layout_marginTop="@dimen/small_space"
-        android:onClick="@{() -> viewModel.onAssignmentRowClick(itemModel)}"
+        android:onClick="@{() -> presenter.onAssignmentRowClick(viewModel)}"
         card_view:cardCornerRadius="@dimen/card_corner_radius"
         card_view:cardElevation="@dimen/card_elevation"
         >
@@ -53,7 +53,7 @@
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginTop="@dimen/normal_space"
                 android:contentDescription="@string/user_avatar"
-                app:avatar="@{itemModel.avatar}"
+                app:avatar="@{viewModel.avatar}"
                 app:fallback="@{@drawable/ic_account_circle_black_40dp}"
                 tools:src="@drawable/ic_account_circle_black_40dp"
                 />
@@ -66,7 +66,7 @@
                 android:layout_marginTop="@dimen/normal_space"
                 android:layout_toEndOf="@id/iv_avatar"
                 android:layout_toStartOf="@+id/tv_assignment_deadline"
-                android:text="@{itemModel.responsible ? @string/nickname_me : itemModel.nickname}"
+                android:text="@{viewModel.responsible ? @string/nickname_me : viewModel.nickname}"
                 tools:text="Vera"
                 />
 
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_assignment_responsible"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{itemModel.title}"
+                android:text="@{viewModel.title}"
                 tools:text="Küche putzen"
                 />
 
@@ -89,7 +89,7 @@
                 android:layout_below="@id/tv_assignment_title"
                 android:layout_marginTop="@dimen/small_space"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{itemModel.timeFrameText}"
+                android:text="@{viewModel.timeFrameText}"
                 tools:text="Wöchentlich"
                 />
 
@@ -101,7 +101,7 @@
                 android:layout_below="@id/tv_assignment_time_frame"
                 android:layout_marginBottom="@dimen/normal_space"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{itemModel.upNext}"
+                android:text="@{viewModel.upNext}"
                 tools:text="vera - lexli - sturzi"
                 />
 
@@ -113,8 +113,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="@dimen/normal_space"
                 android:layout_marginTop="@dimen/normal_space"
-                android:text="@{itemModel.deadlineText}"
-                android:textColor="@{context.getColor(itemModel.deadlineColor)}"
+                android:text="@{viewModel.deadlineFormatted}"
+                android:textColor="@{context.getColor(viewModel.deadlineColor)}"
                 tools:text="In 2 Tagen"
                 tools:textColor="@color/green"
                 />
@@ -134,10 +134,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/divider"
-                android:onClick="@{() -> viewModel.onDoneButtonClick(itemModel)}"
-                android:text="@{itemModel.doneText}"
+                android:onClick="@{() -> presenter.onDoneButtonClick(viewModel)}"
+                android:text="@{viewModel.doneText}"
                 android:textColor="?attr/colorPrimary"
-                android:visibility="@{itemModel.responsible ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.responsible ? View.VISIBLE : View.GONE}"
                 tools:text="Done for this week"
                 />
 
@@ -148,10 +148,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/divider"
-                android:onClick="@{() -> viewModel.onRemindButtonClick(itemModel)}"
-                android:text="@{@string/assignment_remind_user(itemModel.nickname)}"
+                android:onClick="@{() -> presenter.onRemindButtonClick(viewModel)}"
+                android:text="@{@string/assignment_remind_user(viewModel.nickname)}"
                 android:textColor="?attr/colorPrimary"
-                android:visibility="@{itemModel.responsible ? View.GONE : View.VISIBLE}"
+                android:visibility="@{viewModel.responsible ? View.GONE : View.VISIBLE}"
                 tools:text="Remind sturzi"
                 />
 

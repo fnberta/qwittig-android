@@ -8,7 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.presentation.stats.StatsViewModel.StatsType;
+import ch.giantific.qwittig.presentation.stats.StatsContract.StatsType;
 
 /**
  * Represents a stats page with a title and the type number.

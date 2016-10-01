@@ -13,7 +13,7 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
@@ -21,7 +21,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivi
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseEditComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditComponent;
-import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditViewModelModule;
+import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditPresenterModule;
 
 /**
  * Hosts {@link PurchaseAddFragment} or {@link PurchaseEditDraftFragment} that handle the
@@ -46,21 +46,21 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        final String editPurchaseId = getIntent().getStringExtra(Navigator.INTENT_PURCHASE_ID);
+        final String editPurchaseId = getIntent().getStringExtra(Navigator.EXTRA_PURCHASE_ID);
         component = DaggerPurchaseEditComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .purchaseEditViewModelModule(new PurchaseEditViewModelModule(savedInstanceState, editPurchaseId))
+                .purchaseEditPresenterModule(new PurchaseEditPresenterModule(savedInstanceState, editPurchaseId))
                 .build();
         component.inject(this);
 
         final boolean draft = isDraft();
-        addEditViewModel = draft ? component.getEditDraftViewModel() : component.getEditViewModel();
-        addEditViewModel.attachView(this);
+        presenter = draft ? component.getEditDraftPresenter() : component.getEditPresenter();
+        presenter.attachView(this);
     }
 
     private boolean isDraft() {
-        return getIntent().getBooleanExtra(Navigator.INTENT_PURCHASE_EDIT_DRAFT, false);
+        return getIntent().getBooleanExtra(Navigator.EXTRA_PURCHASE_EDIT_DRAFT, false);
     }
 
     @NonNull
@@ -76,6 +76,6 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
 
     @Override
     public void onDiscardChangesSelected() {
-        addEditViewModel.onDiscardChangesSelected();
+        presenter.onDiscardChangesSelected();
     }
 }

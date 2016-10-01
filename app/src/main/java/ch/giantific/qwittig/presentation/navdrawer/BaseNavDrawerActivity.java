@@ -28,9 +28,9 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.navdrawer.di.DaggerNavDrawerComponent;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerViewModelModule;
-import ch.giantific.qwittig.presentation.settings.general.SettingsViewModel;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerPresenterModule;
+import ch.giantific.qwittig.presentation.settings.general.SettingsContract;
+import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileContract;
 
 /**
  * Provides an abstract base class that sets up the navigation drawer and implements a couple of
@@ -39,15 +39,15 @@ import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewMod
  * Subclass of {@link BaseActivity}.
  */
 public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
-        implements NavDrawerViewModel.ViewListener {
+        implements NavDrawerContract.ViewListener {
 
     private static final int NAV_DRAWER_ITEM_INVALID = -1;
 
     protected boolean userLoggedIn;
     @Inject
-    protected NavDrawerViewModel navDrawerViewModel;
-    @Inject
     protected Navigator navigator;
+    @Inject
+    NavDrawerContract.Presenter navPresenter;
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private Menu navigationViewMenu;
@@ -58,7 +58,7 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        userLoggedIn = navDrawerViewModel.isUserLoggedIn();
+        userLoggedIn = navPresenter.isUserLoggedIn();
     }
 
     @Override
@@ -66,12 +66,12 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
         final NavDrawerComponent navComp = DaggerNavDrawerComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .navDrawerViewModelModule(new NavDrawerViewModelModule(savedInstanceState))
+                .navDrawerPresenterModule(new NavDrawerPresenterModule(savedInstanceState))
                 .build();
         injectDependencies(navComp, savedInstanceState);
-        headerIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, navDrawerViewModel);
-        navDrawerViewModel.attachView(this);
-        navDrawerViewModel.setSpinnerInteraction(headerIdentitiesAdapter);
+        headerIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, navPresenter);
+        navPresenter.attachView(this);
+        navPresenter.setSpinnerInteraction(headerIdentitiesAdapter);
     }
 
     protected abstract void injectDependencies(@NonNull NavDrawerComponent navComp,
@@ -96,7 +96,8 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
 
         final View navigationViewHeader = navigationView.getHeaderView(0);
         final NavDrawerHeaderBinding headerBinding = NavDrawerHeaderBinding.bind(navigationViewHeader);
-        headerBinding.setViewModel(navDrawerViewModel);
+        headerBinding.setPresenter(navPresenter);
+        headerBinding.setViewModel(navPresenter.getViewModel());
         headerBinding.spDrawerGroup.setAdapter(headerIdentitiesAdapter);
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -179,14 +180,14 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     protected void onStart() {
         super.onStart();
 
-        navDrawerViewModel.onViewVisible();
+        navPresenter.onViewVisible();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        navDrawerViewModel.onViewGone();
+        navPresenter.onViewGone();
     }
 
     @Override
@@ -194,27 +195,27 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_LOGIN:
+            case Navigator.RC_LOGIN:
                 if (resultCode == RESULT_OK) {
                     setupScreenAfterLogin();
-                    userLoggedIn = navDrawerViewModel.isUserLoggedIn();
+                    userLoggedIn = navPresenter.isUserLoggedIn();
                 } else {
                     finish();
                 }
                 break;
-            case Navigator.INTENT_REQUEST_SETTINGS:
+            case Navigator.RC_SETTINGS:
                 switch (resultCode) {
-                    case SettingsViewModel.Result.LOGOUT:
-                        navDrawerViewModel.afterLogout();
+                    case SettingsContract.Result.LOGOUT:
+                        navPresenter.afterLogout();
                         break;
                 }
                 break;
-            case Navigator.INTENT_REQUEST_SETTINGS_PROFILE:
+            case Navigator.RC_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case RESULT_OK:
                         showMessage(R.string.toast_profile_update);
                         break;
-                    case SettingsProfileViewModel.Result.CHANGES_DISCARDED:
+                    case SettingsProfileContract.Result.CHANGES_DISCARDED:
                         showMessage(R.string.toast_changes_discarded);
                         break;
                 }

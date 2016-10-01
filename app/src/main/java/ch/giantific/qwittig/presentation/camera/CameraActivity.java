@@ -25,12 +25,12 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityCameraBinding;
 import ch.giantific.qwittig.databinding.TutorialOverlayCameraBinding;
 import ch.giantific.qwittig.presentation.camera.di.CameraComponent;
-import ch.giantific.qwittig.presentation.camera.di.CameraViewModelModule;
+import ch.giantific.qwittig.presentation.camera.di.CameraPresenterModule;
 import ch.giantific.qwittig.presentation.camera.di.DaggerCameraComponent;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.utils.CameraUtils;
 import rx.Single;
 import timber.log.Timber;
@@ -50,14 +50,14 @@ import timber.log.Timber;
  */
 @SuppressWarnings("deprecation")
 public class CameraActivity extends BaseActivity<CameraComponent>
-        implements CameraViewModel.ViewListener {
+        implements CameraContract.ViewListener {
 
     @Inject
-    CameraViewModel cameraViewModel;
+    CameraContract.Presenter presenter;
     private final Camera.PictureCallback pictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(@NonNull byte[] data, Camera camera) {
-            cameraViewModel.onPictureTaken(data);
+            presenter.onPictureTaken(data);
         }
     };
     private ActivityCameraBinding binding;
@@ -69,13 +69,14 @@ public class CameraActivity extends BaseActivity<CameraComponent>
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_camera);
-        binding.setViewModel(cameraViewModel);
-        cameraViewModel.attachView(this);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
+        presenter.attachView(this);
 
         try {
             loadCamera();
         } catch (Exception e) {
-            cameraViewModel.onCameraLoadFailed();
+            presenter.onCameraLoadFailed();
             return;
         }
         preview = new CameraPreview(this, camera);
@@ -87,14 +88,14 @@ public class CameraActivity extends BaseActivity<CameraComponent>
         DaggerCameraComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .cameraViewModelModule(new CameraViewModelModule(savedInstanceState))
+                .cameraPresenterModule(new CameraPresenterModule(savedInstanceState))
                 .build()
                 .inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{cameraViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     private void loadCamera() throws Exception {
@@ -123,8 +124,8 @@ public class CameraActivity extends BaseActivity<CameraComponent>
         Camera.getCameraInfo(0, info);
         orientation = (orientation + 45) / 90 * 90;
         final int rotation = info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT
-                ? (info.orientation - orientation + 360) % 360
-                : (info.orientation + orientation) % 360;
+                             ? (info.orientation - orientation + 360) % 360
+                             : (info.orientation + orientation) % 360;
         params.setRotation(rotation);
         return params;
     }
@@ -133,7 +134,7 @@ public class CameraActivity extends BaseActivity<CameraComponent>
     protected void onStart() {
         super.onStart();
 
-        cameraViewModel.onViewVisible();
+        presenter.onViewVisible();
     }
 
     @Override
@@ -147,7 +148,7 @@ public class CameraActivity extends BaseActivity<CameraComponent>
                 loadCamera();
                 preview.setCamera(camera);
             } catch (Exception e) {
-                cameraViewModel.onCameraLoadFailed();
+                presenter.onCameraLoadFailed();
             }
         }
     }
@@ -176,7 +177,7 @@ public class CameraActivity extends BaseActivity<CameraComponent>
     protected void onStop() {
         super.onStop();
 
-        cameraViewModel.onViewGone();
+        presenter.onViewGone();
     }
 
     @Override
@@ -191,10 +192,10 @@ public class CameraActivity extends BaseActivity<CameraComponent>
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_PICK: {
+            case Navigator.RC_IMAGE_PICK: {
                 if (resultCode == RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    cameraViewModel.onGalleryImageChosen(imageUri.toString());
+                    presenter.onGalleryImageChosen(imageUri.toString());
                 }
             }
         }
@@ -203,7 +204,7 @@ public class CameraActivity extends BaseActivity<CameraComponent>
     @Override
     public void showTutorial() {
         tutBinding = TutorialOverlayCameraBinding.inflate(getLayoutInflater(), binding.flCameraMain, false);
-        tutBinding.setViewModel(cameraViewModel);
+        tutBinding.setPresenter(presenter);
         binding.flCameraMain.addView(tutBinding.svTutCamera);
         tutBinding.fabTutCameraDone.setOnClickListener(v -> binding.flCameraMain.removeView(tutBinding.svTutCamera));
     }

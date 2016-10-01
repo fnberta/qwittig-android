@@ -13,6 +13,10 @@
             name="viewModel"
             type="ch.giantific.qwittig.presentation.camera.CameraViewModel"/>
 
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.camera.CameraContract.Presenter"/>
+
         <import type="android.view.View"/>
     </data>
 
@@ -47,7 +51,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/camera_redo"
-                android:onClick="@{viewModel::onRedoClick}"
+                android:onClick="@{presenter::onRedoClick}"
                 android:src="@drawable/ic_redo_white_48dp"
                 android:visibility="@{viewModel.imageTakenBarVisible ? View.VISIBLE : View.GONE}"
                 />
@@ -58,7 +62,7 @@
                 android:layout_height="@dimen/touch_target_min"
                 android:layout_centerInParent="true"
                 android:contentDescription="@string/camera_redo"
-                android:onClick="@{viewModel::onDoneClick}"
+                android:onClick="@{presenter::onDoneClick}"
                 android:src="@drawable/ic_done_white_24dp"
                 android:visibility="@{viewModel.imageTakenBarVisible ? View.VISIBLE : View.GONE}"
                 />
@@ -68,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:onClick="@{viewModel::onFabCaptureClick}"
+                android:onClick="@{presenter::onCaptureClick}"
                 android:src="@drawable/ic_camera_alt_black_24dp"
                 android:visibility="@{viewModel.imageTakenBarVisible ? View.GONE : View.VISIBLE}"
                 />
@@ -82,7 +86,7 @@
                 android:layout_centerVertical="true"
                 android:gravity="center"
                 android:minWidth="@dimen/touch_target_min"
-                android:onClick="@{viewModel::onFromGalleryClick}"
+                android:onClick="@{presenter::onFromGalleryClick}"
                 android:text="@string/camera_pick_image"
                 android:textColor="?attr/colorAccent"
                 />

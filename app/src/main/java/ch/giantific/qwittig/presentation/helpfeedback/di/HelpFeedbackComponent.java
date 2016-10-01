@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.helpfeedback.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
@@ -17,7 +16,7 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {HelpFeedbackViewModelModule.class, NavigatorModule.class, RepositoriesModule.class})
+        modules = {HelpFeedbackPresenterModule.class, NavigatorModule.class})
 public interface HelpFeedbackComponent {
 
     void inject(HelpFeedbackActivity helpFeedbackActivity);

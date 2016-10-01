@@ -31,15 +31,15 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
-import ch.giantific.qwittig.presentation.camera.CameraViewModel.CameraResult;
+import ch.giantific.qwittig.presentation.camera.CameraContract.CameraResult;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.DatePickerDialogFragment;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.dialogs.DatePickerDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -53,7 +53,7 @@ import rx.Single;
  */
 public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> implements
         BasePurchaseAddEditFragment.ActivityListener<T>,
-        PurchaseAddEditViewModel.ViewListener,
+        PurchaseAddEditContract.ViewListener,
         RatesWorkerListener, DatePickerDialog.OnDateSetListener,
         NoteDialogFragment.DialogInteractionListener,
         ExchangeRateDialogFragment.DialogInteractionListener,
@@ -61,7 +61,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
 
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 12;
 
-    protected PurchaseAddEditViewModel addEditViewModel;
+    protected PurchaseAddEditContract.Presenter presenter;
     @Inject
     protected Navigator navigator;
     private ActivityPurchaseAddEditBinding binding;
@@ -70,7 +70,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_add_edit);
-        binding.setViewModel(addEditViewModel);
+        binding.setPresenter(presenter);
 
         setupTabs();
 
@@ -87,8 +87,8 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{addEditViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -133,7 +133,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu_purchase_add_edit, menu);
 
-        if (addEditViewModel.isNoteAvailable()) {
+        if (presenter.getViewModel().isNoteAvailable()) {
             menu.findItem(R.id.action_purchase_add_edit_note_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_add_edit_note_add).setVisible(false);
         }
@@ -146,12 +146,12 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         final int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                addEditViewModel.onExitClick();
+                presenter.onExitClick();
                 return true;
             case R.id.action_purchase_add_edit_note_edit:
                 // fall through
             case R.id.action_purchase_add_edit_note_add:
-                addEditViewModel.onAddEditNoteMenuClick();
+                presenter.onAddEditNoteMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -163,14 +163,14 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_CAPTURE:
+            case Navigator.RC_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        final String imagePath = data.getStringExtra(Navigator.INTENT_STRING_EXTRA);
-                        addEditViewModel.onReceiptImageTaken(imagePath);
+                        final String imagePath = data.getStringExtra(Navigator.EXTRA_GENERIC_STRING);
+                        presenter.onReceiptImageTaken(imagePath);
                         break;
                     case CameraResult.ERROR:
-                        addEditViewModel.onReceiptImageTakeFailed();
+                        presenter.onReceiptImageTakeFailed();
                         break;
                 }
                 break;
@@ -202,18 +202,18 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     @Override
     public void onBackPressed() {
         if (!getSupportFragmentManager().popBackStackImmediate()) {
-            addEditViewModel.onExitClick();
+            presenter.onExitClick();
         }
     }
 
     @Override
     public void onDiscardPurchaseSelected() {
-        addEditViewModel.onDiscardChangesSelected();
+        presenter.onDiscardChangesSelected();
     }
 
     @Override
     public void onSaveAsDraftSelected() {
-        addEditViewModel.onSaveAsDraftMenuClick();
+        presenter.onSaveAsDraftMenuClick();
     }
 
     @Override
@@ -229,7 +229,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         final Date date = DateUtils.parseDateFromPicker(year, monthOfYear, dayOfMonth);
-        addEditViewModel.onDateSet(date);
+        presenter.onDateSet(date);
     }
 
     @Override
@@ -239,7 +239,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
 
     @Override
     public void onExchangeRateManuallySet(double exchangeRate) {
-        addEditViewModel.onExchangeRateManuallySet(exchangeRate);
+        presenter.onExchangeRateManuallySet(exchangeRate);
     }
 
     @Override
@@ -261,12 +261,12 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
 
     @Override
     public void onNoteSet(@NonNull String note) {
-        addEditViewModel.onNoteSet(note);
+        presenter.onNoteSet(note);
     }
 
     @Override
     public void onDeleteNote() {
-        addEditViewModel.onDeleteNote();
+        presenter.onDeleteNote();
     }
 
     @Override
@@ -300,6 +300,6 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     @Override
     public void setRateFetchStream(@NonNull Single<Float> single,
                                    @NonNull String workerTag) {
-        addEditViewModel.setRateFetchStream(single, workerTag);
+        presenter.setRateFetchStream(single, workerTag);
     }
 }

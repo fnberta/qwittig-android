@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowCompUnpaidCreditBinding;
 import ch.giantific.qwittig.databinding.RowCompUnpaidDebtBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompUnpaidItemModel;
-import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompUnpaidItemModel.ViewType;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel.ViewType;
 
 
 /**
@@ -24,17 +24,17 @@ import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompUnpaidIte
  */
 public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final CompsUnpaidViewModel viewModel;
+    private final CompsUnpaidContract.Presenter presenter;
 
     /**
      * Constructs a new {@link CompsUnpaidRecyclerAdapter}.
      *
-     * @param viewModel the view's model
+     * @param presenter the view's presenter
      */
-    public CompsUnpaidRecyclerAdapter(@NonNull CompsUnpaidViewModel viewModel) {
+    public CompsUnpaidRecyclerAdapter(@NonNull CompsUnpaidContract.Presenter presenter) {
         super();
 
-        this.viewModel = viewModel;
+        this.presenter = presenter;
     }
 
     @NonNull
@@ -60,15 +60,15 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        final CompUnpaidItemModel itemModel = viewModel.getItemAtPosition(position);
+        final CompUnpaidItemViewModel viewModel = presenter.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case ViewType.CREDIT: {
                 final BindingRow<RowCompUnpaidCreditBinding> row = (BindingRow<RowCompUnpaidCreditBinding>) holder;
                 final RowCompUnpaidCreditBinding binding = row.getBinding();
 
-                binding.setItemModel(itemModel);
                 binding.setViewModel(viewModel);
+                binding.setPresenter(presenter);
                 binding.executePendingBindings();
                 break;
             }
@@ -77,7 +77,7 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
                         (BindingRow<RowCompUnpaidDebtBinding>) holder;
                 final RowCompUnpaidDebtBinding binding = row.getBinding();
 
-                binding.setItemModel(itemModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -86,11 +86,11 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return viewModel.getItemViewType(position);
+        return presenter.getItemAtPosition(position).getViewType();
     }
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 }

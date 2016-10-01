@@ -9,14 +9,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowAssignmentDetailsHistoryBinding;
-import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsHeaderItem;
-import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsHistoryItem;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsItemModel;
-import ch.giantific.qwittig.presentation.assignments.details.itemmodels.AssignmentDetailsItemModel.Type;
+import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.AssignmentDetailsHeaderItemViewModel;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.AssignmentDetailsHistoryItemViewModel;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.BaseAssignmentDetailsItemViewModel;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.BaseAssignmentDetailsItemViewModel.ViewType;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 
 
 /**
@@ -27,30 +27,30 @@ import ch.giantific.qwittig.presentation.assignments.details.itemmodels.Assignme
  */
 public class AssignmentHistoryRecyclerAdapter extends BaseRecyclerAdapter<RecyclerView.ViewHolder> {
 
-    private final AssignmentDetailsViewModel viewModel;
+    private final AssignmentDetailsContract.Presenter presenter;
 
     /**
      * Constructs a new {@link AssignmentHistoryRecyclerAdapter}.
      *
-     * @param viewModel the view model that provides access to the data
+     * @param presenter the view model that provides access to the data
      */
-    public AssignmentHistoryRecyclerAdapter(@NonNull AssignmentDetailsViewModel viewModel) {
+    public AssignmentHistoryRecyclerAdapter(@NonNull AssignmentDetailsContract.Presenter presenter) {
         super();
 
-        this.viewModel = viewModel;
+        this.presenter = presenter;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @Type int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @ViewType int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case Type.HISTORY: {
+            case ViewType.HISTORY: {
                 RowAssignmentDetailsHistoryBinding binding =
                         RowAssignmentDetailsHistoryBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 RowGenericHeaderBinding binding =
                         RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
@@ -64,34 +64,34 @@ public class AssignmentHistoryRecyclerAdapter extends BaseRecyclerAdapter<Recycl
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return viewModel.getItemViewType(position);
+        return presenter.getItemAtPosition(position).getViewType();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final AssignmentDetailsItemModel detailsItem = viewModel.getItemAtPosition(position);
+        final BaseAssignmentDetailsItemViewModel viewModel = presenter.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
-            case Type.HISTORY: {
+            case ViewType.HISTORY: {
                 final BindingRow<RowAssignmentDetailsHistoryBinding> historyRow =
                         (BindingRow<RowAssignmentDetailsHistoryBinding>) viewHolder;
                 final RowAssignmentDetailsHistoryBinding binding = historyRow.getBinding();
 
-                binding.setItemModel((AssignmentDetailsHistoryItem) detailsItem);
+                binding.setViewModel((AssignmentDetailsHistoryItemViewModel) viewModel);
                 binding.executePendingBindings();
                 break;
             }
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 final BindingRow<RowGenericHeaderBinding> headerRow = (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                binding.setItemModel((AssignmentDetailsHeaderItem) detailsItem);
+                binding.setViewModel((AssignmentDetailsHeaderItemViewModel) viewModel);
                 binding.executePendingBindings();
                 break;
             }

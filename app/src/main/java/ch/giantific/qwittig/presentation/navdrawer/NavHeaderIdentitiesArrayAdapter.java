@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
+import ch.giantific.qwittig.presentation.common.listadapters.interactions.SpinnerInteraction;
 
 
 /**
@@ -32,11 +32,11 @@ public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> impl
      * Constructs a new {@link NavHeaderIdentitiesArrayAdapter}.
      *
      * @param context   the context to use in the adapter
-     * @param viewModel the view model of the view hosting the spinner
+     * @param presenter the view model of the view hosting the spinner
      */
     public NavHeaderIdentitiesArrayAdapter(@NonNull Context context,
-                                           @NonNull NavDrawerViewModel viewModel) {
-        super(context, VIEW_RESOURCE, viewModel.getIdentities());
+                                           @NonNull NavDrawerContract.Presenter presenter) {
+        super(context, VIEW_RESOURCE, presenter.getIdentities());
     }
 
     @NonNull
@@ -84,7 +84,7 @@ public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> impl
          *
          * @param view the inflated view
          */
-        public GroupRow(@NonNull View view) {
+        GroupRow(@NonNull View view) {
             mTextViewGroup = (TextView) view.findViewById(android.R.id.text1);
         }
 

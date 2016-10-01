@@ -8,13 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.FragmentStatsPieBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 
 /**
  * Created by fabio on 14.08.16.
  */
-public class StatsPieFragment extends BaseFragment<StatsSubcomponent, StatsViewModel,
+public class StatsPieFragment extends BaseFragment<StatsSubcomponent, StatsContract.Presenter,
         BaseFragment.ActivityListener<StatsSubcomponent>> {
 
     private FragmentStatsPieBinding binding;
@@ -34,7 +34,7 @@ public class StatsPieFragment extends BaseFragment<StatsSubcomponent, StatsViewM
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        binding.setViewModel(viewModel);
+        binding.setViewModel(presenter.getViewModel());
     }
 
     @Override

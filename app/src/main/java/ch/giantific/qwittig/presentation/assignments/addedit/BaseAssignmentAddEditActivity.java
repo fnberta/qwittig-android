@@ -21,8 +21,8 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityAssignmentAddEditBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -33,14 +33,15 @@ public abstract class BaseAssignmentAddEditActivity<T> extends BaseActivity<T>
         DiscardChangesDialogFragment.DialogInteractionListener {
 
     @Inject
-    AssignmentAddEditViewModel addEditViewModel;
+    AssignmentAddEditContract.Presenter presenter;
     private ActivityAssignmentAddEditBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_assignment_add_edit);
-        binding.setViewModel(addEditViewModel);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
 
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -62,8 +63,8 @@ public abstract class BaseAssignmentAddEditActivity<T> extends BaseActivity<T>
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{addEditViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -93,7 +94,7 @@ public abstract class BaseAssignmentAddEditActivity<T> extends BaseActivity<T>
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                addEditViewModel.onUpOrBackClick();
+                presenter.onUpOrBackClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -102,16 +103,16 @@ public abstract class BaseAssignmentAddEditActivity<T> extends BaseActivity<T>
 
     @Override
     public void onDiscardChangesSelected() {
-        addEditViewModel.onDiscardChangesSelected();
+        presenter.onDiscardChangesSelected();
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        addEditViewModel.onDateSet(view, year, monthOfYear, dayOfMonth);
+        presenter.onDateSet(view, year, monthOfYear, dayOfMonth);
     }
 
     @Override
     public void onBackPressed() {
-        addEditViewModel.onUpOrBackClick();
+        presenter.onUpOrBackClick();
     }
 }

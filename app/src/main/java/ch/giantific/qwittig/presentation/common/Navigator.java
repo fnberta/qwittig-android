@@ -10,11 +10,10 @@ import android.support.v4.app.FragmentActivity;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.presentation.about.AboutActivity;
-import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddActivity;
-import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentEditActivity;
+import ch.giantific.qwittig.presentation.assignments.addedit.add.AssignmentAddActivity;
+import ch.giantific.qwittig.presentation.assignments.addedit.edit.AssignmentEditActivity;
 import ch.giantific.qwittig.presentation.assignments.list.AssignmentsActivity;
 import ch.giantific.qwittig.presentation.camera.CameraActivity;
-import ch.giantific.qwittig.presentation.camera.CameraActivity2;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
 import ch.giantific.qwittig.presentation.intro.AppIntroActivity;
@@ -35,23 +34,23 @@ import ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsAc
 @SuppressWarnings("unchecked")
 public class Navigator {
 
-    public static final String INTENT_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_PURCHASE_ID";
-    public static final String INTENT_PURCHASE_EDIT_DRAFT = BuildConfig.APPLICATION_ID + ".intents.INTENT_PURCHASE_EDIT_DRAFT";
-    public static final String INTENT_ASSIGNMENT_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_ASSIGNMENT_ID";
-    public static final String INTENT_OCR_DATA_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_DATA_ID";
-    public static final String INTENT_OCR_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_PURCHASE_ID";
-    public static final String INTENT_STRING_EXTRA = BuildConfig.APPLICATION_ID + ".intents.INTENT_STRING_EXTRA";
-    public static final int INTENT_REQUEST_LOGIN = 1;
-    public static final int INTENT_REQUEST_SETTINGS = 2;
-    public static final int INTENT_REQUEST_PURCHASE_MODIFY = 3;
-    public static final int INTENT_REQUEST_PURCHASE_DETAILS = 4;
-    public static final int INTENT_REQUEST_IMAGE_CAPTURE = 5;
-    public static final int INTENT_REQUEST_SETTINGS_PROFILE = 6;
-    public static final int INTENT_REQUEST_SETTINGS_ADD_GROUP = 7;
-    public static final int INTENT_REQUEST_ASSIGNMENT_NEW = 8;
-    public static final int INTENT_REQUEST_ASSIGNMENT_MODIFY = 9;
-    public static final int INTENT_REQUEST_ASSIGNMENT_DETAILS = 10;
-    public static final int INTENT_REQUEST_IMAGE_PICK = 11;
+    public static final String EXTRA_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".extras.EXTRA_PURCHASE_ID";
+    public static final String EXTRA_PURCHASE_EDIT_DRAFT = BuildConfig.APPLICATION_ID + ".extras.EXTRA_PURCHASE_EDIT_DRAFT";
+    public static final String EXTRA_ASSIGNMENT_ID = BuildConfig.APPLICATION_ID + ".extras.EXTRA_ASSIGNMENT_ID";
+    public static final String EXTRA_OCR_DATA_ID = BuildConfig.APPLICATION_ID + ".extras.EXTRA_OCR_DATA_ID";
+    public static final String EXTRA_OCR_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".extras.EXTRA_OCR_PURCHASE_ID";
+    public static final String EXTRA_GENERIC_STRING = BuildConfig.APPLICATION_ID + ".extras.EXTRA_GENERIC_STRING";
+    public static final int RC_LOGIN = 1;
+    public static final int RC_SETTINGS = 2;
+    public static final int RC_PURCHASE_MODIFY = 3;
+    public static final int RC_PURCHASE_DETAILS = 4;
+    public static final int RC_IMAGE_CAPTURE = 5;
+    public static final int RC_SETTINGS_PROFILE = 6;
+    public static final int RC_SETTINGS_ADD_GROUP = 7;
+    public static final int RC_ASSIGNMENT_NEW = 8;
+    public static final int RC_ASSIGNMENT_MODIFY = 9;
+    public static final int RC_ASSIGNMENT_DETAILS = 10;
+    public static final int RC_IMAGE_PICK = 11;
 
     private final FragmentActivity activity;
 
@@ -61,7 +60,7 @@ public class Navigator {
 
     public void finish(int result, @NonNull String stringExtra) {
         final Intent data = new Intent();
-        data.putExtra(INTENT_STRING_EXTRA, stringExtra);
+        data.putExtra(EXTRA_GENERIC_STRING, stringExtra);
         activity.setResult(result, data);
         ActivityCompat.finishAfterTransition(activity);
     }
@@ -79,7 +78,7 @@ public class Navigator {
         final Intent intent = new Intent(activity, SettingsProfileActivity.class);
         final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_SETTINGS_PROFILE,
+        activity.startActivityForResult(intent, RC_SETTINGS_PROFILE,
                 options.toBundle());
     }
 
@@ -95,39 +94,39 @@ public class Navigator {
 //        onActivityResult not being called
 //        ActivityOptionsCompat activityOptionsCompat =
 //                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-        activity.startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
+        activity.startActivityForResult(intentLogin, RC_LOGIN);
     }
 
     public void startPurchaseAdd(@Nullable String ocrPurchaseId) {
         final Intent intent = new Intent(activity, PurchaseAddActivity.class);
-        intent.putExtra(INTENT_OCR_PURCHASE_ID, ocrPurchaseId);
+        intent.putExtra(EXTRA_OCR_PURCHASE_ID, ocrPurchaseId);
         final ActivityOptionsCompat activityOptionsCompat =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
+        activity.startActivityForResult(intent, RC_PURCHASE_MODIFY,
                 activityOptionsCompat.toBundle());
     }
 
     public void startPurchaseEdit(@NonNull String purchaseId, boolean isDraft) {
         final Intent intent = new Intent(activity, PurchaseEditActivity.class);
-        intent.putExtra(INTENT_PURCHASE_ID, purchaseId);
-        intent.putExtra(INTENT_PURCHASE_EDIT_DRAFT, isDraft);
+        intent.putExtra(EXTRA_PURCHASE_ID, purchaseId);
+        intent.putExtra(EXTRA_PURCHASE_EDIT_DRAFT, isDraft);
         final ActivityOptionsCompat activityOptionsCompat =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
+        activity.startActivityForResult(intent, RC_PURCHASE_MODIFY,
                 activityOptionsCompat.toBundle());
     }
 
     public void startPurchaseDetails(@NonNull String purchaseId) {
         final Intent intent = new Intent(activity, PurchaseDetailsActivity.class);
-        intent.putExtra(INTENT_PURCHASE_ID, purchaseId);
+        intent.putExtra(EXTRA_PURCHASE_ID, purchaseId);
         final ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_DETAILS,
+        activity.startActivityForResult(intent, RC_PURCHASE_DETAILS,
                 options.toBundle());
     }
 
     public void startOcrRating(@NonNull String ocrDataId) {
         final Intent intent = new Intent(activity, OcrRatingActivity.class);
-        intent.putExtra(INTENT_OCR_DATA_ID, ocrDataId);
+        intent.putExtra(EXTRA_OCR_DATA_ID, ocrDataId);
         activity.startActivity(intent);
     }
 
@@ -143,26 +142,26 @@ public class Navigator {
 
     public void startAssignmentEdit(@NonNull String assignmentId) {
         final Intent intent = new Intent(activity, AssignmentEditActivity.class);
-        intent.putExtra(Navigator.INTENT_ASSIGNMENT_ID, assignmentId);
+        intent.putExtra(Navigator.EXTRA_ASSIGNMENT_ID, assignmentId);
         final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_ASSIGNMENT_MODIFY,
+        activity.startActivityForResult(intent, RC_ASSIGNMENT_MODIFY,
                 options.toBundle());
     }
 
     public void startAssignmentDetails(@NonNull String assignmentId) {
         final Intent intent = new Intent(activity, AssignmentDetailsActivity.class);
-        intent.putExtra(INTENT_ASSIGNMENT_ID, assignmentId);
+        intent.putExtra(EXTRA_ASSIGNMENT_ID, assignmentId);
         final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_ASSIGNMENT_DETAILS, options.toBundle());
+        activity.startActivityForResult(intent, RC_ASSIGNMENT_DETAILS, options.toBundle());
     }
 
     public void startAssignmentAdd() {
         final Intent intent = new Intent(activity, AssignmentAddActivity.class);
         final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, INTENT_REQUEST_ASSIGNMENT_NEW, options.toBundle());
+        activity.startActivityForResult(intent, RC_ASSIGNMENT_NEW, options.toBundle());
     }
 
     public void startStats() {
@@ -172,7 +171,7 @@ public class Navigator {
 
     public void startSettings() {
         final Intent intent = new Intent(activity, SettingsActivity.class);
-        activity.startActivityForResult(intent, INTENT_REQUEST_SETTINGS);
+        activity.startActivityForResult(intent, RC_SETTINGS);
     }
 
     public void startHelpFeedback() {
@@ -194,12 +193,12 @@ public class Navigator {
     public void startImagePicker() {
         final Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        activity.startActivityForResult(intent, INTENT_REQUEST_IMAGE_PICK);
+        activity.startActivityForResult(intent, RC_IMAGE_PICK);
     }
 
     public void startCamera() {
         final Intent intent = new Intent(activity, CameraActivity.class);
-        activity.startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
+        activity.startActivityForResult(intent, RC_IMAGE_CAPTURE);
     }
 
     public void openWebsite(@NonNull String url) {

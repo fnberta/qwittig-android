@@ -6,15 +6,15 @@
 
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     >
 
     <data>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsArticleItemModel"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsArticleItemViewModel"
             />
     </data>
 
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_with_text"
         android:layout_marginEnd="@dimen/key_line_1"
-        android:alpha="@{itemModel.alpha}"
+        android:alpha="@{viewModel.alpha}"
         >
 
         <ch.giantific.qwittig.presentation.purchases.details.widgets.CircleDisplay
@@ -33,7 +33,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
             android:layout_marginStart="@dimen/key_line_1"
-            app:percentage="@{itemModel.percentage}"
+            app:percentage="@{viewModel.percentage}"
             />
 
         <TextView
@@ -44,7 +44,7 @@
             android:layout_toEndOf="@id/list_item_percentage"
             android:layout_toStartOf="@+id/list_item_final_price"
             android:gravity="center_vertical"
-            android:text="@{itemModel.name}"
+            android:text="@{viewModel.name}"
             tools:text="Gipfeli"
             />
 
@@ -56,7 +56,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:gravity="end|center_vertical"
-            android:text="@{itemModel.price}"
+            android:text="@{viewModel.price}"
             tools:text="34.50"
             />
 

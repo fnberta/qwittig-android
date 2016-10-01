@@ -9,9 +9,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowDraftsBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftItemModel;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.DraftItemViewModel;
 
 /**
  * Handles the display of the user's drafts.
@@ -20,17 +20,17 @@ import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftI
  */
 public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDraftsBinding>> {
 
-    private final DraftsViewModel viewModel;
+    private final DraftsContract.Presenter presenter;
 
     /**
      * Constructs a new {@link DraftsRecyclerAdapter}.
      *
-     * @param viewModel the view's model
+     * @param presenter the main view's presenter
      */
-    public DraftsRecyclerAdapter(@NonNull DraftsViewModel viewModel) {
+    public DraftsRecyclerAdapter(@NonNull DraftsContract.Presenter presenter) {
         super();
 
-        this.viewModel = viewModel;
+        this.presenter = presenter;
     }
 
     @NonNull
@@ -44,9 +44,9 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDra
     @Override
     public void onBindViewHolder(BindingRow<RowDraftsBinding> holder, int position) {
         final RowDraftsBinding binding = holder.getBinding();
-        final DraftItemModel itemModel = viewModel.getItemAtPosition(position);
+        final DraftItemViewModel viewModel = presenter.getItemAtPosition(position);
 
-        binding.setItemModel(itemModel);
+        binding.setPresenter(presenter);
         binding.setViewModel(viewModel);
         binding.executePendingBindings();
     }
@@ -59,6 +59,6 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDra
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 }

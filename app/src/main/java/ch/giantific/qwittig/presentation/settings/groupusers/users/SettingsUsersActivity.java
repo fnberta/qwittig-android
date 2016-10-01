@@ -24,11 +24,11 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupViewModelModule;
+import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupPresenterModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersViewModelModule;
+import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersPresenterModule;
 import ch.giantific.qwittig.utils.AvatarUtils;
 
 /**
@@ -41,7 +41,7 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
         implements NicknamePromptDialogFragment.DialogInteractionListener {
 
     @Inject
-    SettingsUsersViewModel usersViewModel;
+    SettingsUsersContract.Presenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,15 +65,15 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
         component = DaggerSettingsGroupUsersComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .settingsAddGroupViewModelModule(new SettingsAddGroupViewModelModule(savedInstanceState))
-                .settingsUsersViewModelModule(new SettingsUsersViewModelModule(savedInstanceState))
+                .settingsAddGroupPresenterModule(new SettingsAddGroupPresenterModule(savedInstanceState))
+                .settingsUsersPresenterModule(new SettingsUsersPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{usersViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     @Override
@@ -93,16 +93,16 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_PICK:
+            case Navigator.RC_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, path -> usersViewModel.onNewAvatarTaken(path));
+                    AvatarUtils.saveImageLocal(this, imageUri, path -> presenter.onNewAvatarTaken(path));
                 }
         }
     }
 
     @Override
     public void onValidNicknameEntered(@NonNull String nickname, int position) {
-        usersViewModel.onValidNicknameEntered(nickname, position);
+        presenter.onValidNicknameEntered(nickname, position);
     }
 }

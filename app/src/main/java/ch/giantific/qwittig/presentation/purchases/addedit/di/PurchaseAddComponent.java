@@ -5,15 +5,13 @@
 package ch.giantific.qwittig.presentation.purchases.addedit.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddOcrFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddOcrReceiptFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddOcrViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddReceiptFragment;
 import dagger.Component;
 
@@ -22,7 +20,7 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {PurchaseAddViewModelModule.class, RepositoriesModule.class, NavigatorModule.class})
+        modules = {PurchaseAddPresenterModule.class, NavigatorModule.class})
 public interface PurchaseAddComponent {
 
     void inject(PurchaseAddActivity purchaseAddActivity);
@@ -35,7 +33,7 @@ public interface PurchaseAddComponent {
 
     void inject(PurchaseAddOcrReceiptFragment purchaseAddOcrReceiptFragment);
 
-    PurchaseAddEditViewModel getAddViewModel();
+    PurchaseAddEditContract.Presenter getAddPresenter();
 
-    PurchaseAddOcrViewModel getAddOcrViewModel();
+    PurchaseAddEditContract.AddOcrPresenter getAddOcrPresenter();
 }

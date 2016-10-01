@@ -4,51 +4,53 @@
 
 package ch.giantific.qwittig.presentation.navdrawer;
 
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.view.View;
-import android.widget.AdapterView;
 
-import java.util.List;
-
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.BR;
 
 /**
- * Defines an observable view model for the navigation drawer.
+ * Provides an implementation of the {@link NavDrawerContract}.
  */
-public interface NavDrawerViewModel extends ViewModel<NavDrawerViewModel.ViewListener> {
+public class NavDrawerViewModel extends BaseObservable {
 
-    void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction);
+    private String nickname;
+    private String avatar;
+    private int selectedIdentity;
 
-    @Bindable
-    String getNickname();
-
-    void setNickname(@NonNull String nickname);
-
-    @Bindable
-    String getAvatar();
-
-    void setAvatar(@NonNull String avatar);
+    public NavDrawerViewModel() {
+    }
 
     @Bindable
-    int getSelectedIdentity();
+    public String getNickname() {
+        return nickname;
+    }
 
-    List<Identity> getIdentities();
+    public void setNickname(@NonNull String nickname) {
+        this.nickname = nickname;
+        notifyPropertyChanged(BR.nickname);
+    }
 
-    boolean isUserLoggedIn();
+    @Bindable
+    public String getAvatar() {
+        return avatar;
+    }
 
-    void afterLogout();
+    public void setAvatar(@NonNull String avatar) {
+        this.avatar = avatar;
+        notifyPropertyChanged(BR.avatar);
+    }
 
-    void onIdentitySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
+    @Bindable
+    public int getSelectedIdentity() {
+        return selectedIdentity;
+    }
 
-    void onAvatarClick(View view);
-
-    /**
-     * Defines the interaction with the attached view.
-     */
-    interface ViewListener extends ViewModel.ViewListener {
-
+    public void setSelectedIdentity(int selectedIdentity) {
+        this.selectedIdentity = selectedIdentity;
+        notifyPropertyChanged(BR.selectedIdentity);
     }
 }

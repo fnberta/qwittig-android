@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.settings.groupusers.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupActivity;
@@ -19,8 +18,8 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {SettingsAddGroupViewModelModule.class, SettingsUsersViewModelModule.class,
-                RepositoriesModule.class, NavigatorModule.class})
+        modules = {SettingsAddGroupPresenterModule.class, SettingsUsersPresenterModule.class,
+                NavigatorModule.class})
 public interface SettingsGroupUsersComponent {
 
     void inject(SettingsAddGroupActivity settingsAddGroupActivity);

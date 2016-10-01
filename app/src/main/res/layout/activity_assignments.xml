@@ -11,8 +11,8 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.assignments.list.AssignmentsViewModel"
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.assignments.list.AssignmentsContract.Presenter"
             />
     </data>
 
@@ -56,7 +56,7 @@
                         android:id="@+id/sp_tasks_deadline"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:onItemSelected="@{viewModel::onDeadlineSelected}"
+                        android:onItemSelected="@{presenter::onDeadlineSelected}"
                         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                         />
 
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
                 android:layout_margin="@dimen/key_line_1"
-                android:onClick="@{viewModel::onAddAssignmentFabClick}"
+                android:onClick="@{presenter::onAddAssignmentClick}"
                 android:src="@drawable/ic_add_black_24dp"
                 android:visibility="gone"
                 tools:visibility="visible"

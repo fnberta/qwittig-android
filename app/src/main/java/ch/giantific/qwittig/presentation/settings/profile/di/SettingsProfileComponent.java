@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.settings.profile.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
@@ -18,8 +17,8 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {SettingsProfileViewModelModule.class, RepositoriesModule.class,
-                NavigatorModule.class, GoogleApiClientDelegateModule.class})
+        modules = {SettingsProfilePresenterModule.class, NavigatorModule.class,
+                GoogleApiClientDelegateModule.class})
 public interface SettingsProfileComponent {
 
     void inject(SettingsProfileActivity settingsProfileActivity);

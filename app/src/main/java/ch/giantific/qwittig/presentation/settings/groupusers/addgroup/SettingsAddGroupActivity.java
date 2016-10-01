@@ -24,12 +24,12 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupViewModelModule;
+import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupPresenterModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersViewModelModule;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersViewModel;
+import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersPresenterModule;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersContract;
 import ch.giantific.qwittig.utils.AvatarUtils;
 
 /**
@@ -47,9 +47,9 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
     public static final String ADD_GROUP_FRAGMENT = "ADD_GROUP_FRAGMENT";
 
     @Inject
-    SettingsAddGroupViewModel addGroupViewModel;
+    SettingsAddGroupContract.Presenter groupPresenter;
     @Inject
-    SettingsUsersViewModel usersViewModel;
+    SettingsUsersContract.Presenter usersViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,15 +68,15 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
         component = DaggerSettingsGroupUsersComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .settingsAddGroupViewModelModule(new SettingsAddGroupViewModelModule(savedInstanceState))
-                .settingsUsersViewModelModule(new SettingsUsersViewModelModule(savedInstanceState))
+                .settingsAddGroupPresenterModule(new SettingsAddGroupPresenterModule(savedInstanceState))
+                .settingsUsersPresenterModule(new SettingsUsersPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{addGroupViewModel, usersViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{groupPresenter, usersViewModel});
     }
 
     @Override
@@ -96,7 +96,7 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_PICK:
+            case Navigator.RC_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
                     AvatarUtils.saveImageLocal(this, imageUri, path -> usersViewModel.onNewAvatarTaken(path));

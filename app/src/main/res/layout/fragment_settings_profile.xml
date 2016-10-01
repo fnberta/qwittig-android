@@ -15,6 +15,11 @@
             name="viewModel"
             type="ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel"
             />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.settings.profile.SettingsProfileContract.Presenter"
+            />
     </data>
 
     <android.support.v4.widget.NestedScrollView
@@ -65,7 +70,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_nickname"
                         android:inputType="textPersonName"
-                        android:onTextChanged="@{viewModel::onNicknameChanged}"
+                        android:onTextChanged="@{presenter::onNicknameChanged}"
                         android:text="@{viewModel.nickname}"
                         />
 
@@ -106,7 +111,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_email"
                         android:inputType="textEmailAddress"
-                        android:onTextChanged="@{viewModel::onEmailChanged}"
+                        android:onTextChanged="@{presenter::onEmailChanged}"
                         android:text="@{viewModel.email}"
                         />
 
@@ -147,7 +152,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_password_new"
                         android:inputType="textPassword"
-                        android:onTextChanged="@{viewModel::onPasswordChanged}"
+                        android:onTextChanged="@{presenter::onPasswordChanged}"
                         />
 
                 </android.support.design.widget.TextInputLayout>
@@ -172,7 +177,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password_repeat"
                     android:inputType="textPassword"
-                    android:onTextChanged="@{viewModel::onPasswordRepeatChanged}"
+                    android:onTextChanged="@{presenter::onPasswordRepeatChanged}"
                     />
 
             </android.support.design.widget.TextInputLayout>

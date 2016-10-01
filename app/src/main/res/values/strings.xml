@@ -9,10 +9,10 @@
     <string name="title_activity_purchase_details">Purchase details</string>
     <string name="title_activity_add_purchase">New purchase</string>
     <string name="tab_purchases">Purchases</string>
-    <string name="header_items">Items</string>
-    <string name="hint_item_name">Item name</string>
-    <string name="hint_item_price">Price</string>
-    <string name="button_add_item">Add Item</string>
+    <string name="header_articles">Articles</string>
+    <string name="hint_article_name">Article name</string>
+    <string name="hint_article_price">Price</string>
+    <string name="button_add_article">Add Article</string>
     <string name="toast_purchase_added">Added new purchase</string>
     <string name="toast_purchase_discarded">Purchase discarded</string>
     <string name="header_users">Users</string>
@@ -40,8 +40,8 @@
     <string name="desc_user_invite_new">Add a new user to %1$s by entering a nickname.</string>
     <string name="error_group_name">Please enter a group name</string>
     <string name="error_email">Please enter a valid email address</string>
-    <string name="error_item_name">Please enter an article name</string>
-    <string name="error_item_price">Please enter a valid price</string>
+    <string name="error_article_name">Please enter an article name</string>
+    <string name="error_article_price">Please enter a valid price</string>
     <string name="pref_group_leave_group">Leave %1$s</string>
     <string name="dialog_group_leave_message">Do you really want to leave this group?</string>
     <string name="title_activity_edit_purchase">Edit purchase</string>
@@ -88,7 +88,7 @@
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
     <string name="toast_min_one_user">Please select at least one user.</string>
-    <string name="toast_min_one_item">Add at least one item</string>
+    <string name="toast_min_one_article">Add at least one article</string>
     <string name="pref_category_me">Me</string>
     <string name="pref_category_current_group">Current group</string>
     <string name="toast_leave_group_balance_not_zero">Please clear all outstanding debts and credits before leaving this group</string>
@@ -151,7 +151,7 @@
     <string name="about_facebook">Find Qwittig on Facebook</string>
     <string name="about_twitter">Find Qwittig on Twitter</string>
     <string name="push_action_confirm">Confirm</string>
-    <string name="push_purchase_new_multiple_title">%1$d new items</string>
+    <string name="push_purchase_new_multiple_title">%1$d new articles</string>
     <string name="push_purchase_new_multiple_more">more</string>
     <string name="action_retry">Retry</string>
     <string name="dialog_group_join_message">%1$s invited you to join %2$s. By accepting the invitation your current group will change to the new one.</string>
@@ -278,7 +278,7 @@
     <string name="progress_joining_group">Joining group…</string>
     <string name="toast_group_joined">Joined and switched to the new group</string>
     <string name="toast_error_draft_delete">Failed to delete draft</string>
-    <string name="toast_error_purchase_add_edit_load">Failed to the group\'s identities</string>
+    <string name="toast_error_purchase_add_edit_load">Failed to load the group\'s identities</string>
     <string name="toast_error_purchase_save_draft">Failed to save purchase as draft</string>
     <string name="toast_error_purchase_save">Failed to save purchase</string>
     <string name="toast_error_purchase_edit_load">Failed to load purchase</string>

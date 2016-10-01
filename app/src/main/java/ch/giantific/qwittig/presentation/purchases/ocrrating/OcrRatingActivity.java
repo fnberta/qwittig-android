@@ -18,19 +18,19 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.purchases.ocrrating.di.DaggerOcrRatingComponent;
 import ch.giantific.qwittig.presentation.purchases.ocrrating.di.OcrRatingComponent;
-import ch.giantific.qwittig.presentation.purchases.ocrrating.di.OcrRatingViewModelModule;
+import ch.giantific.qwittig.presentation.purchases.ocrrating.di.OcrRatingPresenterModule;
 import ch.giantific.qwittig.utils.Utils;
 
 public class OcrRatingActivity extends BaseActivity<OcrRatingComponent>
-        implements OcrRatingViewModel.ViewListener {
+        implements OcrRatingContract.ViewListener {
 
     private static final String FRAGMENT_RATING = "FRAGMENT_RATING";
 
     @Inject
-    OcrRatingViewModel ocrRatingViewModel;
+    OcrRatingContract.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,19 +51,19 @@ public class OcrRatingActivity extends BaseActivity<OcrRatingComponent>
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        final String ocrDataId = getIntent().getStringExtra(Navigator.INTENT_OCR_DATA_ID);
+        final String ocrDataId = getIntent().getStringExtra(Navigator.EXTRA_OCR_DATA_ID);
         component = DaggerOcrRatingComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .ocrRatingViewModelModule(new OcrRatingViewModelModule(savedInstanceState, ocrDataId))
+                .ocrRatingPresenterModule(new OcrRatingPresenterModule(savedInstanceState, ocrDataId))
                 .build();
         component.inject(this);
-        ocrRatingViewModel.attachView(this);
+        presenter.attachView(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{ocrRatingViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     @Override

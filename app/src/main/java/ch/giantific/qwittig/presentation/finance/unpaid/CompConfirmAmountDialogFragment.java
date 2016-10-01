@@ -17,7 +17,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.DialogCompensationConfirmAmountBinding;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.BaseDialogFragment;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**

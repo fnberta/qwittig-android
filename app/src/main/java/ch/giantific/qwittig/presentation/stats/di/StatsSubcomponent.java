@@ -15,7 +15,7 @@ import dagger.Subcomponent;
  * Provides the dependencies for the spending stats screen.
  */
 @PerActivity
-@Subcomponent(modules = {StatsLoaderModule.class, StatsViewModelModule.class})
+@Subcomponent(modules = {StatsLoaderModule.class, StatsPresenterModule.class})
 public interface StatsSubcomponent {
 
     void inject(StatsActivity statsActivity);

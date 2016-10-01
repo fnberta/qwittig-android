@@ -18,7 +18,8 @@ import android.widget.ArrayAdapter;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsAddGroupBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.models.Currency;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersFragment;
 import ch.giantific.qwittig.utils.Utils;
@@ -28,8 +29,8 @@ import ch.giantific.qwittig.utils.Utils;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersComponent, SettingsAddGroupViewModel, SettingsAddGroupFragment.ActivityListener>
-        implements SettingsAddGroupViewModel.ViewListener {
+public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersComponent, SettingsAddGroupContract.Presenter, SettingsAddGroupFragment.ActivityListener>
+        implements SettingsAddGroupContract.ViewListener {
 
     public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
 
@@ -50,10 +51,11 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel.attachView(this);
-        binding.setViewModel(viewModel);
+        presenter.attachView(this);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
         final ArrayAdapter<Currency> spinnerCurrencyAdapter = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_item, viewModel.getSupportedCurrencies());
+                R.layout.spinner_item, presenter.getSupportedCurrencies());
         spinnerCurrencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spSettingsGroupAddNewCurrency.setAdapter(spinnerCurrencyAdapter);
     }

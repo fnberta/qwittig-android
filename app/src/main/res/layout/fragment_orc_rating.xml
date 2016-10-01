@@ -11,8 +11,8 @@
         <import type="android.view.View"/>
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingViewModel"
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingContract.Presenter"
             />
     </data>
 
@@ -23,7 +23,8 @@
         android:clipToPadding="false"
         android:fillViewport="true"
         android:paddingBottom="@dimen/small_space"
-        android:paddingTop="@dimen/normal_space">
+        android:paddingTop="@dimen/normal_space"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,8 +58,8 @@
                     android:layout_marginEnd="@dimen/key_line_1"
                     android:layout_marginStart="@dimen/key_line_1"
                     android:numStars="4"
+                    android:onRatingChanged="@{presenter::onSatisfactionChanged}"
                     android:stepSize="1"
-                    android:onRatingChanged="@{viewModel::onSatisfactionChanged}"
                     />
             </LinearLayout>
 
@@ -67,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/normal_space"
-                android:onClick="@{viewModel::onFabDoneClick}"
+                android:onClick="@{presenter::onDoneClick}"
                 android:src="@drawable/ic_done_black_24dp"
                 />
 
