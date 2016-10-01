@@ -22,7 +22,8 @@ import ch.giantific.qwittig.BR;
 /**
  * Provides a purchase list item in the add or edit purchase screen.
  */
-public class PurchaseAddEditArticleItemViewModel extends BaseObservable implements BasePurchaseAddEditItemViewModel {
+public class PurchaseAddEditArticleItemViewModel extends BaseObservable
+        implements BasePurchaseAddEditItemViewModel {
 
     public static final Creator<PurchaseAddEditArticleItemViewModel> CREATOR = new Creator<PurchaseAddEditArticleItemViewModel>() {
         @Override
@@ -161,20 +162,21 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable implemen
         }
     }
 
-    public boolean validateFields() {
+    public boolean isInputValid() {
         validate = true;
         notifyPropertyChanged(BR.validate);
         return isNameComplete() && isPriceComplete();
     }
 
     public List<String> getSelectedIdentitiesIds() {
-        final List<String> userIds = new ArrayList<>();
-        for (PurchaseAddEditArticleIdentityItemViewModel user : identities) {
-            if (user.isSelected()) {
-                userIds.add(user.getIdentityId());
+        final List<String> identityIds = new ArrayList<>();
+        for (PurchaseAddEditArticleIdentityItemViewModel identityItem : identities) {
+            if (identityItem.isSelected()) {
+                identityIds.add(identityItem.getIdentityId());
             }
         }
-        return userIds;
+
+        return identityIds;
     }
 
     @Override

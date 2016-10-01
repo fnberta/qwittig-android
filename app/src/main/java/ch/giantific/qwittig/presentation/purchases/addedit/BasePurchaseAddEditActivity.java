@@ -41,6 +41,9 @@ import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFrag
 import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.DiscardPurchaseDialogFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.ExchangeRateDialogFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.NoteDialogFragment;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.Utils;

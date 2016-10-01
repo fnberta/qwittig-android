@@ -212,10 +212,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                 return;
             }
         }
-
-        // hack: run another update total and my share run because after configuration change,
-        // recycler view is not yet able to receive the update calls before
-        updateTotalAndMyShare();
     }
 
     final PurchaseAddEditArticleIdentityItemViewModel[] getArticleIdentities() {
@@ -573,7 +569,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
             hasItem = true;
             final PurchaseAddEditArticleItemViewModel articleItem =
                     (PurchaseAddEditArticleItemViewModel) itemViewModel;
-            if (!articleItem.validateFields()) {
+            if (!articleItem.isInputValid()) {
                 allValid = false;
             }
         }

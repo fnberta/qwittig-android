@@ -15,6 +15,8 @@ import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListIn
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
+import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.ExchangeRateDialogFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.NoteDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
