@@ -124,7 +124,7 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
 
     @Override
     protected List<BasePresenter> getPresenters() {
-        return Arrays.asList(new BasePresenter[]{presenter});
+        return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
     }
 
     @Override

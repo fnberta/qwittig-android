@@ -92,7 +92,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
 
     @Override
     protected List<BasePresenter> getPresenters() {
-        return Arrays.asList(new BasePresenter[]{headerPresenter, unpaidPresenter,
+        return Arrays.asList(new BasePresenter[]{navPresenter, headerPresenter, unpaidPresenter,
                 paidPresenter});
     }
 
@@ -110,20 +110,6 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
         }
 
         binding.tabs.setupWithViewPager(binding.viewpager);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        headerPresenter.onViewVisible();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        headerPresenter.onViewGone();
     }
 
     @Override

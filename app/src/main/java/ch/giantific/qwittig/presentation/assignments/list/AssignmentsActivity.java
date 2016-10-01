@@ -87,7 +87,7 @@ public class AssignmentsActivity extends BaseNavDrawerActivity<AssignmentsSubcom
 
     @Override
     protected List<BasePresenter> getPresenters() {
-        return Arrays.asList(new BasePresenter[]{presenter});
+        return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
     }
 
     private void showFab() {

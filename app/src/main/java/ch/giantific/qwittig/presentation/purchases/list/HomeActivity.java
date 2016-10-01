@@ -137,7 +137,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
 
     @Override
     protected List<BasePresenter> getPresenters() {
-        return Arrays.asList(new BasePresenter[]{homePresenter, purchasesPresenter, draftsPresenter});
+        return Arrays.asList(new BasePresenter[]{navPresenter, homePresenter, purchasesPresenter,
+                draftsPresenter});
     }
 
     @Override
@@ -176,20 +177,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         final String groupName = deepLink.getQueryParameter(GroupRepository.INVITATION_GROUP);
         final String inviterNickname = deepLink.getQueryParameter(GroupRepository.INVITATION_INVITER);
         homePresenter.handleInvitation(identityId, groupName, inviterNickname);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        homePresenter.onViewVisible();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        homePresenter.onViewGone();
     }
 
     @Override

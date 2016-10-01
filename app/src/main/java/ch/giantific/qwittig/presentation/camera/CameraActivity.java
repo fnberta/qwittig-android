@@ -131,13 +131,6 @@ public class CameraActivity extends BaseActivity<CameraComponent>
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        presenter.onViewVisible();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 
@@ -171,13 +164,6 @@ public class CameraActivity extends BaseActivity<CameraComponent>
         }
 
         super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        presenter.onViewGone();
     }
 
     @Override

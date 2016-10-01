@@ -89,7 +89,7 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
 
     @Override
     protected List<BasePresenter> getPresenters() {
-        return Arrays.asList(new BasePresenter[]{presenter});
+        return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
     }
 
     private void setUpNavigation() {

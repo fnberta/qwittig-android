@@ -47,7 +47,7 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     @Inject
     protected Navigator navigator;
     @Inject
-    NavDrawerContract.Presenter navPresenter;
+    protected NavDrawerContract.Presenter navPresenter;
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private Menu navigationViewMenu;
@@ -174,20 +174,6 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
         if (drawerToggle != null) {
             drawerToggle.onConfigurationChanged(newConfig);
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        navPresenter.onViewVisible();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        navPresenter.onViewGone();
     }
 
     @Override

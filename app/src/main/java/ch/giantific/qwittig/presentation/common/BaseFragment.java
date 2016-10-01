@@ -60,20 +60,6 @@ public abstract class BaseFragment<U, T extends BasePresenter, S extends BaseFra
     protected abstract void injectDependencies(@NonNull U component);
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        presenter.onViewVisible();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        presenter.onViewGone();
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
 

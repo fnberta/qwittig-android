@@ -59,6 +59,13 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     protected abstract List<BasePresenter> getPresenters();
 
     @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+
+        setupToolbar();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
@@ -70,10 +77,25 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     }
 
     @Override
-    public void setContentView(int layoutResID) {
-        super.setContentView(layoutResID);
+    protected void onStart() {
+        super.onStart();
 
-        setupToolbar();
+        for (BasePresenter presenter : presenters) {
+            if (presenter != null) {
+                presenter.onViewVisible();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        for (BasePresenter presenter : presenters) {
+            if (presenter != null) {
+                presenter.onViewGone();
+            }
+        }
     }
 
     private void setupToolbar() {

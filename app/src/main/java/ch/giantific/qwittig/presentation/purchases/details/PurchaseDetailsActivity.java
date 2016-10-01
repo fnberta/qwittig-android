@@ -97,7 +97,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
 
     @Override
     protected List<BasePresenter> getPresenters() {
-        return Arrays.asList(new BasePresenter[]{presenter});
+        return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
     }
 
     private void setupTabs() {
