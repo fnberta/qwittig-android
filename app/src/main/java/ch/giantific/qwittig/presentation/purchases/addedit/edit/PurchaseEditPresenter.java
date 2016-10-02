@@ -119,9 +119,11 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
     private void setOldArticles(@NonNull List<Article> oldArticles) {
         for (Article article : oldArticles) {
             final Set<String> identities = article.getIdentitiesIds();
-            final String price = moneyFormatter.format(article.getPriceForeign(viewModel.getExchangeRate()));
+            final double price = article.getPriceForeign(viewModel.getExchangeRate());
+            final String priceFormatted = moneyFormatter.format(price);
             final PurchaseAddEditArticleItemViewModel articleItem =
-                    new PurchaseAddEditArticleItemViewModel(article.getName(), price, getArticleIdentities(identities));
+                    new PurchaseAddEditArticleItemViewModel(article.getName(), priceFormatted,
+                            price, getArticleIdentities(identities));
             final int pos = getItemCount() - 2;
             items.add(pos, articleItem);
             listInteraction.notifyItemInserted(pos);

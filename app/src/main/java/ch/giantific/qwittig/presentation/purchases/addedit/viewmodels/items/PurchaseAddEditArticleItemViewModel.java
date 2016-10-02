@@ -40,13 +40,16 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
     private PurchaseAddEditArticleIdentityItemViewModel[] identities;
 
     public PurchaseAddEditArticleItemViewModel(@NonNull PurchaseAddEditArticleIdentityItemViewModel[] identities) {
-        this("", "", identities);
+        this("", "", 0, identities);
     }
 
-    public PurchaseAddEditArticleItemViewModel(@NonNull String name, @NonNull String price,
+    public PurchaseAddEditArticleItemViewModel(@NonNull String name,
+                                               @NonNull String price,
+                                               double priceParsed,
                                                @NonNull PurchaseAddEditArticleIdentityItemViewModel[] identities) {
         this.name = name;
         this.price = price;
+        this.priceParsed = priceParsed;
         this.identities = identities;
     }
 

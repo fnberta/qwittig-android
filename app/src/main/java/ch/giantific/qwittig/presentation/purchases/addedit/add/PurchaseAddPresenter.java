@@ -63,6 +63,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     private static final String STATE_VIEW_MODEL = PurchaseAddEditViewModel.class.getCanonicalName();
     private static final String STATE_ROW_ITEMS = "STATE_ROW_ITEMS";
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
+    private static final int FIXED_ROWS_COUNT = 6;
     protected final PurchaseAddEditViewModel viewModel;
     protected final PurchaseRepository purchaseRepo;
     protected final RemoteConfigHelper configHelper;
@@ -147,7 +148,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                     @Override
                     public void onSuccess(List<Identity> value) {
                         // fill with one article row on first start
-                        addFirstArticleIfEmpty();
+                        addArticleOnFirstRun();
                     }
 
                     @Override
@@ -190,23 +191,13 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         }
     }
 
-    private void addFirstArticleIfEmpty() {
-        boolean hasArticles = false;
-        for (int i = 0, size = items.size(); i < size; i++) {
-            final BasePurchaseAddEditItemViewModel itemViewModel = items.get(i);
-
-            if (itemViewModel.getViewType() == ViewType.ARTICLE) {
-                hasArticles = true;
-                continue;
-            }
-
-            if (itemViewModel.getViewType() == ViewType.ADD_ROW && !hasArticles) {
-                final PurchaseAddEditArticleItemViewModel articleItem =
-                        new PurchaseAddEditArticleItemViewModel(getArticleIdentities());
-                items.add(i, articleItem);
-                listInteraction.notifyItemInserted(i);
-                return;
-            }
+    private void addArticleOnFirstRun() {
+        if (getItemCount() == FIXED_ROWS_COUNT) {
+            final PurchaseAddEditArticleItemViewModel articleItem =
+                    new PurchaseAddEditArticleItemViewModel(getArticleIdentities());
+            // add right above 'add article' row
+            items.add(4, articleItem);
+            listInteraction.notifyItemInserted(4);
         }
     }
 
