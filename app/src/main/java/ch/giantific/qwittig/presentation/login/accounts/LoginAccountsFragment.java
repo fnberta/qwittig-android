@@ -117,12 +117,12 @@ public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAcc
     }
 
     @Override
-    public void showEmailFragment(@NonNull String identityId) {
+    public void showEmailLogin(@NonNull String identityId) {
         activity.showEmailFragment(identityId);
     }
 
     @Override
-    public void showProfileFragment(boolean withInvitation) {
+    public void showProfileAdjust(boolean withInvitation) {
         activity.showProfileFragment(withInvitation);
     }
 

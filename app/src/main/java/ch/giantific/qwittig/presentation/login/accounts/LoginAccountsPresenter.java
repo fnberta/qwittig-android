@@ -73,7 +73,7 @@ public class LoginAccountsPresenter extends BasePresenterImpl<LoginAccountsContr
                         view.removeWorker(workerTag);
 
                         if (isUserNew) {
-                            view.showProfileFragment(!TextUtils.isEmpty(joinIdentityId));
+                            view.showProfileAdjust(!TextUtils.isEmpty(joinIdentityId));
                         } else {
                             navigator.finish(Activity.RESULT_OK);
                         }
@@ -133,6 +133,6 @@ public class LoginAccountsPresenter extends BasePresenterImpl<LoginAccountsContr
 
     @Override
     public void onUseEmailClick(View view) {
-        this.view.showEmailFragment(joinIdentityId);
+        this.view.showEmailLogin(joinIdentityId);
     }
 }

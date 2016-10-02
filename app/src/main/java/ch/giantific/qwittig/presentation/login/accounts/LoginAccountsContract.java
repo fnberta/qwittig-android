@@ -43,8 +43,8 @@ public interface LoginAccountsContract {
 
         void loadGoogleLoginWorker(@Nullable String tokenId);
 
-        void showEmailFragment(@NonNull String identityId);
+        void showEmailLogin(@NonNull String identityId);
 
-        void showProfileFragment(boolean withInvitation);
+        void showProfileAdjust(boolean withInvitation);
     }
 }

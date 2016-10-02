@@ -45,13 +45,13 @@ public class LoginInvitationPresenter extends BasePresenterImpl<LoginInvitationC
 
     @Override
     public void onAcceptClick(View view) {
-        this.view.showAccountsScreen(true);
+        this.view.showAccountsLogin(true);
         this.view.showMessage(R.string.toast_invitation_accept_login);
     }
 
     @Override
     public void onDeclineClick(View view) {
-        this.view.showAccountsScreen(false);
+        this.view.showAccountsLogin(false);
         this.view.showMessage(R.string.toast_invitation_ignore);
     }
 }

@@ -72,7 +72,7 @@ public class LoginInvitationFragment extends BaseFragment<LoginComponent, LoginI
     }
 
     @Override
-    public void showAccountsScreen(boolean accept) {
+    public void showAccountsLogin(boolean accept) {
         activity.popBackStack(accept);
     }
 

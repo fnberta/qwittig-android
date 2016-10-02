@@ -24,6 +24,6 @@ public interface LoginInvitationContract {
     }
 
     interface ViewListener extends BaseViewListener {
-        void showAccountsScreen(boolean accept);
+        void showAccountsLogin(boolean accept);
     }
 }

@@ -51,6 +51,6 @@ public interface LoginEmailContract {
 
         void hideKeyboard();
 
-        void showProfileScreen(boolean accepted);
+        void showProfileAdjust(boolean accepted);
     }
 }

@@ -77,7 +77,7 @@ public class LoginEmailPresenter extends BasePresenterImpl<LoginEmailContract.Vi
                         view.removeWorker(workerTag);
 
                         if (isUserNew) {
-                            view.showProfileScreen(!TextUtils.isEmpty(joinIdentityId));
+                            view.showProfileAdjust(!TextUtils.isEmpty(joinIdentityId));
                         } else {
                             navigator.finish(Activity.RESULT_OK);
                         }

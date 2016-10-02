@@ -32,6 +32,6 @@ public interface LoginProfileContract {
 
     interface ViewListener extends BaseViewListener {
 
-        void showFirstGroupScreen();
+        void showFirstGroupAdjust();
     }
 }

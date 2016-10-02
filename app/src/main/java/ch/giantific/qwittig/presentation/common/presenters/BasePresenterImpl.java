@@ -12,7 +12,6 @@ import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import rx.subscriptions.CompositeSubscription;
-import timber.log.Timber;
 
 /**
  * Created by fabio on 28.09.16.

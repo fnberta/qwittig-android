@@ -191,6 +191,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     @Override
     public void showEmailFragment(@NonNull String identityId) {
         emailPresenter = component.getLoginEmailPresenter();
+
         final FragmentManager fm = getSupportFragmentManager();
         final LoginEmailFragment fragment = LoginEmailFragment.newInstance(identityId);
         if (Utils.isRunningLollipopAndHigher()) {
@@ -208,6 +209,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     @Override
     public void showProfileFragment(boolean withInvitation) {
         profilePresenter = component.getLoginProfilePresenter();
+
         final FragmentManager fm = getSupportFragmentManager();
         final LoginProfileFragment fragment = LoginProfileFragment.newInstance(withInvitation);
         if (Utils.isRunningLollipopAndHigher()) {
@@ -227,6 +229,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     @Override
     public void showFirstGroupFragment() {
         firstGroupPresenter = component.getLoginFirstGroupPresenter();
+
         final FragmentManager fm = getSupportFragmentManager();
         final LoginFirstGroupFragment fragment = new LoginFirstGroupFragment();
         if (Utils.isRunningLollipopAndHigher()) {

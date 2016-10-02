@@ -107,7 +107,7 @@ public class LoginProfilePresenter extends BasePresenterImpl<LoginProfileContrac
                         if (withInvitation) {
                             navigator.finish(Activity.RESULT_OK);
                         } else {
-                            view.showFirstGroupScreen();
+                            view.showFirstGroupAdjust();
                         }
                     }
 

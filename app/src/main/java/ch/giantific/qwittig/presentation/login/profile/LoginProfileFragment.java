@@ -67,7 +67,7 @@ public class LoginProfileFragment extends BaseFragment<LoginComponent, LoginProf
     }
 
     @Override
-    public void showFirstGroupScreen() {
+    public void showFirstGroupAdjust() {
         activity.showFirstGroupFragment();
     }
 

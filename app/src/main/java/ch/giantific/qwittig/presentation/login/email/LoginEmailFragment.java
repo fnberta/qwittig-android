@@ -69,7 +69,7 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailC
     }
 
     @Override
-    public void showProfileScreen(boolean withInvitation) {
+    public void showProfileAdjust(boolean withInvitation) {
         activity.showProfileFragment(withInvitation);
     }
 
