@@ -34,7 +34,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.jobs.UploadAvatarJob;
-import ch.giantific.qwittig.data.rest.DeleteUserData;
+import ch.giantific.qwittig.data.rest.UserDataDeletion;
 import ch.giantific.qwittig.data.rest.UserIdToken;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.DataMapper;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseAuth;
@@ -64,19 +64,19 @@ public class UserRepository {
     private final DatabaseReference databaseRef;
     private final StorageReference storageRef;
     private final FirebaseJobDispatcher jobDispatcher;
-    private final DeleteUserData deleteUserData;
+    private final UserDataDeletion userDataDeletion;
 
     @Inject
     public UserRepository(@NonNull FirebaseAuth auth,
                           @NonNull FirebaseDatabase firebaseDatabase,
                           @NonNull FirebaseStorage firebaseStorage,
                           @NonNull FirebaseJobDispatcher jobDispatcher,
-                          @NonNull DeleteUserData deleteUserData) {
+                          @NonNull UserDataDeletion userDataDeletion) {
         this.auth = auth;
         databaseRef = firebaseDatabase.getReference();
         storageRef = firebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL).child("avatars");
         this.jobDispatcher = jobDispatcher;
-        this.deleteUserData = deleteUserData;
+        this.userDataDeletion = userDataDeletion;
     }
 
     @Nullable
@@ -359,7 +359,7 @@ public class UserRepository {
                         return Single.error(new Throwable("could not get id token!"));
                     }
 
-                    return deleteUserData.deleteUserData(new UserIdToken(idToken))
+                    return userDataDeletion.deleteUserData(new UserIdToken(idToken))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread());
                 })

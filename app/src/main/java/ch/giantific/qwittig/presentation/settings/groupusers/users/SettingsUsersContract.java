@@ -47,5 +47,7 @@ public interface SettingsUsersContract {
         void hideProgressDialog();
 
         void showChangeNicknameDialog(@NonNull String nickname, int position);
+
+        String getGoogleApiKey();
     }
 }

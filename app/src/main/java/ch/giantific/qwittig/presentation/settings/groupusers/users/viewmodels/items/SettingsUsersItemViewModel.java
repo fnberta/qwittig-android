@@ -6,13 +6,12 @@ package ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.i
 
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.BaseChildItemViewModel;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 
 /**
  * Defines an observable view model for an invited user row.
@@ -20,21 +19,29 @@ import ch.giantific.qwittig.presentation.common.viewmodels.items.BaseChildItemVi
 public class SettingsUsersItemViewModel extends BaseChildItemViewModel
         implements Comparable<SettingsUsersItemViewModel> {
 
+    private final boolean pending;
     private final String nickname;
     private final String avatar;
     private final BigFraction balance;
-    private final String invitationLink;
     private final String groupId;
+    private final String groupName;
 
     public SettingsUsersItemViewModel(@EventType int eventType,
-                                      @NonNull Identity identity) {
+                                      @NonNull Identity identity,
+                                      @NonNull String groupName) {
         super(eventType, identity.getId());
 
+        pending = identity.isPending();
         nickname = identity.getNickname();
         avatar = identity.getAvatar();
         balance = identity.getBalanceFraction();
-        invitationLink = identity.getInvitationLink();
         groupId = identity.getGroup();
+        this.groupName = groupName;
+    }
+
+    @Bindable
+    public boolean isPending() {
+        return !pending;
     }
 
     @Bindable
@@ -51,17 +58,12 @@ public class SettingsUsersItemViewModel extends BaseChildItemViewModel
         return balance;
     }
 
-    public String getInvitationLink() {
-        return invitationLink;
-    }
-
     public String getGroupId() {
         return groupId;
     }
 
-    @Bindable
-    public boolean isPending() {
-        return !TextUtils.isEmpty(invitationLink);
+    public String getGroupName() {
+        return groupName;
     }
 
     @Override
@@ -80,19 +82,22 @@ public class SettingsUsersItemViewModel extends BaseChildItemViewModel
 
         final SettingsUsersItemViewModel that = (SettingsUsersItemViewModel) o;
 
-        if (!nickname.equals(that.getNickname())) return false;
-        if (avatar != null ? !avatar.equals(that.getAvatar()) : that.getAvatar() != null)
-            return false;
-        if (!balance.equals(that.getBalance())) return false;
-        return invitationLink != null ? invitationLink.equals(that.getInvitationLink()) : that.getInvitationLink() == null;
+        if (pending != that.pending) return false;
+        if (!nickname.equals(that.nickname)) return false;
+        if (avatar != null ? !avatar.equals(that.avatar) : that.avatar != null) return false;
+        if (!balance.equals(that.balance)) return false;
+        if (!groupId.equals(that.groupId)) return false;
+        return groupName.equals(that.groupName);
     }
 
     @Override
     public int hashCode() {
-        int result = nickname.hashCode();
+        int result = (pending ? 1 : 0);
+        result = 31 * result + nickname.hashCode();
         result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
         result = 31 * result + balance.hashCode();
-        result = 31 * result + (invitationLink != null ? invitationLink.hashCode() : 0);
+        result = 31 * result + groupId.hashCode();
+        result = 31 * result + groupName.hashCode();
         return result;
     }
 }

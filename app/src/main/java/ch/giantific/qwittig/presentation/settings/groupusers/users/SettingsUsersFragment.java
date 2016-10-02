@@ -100,4 +100,9 @@ public class SettingsUsersFragment extends BaseFragment<SettingsGroupUsersCompon
     public void showChangeNicknameDialog(@NonNull String nickname, int position) {
         NicknamePromptDialogFragment.display(getFragmentManager(), nickname, position);
     }
+
+    @Override
+    public String getGoogleApiKey() {
+        return getString(R.string.google_api_key);
+    }
 }

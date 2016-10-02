@@ -11,7 +11,7 @@ import rx.Single;
 /**
  * Defines the call to the server to perform OCR on an image.
  */
-public interface DeleteUserData {
+public interface UserDataDeletion {
     /**
      * Makes a POST call to the server to perform the OCR.
      *

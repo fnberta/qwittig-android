@@ -46,7 +46,6 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
     private String nickname;
     private String avatar;
     private Map<String, Long> balance;
-    private String invitationLink;
 
     public Identity() {
         // required for firebase de-/serialization
@@ -55,7 +54,7 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
     public Identity(boolean active, @NonNull String group, @NonNull String groupName,
                     @NonNull String groupCurrency, @Nullable String user,
                     @NonNull String nickname, @Nullable String avatar,
-                    @NonNull Map<String, Long> balance, @Nullable String invitationLink) {
+                    @NonNull Map<String, Long> balance) {
         this.active = active;
         this.group = group;
         this.groupName = groupName;
@@ -64,7 +63,6 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
         this.nickname = nickname;
         this.avatar = avatar;
         this.balance = balance;
-        this.invitationLink = invitationLink;
     }
 
     @Exclude
@@ -124,13 +122,9 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
         return new BigFraction(balance.get(NUMERATOR), balance.get(DENOMINATOR));
     }
 
-    public String getInvitationLink() {
-        return invitationLink;
-    }
-
     @Exclude
     public boolean isPending() {
-        return !TextUtils.isEmpty(invitationLink);
+        return active && !TextUtils.isEmpty(user);
     }
 
     @Exclude
@@ -145,7 +139,6 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
         result.put(PATH_NICKNAME, nickname);
         result.put(PATH_AVATAR, avatar);
         result.put(PATH_BALANCE, balance);
-        result.put(PATH_INVITATION_LINK, invitationLink);
 
         return result;
     }

@@ -21,6 +21,9 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.queues.GroupJoinQueue;
+import ch.giantific.qwittig.data.rest.UrlShortener;
+import ch.giantific.qwittig.data.rest.UrlShortenerRequest;
+import ch.giantific.qwittig.data.rest.UrlShortenerResult;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
@@ -28,6 +31,8 @@ import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseDatabase;
 import rx.Observable;
 import rx.Single;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 
 /**
@@ -43,12 +48,15 @@ public class GroupRepository {
 
     private final DatabaseReference databaseRef;
     private final FirebaseMessaging messaging;
+    private final UrlShortener urlShortener;
 
     @Inject
     public GroupRepository(@NonNull FirebaseDatabase firebaseDatabase,
-                           @NonNull FirebaseMessaging messaging) {
+                           @NonNull FirebaseMessaging messaging,
+                           @NonNull UrlShortener urlShortener) {
         databaseRef = firebaseDatabase.getReference();
         this.messaging = messaging;
+        this.urlShortener = urlShortener;
     }
 
     public Observable<Group> observeGroup(@NonNull String groupId) {
@@ -125,7 +133,7 @@ public class GroupRepository {
         balance.put(Identity.NUMERATOR, 0L);
         balance.put(Identity.DENOMINATOR, 1L);
         final Identity identity = new Identity(true, groupId, name, currency, userId,
-                identityNickname, identityAvatar, balance, null);
+                identityNickname, identityAvatar, balance);
         childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), identity.toMap());
 
         // add to user
@@ -188,41 +196,16 @@ public class GroupRepository {
         final String identityId = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).push().getKey();
         final String groupId = currentIdentity.getGroup();
         final String groupName = currentIdentity.getGroupName();
-        final String invitationLink = getInvitationLink(identityId, groupName, currentIdentity.getNickname());
         final Map<String, Long> balance = new HashMap<>();
         balance.put(Identity.NUMERATOR, 0L);
         balance.put(Identity.DENOMINATOR, 1L);
         final Identity identity = new Identity(true, groupId, groupName,
-                currentIdentity.getGroupCurrency(), null, nickname, null, balance, invitationLink);
+                currentIdentity.getGroupCurrency(), null, nickname, null, balance);
 
         final Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), identity.toMap());
         childUpdates.put(String.format("%s/%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_IDENTITIES, identityId), true);
         databaseRef.updateChildren(childUpdates);
-    }
-
-    private String getInvitationLink(@NonNull final String identityId,
-                                     @NonNull String groupName,
-                                     @NonNull String inviterNickname) {
-        final Uri link = new Uri.Builder()
-                .scheme("https")
-                .authority(QWITTIG_AUTHORITY)
-                .path("invitation/")
-                .appendQueryParameter(INVITATION_IDENTITY, identityId)
-                .appendQueryParameter(INVITATION_GROUP, groupName)
-                .appendQueryParameter(INVITATION_INVITER, inviterNickname)
-                .build();
-        final Uri uri = new Uri.Builder()
-                .scheme("https")
-                .authority(FIREBASE_APP_CODE + ".app.goo.gl")
-                .path("/")
-                .appendQueryParameter("link", link.toString())
-                .appendQueryParameter("apn", BuildConfig.APPLICATION_ID)
-                .appendQueryParameter("ibi", BuildConfig.APPLICATION_ID)
-                .build();
-
-        // TODO: shorten
-        return uri.toString();
     }
 
     public Single<Identity> removePendingIdentity(@NonNull final String identityId,
@@ -239,5 +222,35 @@ public class GroupRepository {
                     childUpdates.put(String.format("%s/%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_IDENTITIES, identityId), null);
                     databaseRef.updateChildren(childUpdates);
                 });
+    }
+
+    public String getInvitationLink(@NonNull final String identityId,
+                                    @NonNull String groupName,
+                                    @NonNull String inviterNickname) {
+        final Uri link = new Uri.Builder()
+                .scheme("https")
+                .authority(QWITTIG_AUTHORITY)
+                .path("invitation")
+                .appendQueryParameter(INVITATION_IDENTITY, identityId)
+                .appendQueryParameter(INVITATION_GROUP, groupName)
+                .appendQueryParameter(INVITATION_INVITER, inviterNickname)
+                .build();
+        final Uri uri = new Uri.Builder()
+                .scheme("https")
+                .authority(FIREBASE_APP_CODE + ".app.goo.gl")
+                .path("/")
+                .appendQueryParameter("link", link.toString())
+                .appendQueryParameter("apn", BuildConfig.APPLICATION_ID)
+                .appendQueryParameter("ibi", BuildConfig.APPLICATION_ID)
+                .build();
+
+        return uri.toString();
+    }
+
+    public Single<String> shortenUrl(@NonNull String link, @NonNull String apiKey) {
+        return urlShortener.shortenUrl(apiKey, new UrlShortenerRequest(link))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(UrlShortenerResult::getId);
     }
 }

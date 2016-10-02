@@ -30,8 +30,8 @@ import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
+import rx.Observable;
 import rx.SingleSubscriber;
 import rx.Subscriber;
 import timber.log.Timber;
@@ -109,6 +109,7 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
                         viewModel.setGroupName(identity.getGroupName());
                         items.clear();
 
+                        initialDataLoaded = false;
                         final String groupId = identity.getGroup();
                         addDataListener(groupId);
                         loadInitialData(groupId);
@@ -120,7 +121,7 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
     private void addDataListener(@NonNull String groupId) {
         subscriptions.add(groupRepo.observeGroupIdentityChildren(groupId)
                 .filter(childEvent -> initialDataLoaded)
-                .map(event -> new SettingsUsersItemViewModel(event.getEventType(), event.getValue()))
+                .flatMap(event -> getItemViewModel(event.getEventType(), event.getValue()))
                 .subscribe(new ChildEventSubscriber<>(items, viewModel, e ->
                         view.showMessage(R.string.toast_error_users_load)))
         );
@@ -128,7 +129,7 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
 
     private void loadInitialData(@NonNull String groupId) {
         subscriptions.add(groupRepo.getGroupIdentities(groupId, true)
-                .map(identity -> new SettingsUsersItemViewModel(EventType.NONE, identity))
+                .flatMap((identity) -> getItemViewModel(EventType.NONE, identity))
                 .toList()
                 .subscribe(new Subscriber<List<SettingsUsersItemViewModel>>() {
                     @Override
@@ -152,6 +153,12 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
         );
     }
 
+    private Observable<SettingsUsersItemViewModel> getItemViewModel(@EventType int eventType,
+                                                                    @NonNull Identity identity) {
+        return groupRepo.getGroup(identity.getGroup()).toObservable()
+                .map(group -> new SettingsUsersItemViewModel(eventType, identity, group.getName()));
+    }
+
     @Override
     public SettingsUsersItemViewModel getItemAtPosition(int position) {
         return items.get(position);
@@ -165,7 +172,24 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
     @Override
     public void onInviteClick(int position) {
         final SettingsUsersItemViewModel userItem = getItemAtPosition(position);
-        view.loadLinkShareOptions(userItem.getInvitationLink());
+        final String invitationLink = groupRepo.getInvitationLink(userItem.getId(),
+                userItem.getGroupName(), currentIdentity.getNickname());
+        final String googleApiKey = view.getGoogleApiKey();
+        subscriptions.add(groupRepo.shortenUrl(invitationLink, googleApiKey)
+                .subscribe(new SingleSubscriber<String>() {
+                    @Override
+                    public void onSuccess(String shortUrl) {
+                        view.loadLinkShareOptions(shortUrl);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        Timber.e(error, "failed to get short URL with error:");
+                    }
+                })
+        );
+
+        // TODO: protect against configuration changes
     }
 
     @Override

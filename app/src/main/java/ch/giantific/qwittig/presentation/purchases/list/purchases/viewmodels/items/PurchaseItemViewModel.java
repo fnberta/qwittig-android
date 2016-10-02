@@ -93,19 +93,20 @@ public class PurchaseItemViewModel extends BaseChildItemViewModel
 
         final PurchaseItemViewModel that = (PurchaseItemViewModel) o;
 
-        if (read != that.isRead()) return false;
-        if (!buyerNicknameAndDate.equals(that.getBuyerNicknameAndDate())) return false;
-        if (buyerAvatar != null ? !buyerAvatar.equals(that.getBuyerAvatar()) : that.getBuyerAvatar() != null)
+        if (read != that.read) return false;
+        if (!date.equals(that.date)) return false;
+        if (!buyerNicknameAndDate.equals(that.buyerNicknameAndDate)) return false;
+        if (buyerAvatar != null ? !buyerAvatar.equals(that.buyerAvatar) : that.buyerAvatar != null)
             return false;
-        if (!store.equals(that.getStore())) return false;
-        if (!total.equals(that.getTotal())) return false;
-        return userShare.equals(that.getUserShare());
-
+        if (!store.equals(that.store)) return false;
+        if (!total.equals(that.total)) return false;
+        return userShare.equals(that.userShare);
     }
 
     @Override
     public int hashCode() {
-        int result = buyerNicknameAndDate.hashCode();
+        int result = date.hashCode();
+        result = 31 * result + buyerNicknameAndDate.hashCode();
         result = 31 * result + (buyerAvatar != null ? buyerAvatar.hashCode() : 0);
         result = 31 * result + store.hashCode();
         result = 31 * result + total.hashCode();
