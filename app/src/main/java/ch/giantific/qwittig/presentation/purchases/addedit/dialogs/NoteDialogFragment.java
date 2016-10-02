@@ -51,7 +51,8 @@ public class NoteDialogFragment extends BaseDialogFragment<NoteDialogFragment.Di
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final FragmentActivity activity = getActivity();
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity,
+                R.style.Theme_AppCompat_Light_Dialog_Alert_PrimaryAsAccent);
         final DialogPurchaseNoteBinding binding =
                 DialogPurchaseNoteBinding.inflate(activity.getLayoutInflater());
 

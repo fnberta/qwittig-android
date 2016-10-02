@@ -36,7 +36,8 @@ public class DiscardPurchaseDialogFragment extends BaseDialogFragment<DiscardPur
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity(),
+                R.style.Theme_AppCompat_Light_Dialog_Alert_PrimaryAsAccent);
         dialogBuilder.setMessage(R.string.dialog_purchase_discard_message)
                 .setPositiveButton(R.string.dialog_positive_save_draft, (dialog, id) -> {
                     activity.onSaveAsDraftSelected();

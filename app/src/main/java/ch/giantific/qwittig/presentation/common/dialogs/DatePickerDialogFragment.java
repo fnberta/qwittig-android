@@ -12,6 +12,8 @@ import android.support.v4.app.FragmentManager;
 
 import java.util.Calendar;
 
+import ch.giantific.qwittig.R;
+
 /**
  * Provides an Android standard date picker dialog.
  * <p/>
@@ -41,6 +43,7 @@ public class DatePickerDialogFragment extends BaseDialogFragment<DatePickerDialo
         int day = c.get(Calendar.DAY_OF_MONTH);
 
         // Create a new instance of DatePickerDialog and return it
-        return new DatePickerDialog(getActivity(), activity, year, month, day);
+        return new DatePickerDialog(getActivity(),
+                R.style.Theme_AppCompat_Light_Dialog_Alert_PrimaryAsAccent, activity, year, month, day);
     }
 }

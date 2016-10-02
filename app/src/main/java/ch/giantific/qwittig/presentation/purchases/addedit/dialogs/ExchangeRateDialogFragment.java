@@ -58,7 +58,8 @@ public class ExchangeRateDialogFragment extends BaseDialogFragment<ExchangeRateD
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final FragmentActivity activity = getActivity();
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity,
+                R.style.Theme_AppCompat_Light_Dialog_Alert_PrimaryAsAccent);
         final DialogExchangeRateManualBinding binding =
                 DialogExchangeRateManualBinding.inflate(activity.getLayoutInflater());
         if (!TextUtils.isEmpty(exchangeRate)) {
