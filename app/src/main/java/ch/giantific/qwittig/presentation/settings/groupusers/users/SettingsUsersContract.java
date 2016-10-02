@@ -38,6 +38,8 @@ public interface SettingsUsersContract {
 
     interface ViewListener extends BaseViewListener {
 
+        void startEnterTransition();
+
         void loadLinkShareOptions(@NonNull String link);
 
         void showProgressDialog(@StringRes int message);

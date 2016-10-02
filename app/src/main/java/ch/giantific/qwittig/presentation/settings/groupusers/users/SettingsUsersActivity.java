@@ -53,6 +53,8 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
             actionBar.setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
         }
 
+        supportPostponeEnterTransition();
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new SettingsUsersFragment())

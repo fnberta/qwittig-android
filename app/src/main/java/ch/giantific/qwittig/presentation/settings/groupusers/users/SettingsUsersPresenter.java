@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.util.List;
 import java.util.Objects;
 
 import ch.giantific.qwittig.R;
@@ -26,9 +27,13 @@ import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
 import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
+import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.SingleSubscriber;
+import rx.Subscriber;
 import timber.log.Timber;
 
 /**
@@ -43,6 +48,7 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
     private final SortedList<SettingsUsersItemViewModel> items;
     private final SortedListCallback<SettingsUsersItemViewModel> listCallback;
     private final GroupRepository groupRepo;
+    private boolean initialDataLoaded;
     private Identity currentIdentity;
     private String avatarIdentityId;
 
@@ -96,15 +102,53 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
 
         subscriptions.add(userRepo.observeCurrentIdentityId(currentUser.getUid())
                 .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable())
-                .doOnNext(identity -> {
-                    currentIdentity = identity;
-                    viewModel.setGroupName(identity.getGroupName());
-                    items.clear();
+                .subscribe(new IndefiniteSubscriber<Identity>() {
+                    @Override
+                    public void onNext(Identity identity) {
+                        currentIdentity = identity;
+                        viewModel.setGroupName(identity.getGroupName());
+                        items.clear();
+
+                        final String groupId = identity.getGroup();
+                        addDataListener(groupId);
+                        loadInitialData(groupId);
+                    }
                 })
-                .flatMap(identity -> groupRepo.observeGroupIdentityChildren(identity.getGroup()))
+        );
+    }
+
+    private void addDataListener(@NonNull String groupId) {
+        subscriptions.add(groupRepo.observeGroupIdentityChildren(groupId)
+                .filter(childEvent -> initialDataLoaded)
                 .map(event -> new SettingsUsersItemViewModel(event.getEventType(), event.getValue()))
                 .subscribe(new ChildEventSubscriber<>(items, viewModel, e ->
                         view.showMessage(R.string.toast_error_users_load)))
+        );
+    }
+
+    private void loadInitialData(@NonNull String groupId) {
+        subscriptions.add(groupRepo.getGroupIdentities(groupId, true)
+                .map(identity -> new SettingsUsersItemViewModel(EventType.NONE, identity))
+                .toList()
+                .subscribe(new Subscriber<List<SettingsUsersItemViewModel>>() {
+                    @Override
+                    public void onCompleted() {
+                        initialDataLoaded = true;
+                        viewModel.setEmpty(getItemCount() == 0);
+                        view.startEnterTransition();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.e(e, "failed to load initial users with error:");
+                        view.showMessage(R.string.toast_error_users_load);
+                    }
+
+                    @Override
+                    public void onNext(List<SettingsUsersItemViewModel> purchaseItemModels) {
+                        items.addAll(purchaseItemModels);
+                    }
+                })
         );
     }
 

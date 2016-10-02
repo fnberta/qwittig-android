@@ -62,13 +62,21 @@ public class GroupRepository {
     }
 
     public Observable<RxChildEvent<Identity>> observeGroupIdentityChildren(@NonNull String groupId) {
-        final Query query = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
+        final Query query = databaseRef
+                .child(Identity.BASE_PATH)
+                .child(Identity.BASE_PATH_ACTIVE)
+                .orderByChild(Identity.PATH_GROUP)
+                .equalTo(groupId);
         return RxFirebaseDatabase.observeChildren(query, Identity.class);
     }
 
     public Observable<Identity> getGroupIdentities(@NonNull String groupId,
                                                    final boolean includePending) {
-        final Query query = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
+        final Query query = databaseRef
+                .child(Identity.BASE_PATH)
+                .child(Identity.BASE_PATH_ACTIVE)
+                .orderByChild(Identity.PATH_GROUP)
+                .equalTo(groupId);
         return RxFirebaseDatabase.observeValueListOnce(query, Identity.class)
                 .filter(identity -> includePending || !identity.isPending());
     }
