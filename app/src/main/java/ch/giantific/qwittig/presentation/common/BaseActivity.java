@@ -24,6 +24,7 @@ import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Provides an abstract base class that sets up the {@link Toolbar} and commonly used methods.
@@ -33,6 +34,7 @@ import ch.giantific.qwittig.utils.WorkerUtils;
 public abstract class BaseActivity<T> extends AppCompatActivity
         implements BaseFragment.ActivityListener<T>, BaseWorkerListener, BaseViewListener {
 
+    protected final CompositeSubscription subscriptions = new CompositeSubscription();
     protected Toolbar toolbar;
     protected T component;
     @Inject
@@ -90,6 +92,10 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
+
+        if (subscriptions.hasSubscriptions()) {
+            subscriptions.clear();
+        }
 
         for (BasePresenter presenter : presenters) {
             if (presenter != null) {

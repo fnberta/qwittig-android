@@ -69,8 +69,8 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
     protected void handleEnterTransition(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
-                RxAndroidViews.observeTransition(getWindow().getEnterTransition())
-                        .subscribe(transitionSubject);
+                subscriptions.add(RxAndroidViews.observeTransition(getWindow().getEnterTransition())
+                        .subscribe(transitionSubject));
             } else {
                 dispatchFakeEnterTransitionEnd();
             }

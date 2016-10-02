@@ -58,8 +58,8 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
                 if (getIntent().hasExtra(FcmMessagingService.PUSH_OCR_DATA_ID)) {
                     dispatchFakeEnterTransitionEnd();
                 } else {
-                    RxAndroidViews.observeTransition(getWindow().getEnterTransition())
-                            .subscribe(transitionSubject);
+                    subscriptions.add(RxAndroidViews.observeTransition(getWindow().getEnterTransition())
+                            .subscribe(transitionSubject));
                 }
             } else {
                 dispatchFakeEnterTransitionEnd();

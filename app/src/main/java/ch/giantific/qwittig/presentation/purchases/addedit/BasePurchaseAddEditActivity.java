@@ -48,6 +48,7 @@ import ch.giantific.qwittig.utils.rxwrapper.android.RxAndroidViews;
 import ch.giantific.qwittig.utils.rxwrapper.android.transitions.TransitionEvent;
 import rx.Observable;
 import rx.Single;
+import rx.Subscription;
 import rx.subjects.ReplaySubject;
 
 /**
