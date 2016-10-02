@@ -19,7 +19,8 @@ import ch.giantific.qwittig.utils.DateUtils;
  * Represents a history entry of a task including a user and the date
  * he/she completed the task.
  */
-public class AssignmentDetailsHistoryItemViewModel extends BaseObservable implements BaseAssignmentDetailsItemViewModel,
+public class AssignmentDetailsHistoryItemViewModel extends BaseObservable
+        implements BaseAssignmentDetailsItemViewModel,
         Comparable<AssignmentDetailsHistoryItemViewModel> {
 
     private final Date eventDate;

@@ -82,11 +82,11 @@ public class SettingsPresenter extends BasePresenterImpl<SettingsContract.ViewLi
         firebaseUser = currentUser;
         subscriptions.add(userRepo.observeCurrentIdentityId(currentUser.getUid())
                 .doOnNext(currentIdentityId -> this.currentIdentityId = currentIdentityId)
-                .flatMap(currentIdentityId -> userRepo.observeIdentity(currentIdentityId)
-                        .doOnNext(identity -> {
-                            currentIdentity = identity;
-                            setupCurrentGroupCategory();
-                        }))
+                .flatMap(userRepo::observeIdentity)
+                .doOnNext(identity -> {
+                    currentIdentity = identity;
+                    setupCurrentGroupCategory();
+                })
                 .flatMap(identity -> userRepo.getUser(identity.getUser()).toObservable())
                 .flatMap(user -> Observable.from(user.getIdentitiesIds())
                         .flatMap(identityId -> userRepo.getIdentity(identityId).toObservable())

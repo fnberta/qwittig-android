@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.assignments.details;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -91,22 +92,19 @@ public class AssignmentDetailsPresenter extends BasePresenterImpl<AssignmentDeta
 
         subscriptions.add(userRepo.observeCurrentIdentityId(currentUser.getUid())
                 .doOnNext(currentIdentityId -> {
-                    if (!TextUtils.isEmpty(this.currentIdentityId)
-                            && !Objects.equals(this.currentIdentityId, currentIdentityId)) {
+                    if (!TextUtils.isEmpty(this.currentIdentityId) && !Objects.equals(this.currentIdentityId, currentIdentityId)) {
                         navigator.finish();
                     }
-
                     this.currentIdentityId = currentIdentityId;
                 })
                 .flatMap(currentIdentityId -> assignmentRepo.observeAssignment(assignmentId))
                 .doOnNext(assignment -> {
                     this.assignment = assignment;
-
                     updateToolbarHeader();
                     items.clear();
                     items.add(new AssignmentDetailsHeaderItemViewModel(R.string.header_assignment_history));
                 })
-                .flatMap(assignment1 -> Observable.from(assignment1.getIdentityIdsSorted())
+                .flatMap(assignment -> Observable.from(assignment.getIdentityIdsSorted())
                         .concatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
                         .toList())
                 .doOnNext(identities -> {
@@ -122,6 +120,7 @@ public class AssignmentDetailsPresenter extends BasePresenterImpl<AssignmentDeta
                                 }
                             }
 
+                            // should never happen
                             return null;
                         })
                         .toSortedList())

@@ -45,9 +45,7 @@ import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupActivity;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersActivity;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 
@@ -75,6 +73,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
     SettingsContract.Presenter presenter;
     @Inject
     SharedPreferences sharedPrefs;
+    @Inject
+    Navigator navigator;
     private ActivityListener activity;
     private PreferenceCategory categoryCurrentGroup;
     private ListPreference listPreferenceGroupCurrent;
@@ -144,28 +144,17 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
         final Preference prefProfile = findPreference(PREF_PROFILE);
         prefProfile.setOnPreferenceClickListener(preference -> {
-            final Intent intent = new Intent(activity, SettingsProfileActivity.class);
-            final ActivityOptionsCompat activityOptionsCompat =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-            activity.startActivityForResult(intent, Navigator.RC_SETTINGS_PROFILE,
-                    activityOptionsCompat.toBundle());
+            navigator.startProfileSettings();
             return true;
         });
         final Preference prefGroupNew = findPreference(PREF_GROUP_ADD_NEW);
         prefGroupNew.setOnPreferenceClickListener(preference -> {
-            final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
-            final ActivityOptionsCompat activityOptionsCompat =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-            activity.startActivityForResult(intent, Navigator.RC_SETTINGS_ADD_GROUP,
-                    activityOptionsCompat.toBundle());
+            navigator.startGroupAddSettings();
             return true;
         });
         final Preference prefGroupAddUser = findPreference(PREF_GROUP_USERS);
         prefGroupAddUser.setOnPreferenceClickListener(preference -> {
-            final Intent intent = new Intent(activity, SettingsUsersActivity.class);
-            final ActivityOptionsCompat activityOptionsCompat =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-            activity.startActivity(intent, activityOptionsCompat.toBundle());
+            navigator.startUsersSettings();
             return true;
         });
     }

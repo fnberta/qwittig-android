@@ -20,7 +20,6 @@ import java.util.Objects;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.AssignmentRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.AssignmentHistory;
@@ -36,6 +35,7 @@ import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListIn
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
 import rx.Subscriber;
 import timber.log.Timber;

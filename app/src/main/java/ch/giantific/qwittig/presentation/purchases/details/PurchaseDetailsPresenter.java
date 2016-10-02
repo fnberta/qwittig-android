@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Pair;
 
 import com.google.firebase.auth.FirebaseUser;
 
@@ -107,39 +108,31 @@ public class PurchaseDetailsPresenter extends BasePresenterImpl<PurchaseDetailsC
 
         subscriptions.add(userRepo.observeCurrentIdentityId(currentUser.getUid())
                 .doOnNext(currentIdentityId -> {
-                    if (!TextUtils.isEmpty(this.currentIdentityId)
-                            && !Objects.equals(this.currentIdentityId, currentIdentityId)) {
+                    if (!TextUtils.isEmpty(this.currentIdentityId) && !Objects.equals(this.currentIdentityId, currentIdentityId)) {
                         navigator.finish();
                     }
-
                     this.currentIdentityId = currentIdentityId;
                 })
-                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable()
-                        .flatMap(identity -> {
-                            if (TextUtils.isEmpty(purchaseGroupId)
-                                    || Objects.equals(purchaseGroupId, identity.getGroup())) {
-                                return Observable.just(identity);
-                            }
-
-                            return userRepo.switchGroup(identity.getUser(), purchaseGroupId)
-                                    .flatMap(newIdentity -> Observable.never());
-                        }))
+                .flatMap(currentIdentityId -> userRepo.getIdentity(currentIdentityId).toObservable())
+                .flatMap(identity -> {
+                    if (TextUtils.isEmpty(purchaseGroupId) || Objects.equals(purchaseGroupId, identity.getGroup())) {
+                        return Observable.just(identity);
+                    }
+                    // change identity and don't pass anything further down the chain
+                    // chain will restart because we are observing the current identity id
+                    return userRepo.switchGroup(identity.getUser(), purchaseGroupId)
+                            .flatMap(newIdentity -> Observable.never());
+                })
                 .map(Identity::getGroupCurrency)
                 .doOnNext(groupCurrency -> moneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, true, true))
-                .flatMap(groupCurrency -> purchaseRepo.observePurchase(purchaseId)
-                        .doOnNext(purchase -> {
-                            foreignMoneyFormatter = MoneyUtils.getMoneyFormatter(purchase.getCurrency(), true, true);
-                            updateReadBy(purchase, currentIdentityId);
-                            updateActionBarMenu(purchase, groupCurrency, currentIdentityId);
-                            setPurchaseDetails(purchase, currentIdentityId);
-                        }))
-                .flatMap(purchase -> Observable.from(purchase.getIdentitiesIds())
-                        .flatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
-                        .map(identity -> {
-                            final boolean isBuyer = Objects.equals(purchase.getBuyer(), identity.getId());
-                            return new PurchaseDetailsIdentityItemViewModel(identity, isBuyer);
-                        })
-                        .toSortedList())
+                .flatMap(groupCurrency -> purchaseRepo.observePurchase(purchaseId), Pair::create)
+                .doOnNext(pair -> {
+                    foreignMoneyFormatter = MoneyUtils.getMoneyFormatter(pair.second.getCurrency(), true, true);
+                    updateReadBy(pair.second, currentIdentityId);
+                    updateActionBarMenu(pair.second, pair.first, currentIdentityId);
+                    setPurchaseDetails(pair.second, currentIdentityId);
+                })
+                .flatMap(pair -> getIdentityItemViewModels(pair.second))
                 .subscribe(new IndefiniteSubscriber<List<PurchaseDetailsIdentityItemViewModel>>() {
                     @Override
                     public void onError(Throwable e) {
@@ -161,6 +154,16 @@ public class PurchaseDetailsPresenter extends BasePresenterImpl<PurchaseDetailsC
                     }
                 })
         );
+    }
+
+    private Observable<List<PurchaseDetailsIdentityItemViewModel>> getIdentityItemViewModels(@NonNull Purchase purchase) {
+        return Observable.from(purchase.getIdentitiesIds())
+                .flatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
+                .map(identity -> {
+                    final boolean isBuyer = Objects.equals(purchase.getBuyer(), identity.getId());
+                    return new PurchaseDetailsIdentityItemViewModel(identity, isBuyer);
+                })
+                .toSortedList();
     }
 
     private void setPurchaseDetails(@NonNull Purchase purchase, @NonNull String identityId) {

@@ -13,12 +13,12 @@ import java.util.Date;
 import java.util.Objects;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.BaseAssignmentDetailsItemViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.BaseChildItemViewModel;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 
 /**
  * Provides an implementation of the {@link BaseAssignmentDetailsItemViewModel} interface for a task item.
@@ -108,8 +108,8 @@ public class AssignmentItemViewModel extends BaseChildItemViewModel
         }
 
         return daysToDeadline != 0 && (daysToDeadline == -1 || daysToDeadline < 0)
-                ? R.color.red
-                : R.color.green;
+               ? R.color.red
+               : R.color.green;
     }
 
     public String[] getIdentitiesSorted() {

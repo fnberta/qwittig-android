@@ -12,6 +12,7 @@ import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.presentation.about.AboutActivity;
 import ch.giantific.qwittig.presentation.assignments.addedit.add.AssignmentAddActivity;
 import ch.giantific.qwittig.presentation.assignments.addedit.edit.AssignmentEditActivity;
+import ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsActivity;
 import ch.giantific.qwittig.presentation.assignments.list.AssignmentsActivity;
 import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
@@ -24,9 +25,10 @@ import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsActivi
 import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
 import ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingActivity;
 import ch.giantific.qwittig.presentation.settings.general.SettingsActivity;
+import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupActivity;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
 import ch.giantific.qwittig.presentation.stats.StatsActivity;
-import ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsActivity;
 
 /**
  * Created by fabio on 17.06.16.
@@ -209,5 +211,20 @@ public class Navigator {
     public void startAbout() {
         final Intent intent = new Intent(activity, AboutActivity.class);
         activity.startActivity(intent);
+    }
+
+    public void startGroupAddSettings() {
+        final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
+        final ActivityOptionsCompat activityOptionsCompat =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, Navigator.RC_SETTINGS_ADD_GROUP,
+                activityOptionsCompat.toBundle());
+    }
+
+    public void startUsersSettings() {
+        final Intent intent = new Intent(activity, SettingsUsersActivity.class);
+        final ActivityOptionsCompat activityOptionsCompat =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivity(intent, activityOptionsCompat.toBundle());
     }
 }
