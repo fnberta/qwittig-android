@@ -68,7 +68,7 @@
                     android:hint="@string/hint_article_name"
                     android:imeOptions="actionNext"
                     android:inputType="text|textCapSentences"
-                    android:onTextChanged="@{viewModel::onNameChanged}"
+                    android:onTextChanged="@{(name, start, before, count) -> presenter.onArticleNameChanged(viewModel, name)}"
                     android:text="@{viewModel.name}"
                     />
 
@@ -91,8 +91,8 @@
                     android:hint="@string/hint_article_price"
                     android:inputType="numberDecimal"
                     android:maxLength="9"
-                    android:onFocusChange="@{viewModel::onPriceFocusChange}"
-                    android:onTextChanged="@{viewModel::onPriceChanged}"
+                    android:onFocusChange="@{(v, hasFocus) -> presenter.onArticlePriceFocusChange(viewModel, hasFocus)}"
+                    android:onTextChanged="@{(price, start, before, count) -> presenter.onArticlePriceChanged(viewModel, price)}"
                     android:selectAllOnFocus="true"
                     android:text="@{viewModel.price}"
                     />

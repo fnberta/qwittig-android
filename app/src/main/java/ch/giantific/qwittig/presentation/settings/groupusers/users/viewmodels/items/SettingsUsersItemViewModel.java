@@ -10,7 +10,7 @@ import android.text.TextUtils;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.BaseChildItemViewModel;
 

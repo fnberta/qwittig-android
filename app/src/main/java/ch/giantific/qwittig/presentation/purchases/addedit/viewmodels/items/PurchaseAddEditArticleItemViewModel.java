@@ -9,10 +9,7 @@ import android.databinding.Bindable;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.view.View;
 
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,11 +33,10 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
             return new PurchaseAddEditArticleItemViewModel[size];
         }
     };
-    private PriceChangedListener priceChangedListener;
-    private NumberFormat moneyFormatter;
     private boolean validate;
     private String name;
     private String price;
+    private double priceParsed;
     private PurchaseAddEditArticleIdentityItemViewModel[] identities;
 
     public PurchaseAddEditArticleItemViewModel(@NonNull PurchaseAddEditArticleIdentityItemViewModel[] identities) {
@@ -55,18 +51,22 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
     }
 
     private PurchaseAddEditArticleItemViewModel(Parcel in) {
-        validate = in.readByte() != 0;
-        name = in.readString();
-        price = in.readString();
-        identities = in.createTypedArray(PurchaseAddEditArticleIdentityItemViewModel.CREATOR);
+        this.validate = in.readByte() != 0;
+        this.name = in.readString();
+        this.price = in.readString();
+        this.priceParsed = in.readDouble();
+        this.identities = in.createTypedArray(PurchaseAddEditArticleIdentityItemViewModel.CREATOR);
     }
 
-    public void setPriceChangedListener(@NonNull PriceChangedListener priceChangedListener) {
-        this.priceChangedListener = priceChangedListener;
+
+    @Bindable
+    public boolean isValidate() {
+        return validate;
     }
 
-    public void setMoneyFormatter(@NonNull NumberFormat moneyFormatter) {
-        this.moneyFormatter = moneyFormatter;
+    public void setValidate(boolean validate) {
+        this.validate = validate;
+        notifyPropertyChanged(BR.validate);
     }
 
     @Bindable
@@ -77,56 +77,9 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
     public void setName(@NonNull String name) {
         this.name = name;
         notifyPropertyChanged(BR.name);
-    }
-
-    @Bindable
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(@NonNull String price) {
-        this.price = price;
-        notifyPropertyChanged(BR.price);
-    }
-
-    /**
-     * Returns the price parsed as a double. Accounts for localized string formatting.
-     *
-     * @return the price parsed as a double.
-     */
-    public double parsePrice() {
-        try {
-            return Double.parseDouble(price);
-        } catch (NumberFormatException e) {
-            try {
-                return moneyFormatter.parse(price).doubleValue();
-            } catch (ParseException e1) {
-                return 0;
-            }
+        if (validate) {
+            notifyPropertyChanged(BR.validate);
         }
-    }
-
-    @Bindable
-    public PurchaseAddEditArticleIdentityItemViewModel[] getIdentities() {
-        return identities;
-    }
-
-    public void setIdentities(@NonNull PurchaseAddEditArticleIdentityItemViewModel[] identities) {
-        this.identities = identities;
-    }
-
-    public void toggleUser(@NonNull PurchaseAddEditArticleIdentityItemViewModel userClicked) {
-        final boolean isSelected = userClicked.isSelected();
-        for (PurchaseAddEditArticleIdentityItemViewModel user : identities) {
-            if (Objects.equals(user.getIdentityId(), userClicked.getIdentityId())) {
-                user.setSelected(isSelected);
-            }
-        }
-    }
-
-    @Bindable
-    public boolean isValidate() {
-        return validate;
     }
 
     @Bindable
@@ -135,37 +88,45 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
     }
 
     @Bindable
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(@NonNull String price, double priceParsed) {
+        this.price = price;
+        this.priceParsed = priceParsed;
+        notifyPropertyChanged(BR.price);
+        if (validate) {
+            notifyPropertyChanged(BR.validate);
+        }
+    }
+
+    public double getPriceParsed() {
+        return priceParsed;
+    }
+
+    @Bindable
     public boolean isPriceComplete() {
         return !TextUtils.isEmpty(price);
     }
 
-    public void onNameChanged(CharSequence s, int start, int before, int count) {
-        name = s.toString();
-
-        if (validate) {
-            notifyPropertyChanged(BR.validate);
-        }
-    }
-
-    public void onPriceChanged(CharSequence s, int start, int before, int count) {
-        price = s.toString();
-        priceChangedListener.onRowPriceChanged();
-
-        if (validate) {
-            notifyPropertyChanged(BR.validate);
-        }
-    }
-
-    public void onPriceFocusChange(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            setPrice(moneyFormatter.format(parsePrice()));
-        }
+    @Bindable
+    public PurchaseAddEditArticleIdentityItemViewModel[] getIdentities() {
+        return identities;
     }
 
     public boolean isInputValid() {
-        validate = true;
-        notifyPropertyChanged(BR.validate);
+        setValidate(true);
         return isNameComplete() && isPriceComplete();
+    }
+
+    public void toggleIdentity(@NonNull PurchaseAddEditArticleIdentityItemViewModel identityItem) {
+        final boolean isSelected = identityItem.isSelected();
+        for (PurchaseAddEditArticleIdentityItemViewModel user : identities) {
+            if (Objects.equals(user.getIdentityId(), identityItem.getIdentityId())) {
+                user.setSelected(isSelected);
+            }
+        }
     }
 
     public List<String> getSelectedIdentitiesIds() {
@@ -191,20 +152,10 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(validate ? (byte) 1 : (byte) 0);
-        dest.writeString(name);
-        dest.writeString(price);
-        dest.writeTypedArray(identities, 0);
-    }
-
-    /**
-     * Defines the action to take when the price changed.
-     */
-    public interface PriceChangedListener {
-
-        /**
-         * Called when the price in the row changes.
-         */
-        void onRowPriceChanged();
+        dest.writeByte(this.validate ? (byte) 1 : (byte) 0);
+        dest.writeString(this.name);
+        dest.writeString(this.price);
+        dest.writeDouble(this.priceParsed);
+        dest.writeTypedArray(this.identities, flags);
     }
 }

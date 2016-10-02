@@ -76,9 +76,7 @@ public class PurchaseAddOcrPresenter extends PurchaseAddPresenter
                 .subscribe(new SingleSubscriber<OcrData>() {
                     @Override
                     public void onSuccess(OcrData ocrData) {
-                        if (ocrValuesSet) {
-                            updateRows();
-                        } else {
+                        if (!ocrValuesSet) {
                             setOcrData(ocrData);
                             ocrValuesSet = true;
                         }
@@ -112,8 +110,6 @@ public class PurchaseAddOcrPresenter extends PurchaseAddPresenter
                 final String name = (String) item.get("name");
                 final PurchaseAddEditArticleItemViewModel articleItem =
                         new PurchaseAddEditArticleItemViewModel(name, price, getArticleIdentities());
-                articleItem.setMoneyFormatter(moneyFormatter);
-                articleItem.setPriceChangedListener(this);
                 final int pos = getItemCount() - 2;
                 this.items.add(pos, articleItem);
                 listInteraction.notifyItemInserted(this.items.indexOf(articleItem));
@@ -137,7 +133,7 @@ public class PurchaseAddOcrPresenter extends PurchaseAddPresenter
         if (asDraft) {
             purchaseRepo.saveDraft(purchase, purchaseId);
         } else {
-            purchaseRepo.savePurchase(purchase, purchaseId, currentUserId, false);
+            purchaseRepo.savePurchase(purchase, purchaseId, currentIdentity.getUser(), false);
         }
     }
 
@@ -152,7 +148,7 @@ public class PurchaseAddOcrPresenter extends PurchaseAddPresenter
 
     @Override
     public void onDiscardChangesSelected() {
-        purchaseRepo.discardOcrData(currentUserId, ocrDataId);
+        purchaseRepo.discardOcrData(currentIdentity.getUser(), ocrDataId);
 
         super.onDiscardChangesSelected();
     }

@@ -9,7 +9,7 @@ import android.databinding.Bindable;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.BaseAssignmentDetailsItemViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.HeaderItemViewModel;
 

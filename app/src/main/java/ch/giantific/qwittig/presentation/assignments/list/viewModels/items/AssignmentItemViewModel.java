@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.Identity;

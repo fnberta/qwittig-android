@@ -21,8 +21,8 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.queues.AssignmentRemindQueue;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.domain.models.Assignment;
 import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.AssignmentHistory;

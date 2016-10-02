@@ -3,7 +3,7 @@ package ch.giantific.qwittig.presentation.common.viewmodels.items;
 import android.databinding.BaseObservable;
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 
 /**
  * Created by fabio on 03.07.16.

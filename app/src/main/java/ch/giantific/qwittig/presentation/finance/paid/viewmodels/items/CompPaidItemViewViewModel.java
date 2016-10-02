@@ -11,7 +11,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
 
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.BaseChildItemViewModel;

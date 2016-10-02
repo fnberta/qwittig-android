@@ -5,19 +5,17 @@
 package ch.giantific.qwittig.presentation.purchases.addedit;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
-import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +33,6 @@ import ch.giantific.qwittig.presentation.camera.CameraContract.CameraResult;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
 import ch.giantific.qwittig.presentation.common.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
@@ -47,7 +44,11 @@ import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.NoteDialogFra
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.rxwrapper.android.RxAndroidViews;
+import ch.giantific.qwittig.utils.rxwrapper.android.transitions.TransitionEvent;
+import rx.Observable;
 import rx.Single;
+import rx.subjects.ReplaySubject;
 
 /**
  * Hosts {@link PurchaseAddFragment} that handles the creation of a new purchase.
@@ -62,8 +63,8 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         ExchangeRateDialogFragment.DialogInteractionListener,
         DiscardPurchaseDialogFragment.DialogInteractionListener {
 
-    private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 12;
-
+    private static final int RC_CAPTURE_IMAGES = 12;
+    protected final ReplaySubject<TransitionEvent> transitionSubject = ReplaySubject.create();
     protected PurchaseAddEditContract.Presenter presenter;
     @Inject
     protected Navigator navigator;
@@ -76,50 +77,12 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         binding.setPresenter(presenter);
 
         setupTabs();
-
-        if (savedInstanceState == null) {
-            if (Utils.isRunningLollipopAndHigher()) {
-                addActivityTransitionListener();
-            } else {
-                showFab();
-            }
-        } else {
-            showFab();
-        }
-
+        handleEnterTransition(savedInstanceState);
     }
 
     @Override
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{presenter});
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void addActivityTransitionListener() {
-        final Transition enter = getWindow().getEnterTransition();
-        enter.addListener(new TransitionListenerAdapter() {
-            @Override
-            public void onTransitionEnd(@NonNull Transition transition) {
-                super.onTransitionEnd(transition);
-                transition.removeListener(this);
-
-                showFab();
-            }
-        });
-    }
-
-    protected final void showFab() {
-        if (ViewCompat.isLaidOut(binding.fabPurchaseSave)) {
-            binding.fabPurchaseSave.show();
-        } else {
-            binding.fabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(@NonNull View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    v.removeOnLayoutChangeListener(this);
-                    binding.fabPurchaseSave.show();
-                }
-            });
-        }
     }
 
     private void setupTabs() {
@@ -128,6 +91,8 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         tabsAdapter.addInitialFragment(getReceiptFragment(), getString(R.string.tab_details_receipt));
         binding.viewpager.setAdapter(tabsAdapter);
     }
+
+    protected abstract void handleEnterTransition(@Nullable Bundle savedInstanceState);
 
     @NonNull
     protected abstract BasePurchaseAddEditFragment getPurchaseAddEditFragment();
@@ -185,7 +150,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
+            case RC_CAPTURE_IMAGES:
                 if (Utils.verifyPermissions(grantResults)) {
                     navigator.startCamera();
                 } else {
@@ -207,6 +172,21 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         if (!getSupportFragmentManager().popBackStackImmediate()) {
             presenter.onExitClick();
         }
+    }
+
+    @Override
+    public Observable<TransitionEvent> getEnterTransition() {
+        return transitionSubject.asObservable();
+    }
+
+    protected void dispatchFakeEnterTransitionEnd() {
+        transitionSubject.onNext(TransitionEvent.createEmptyEnd());
+        transitionSubject.onCompleted();
+    }
+
+    @Override
+    public Single<FloatingActionButton> showFab() {
+        return RxAndroidViews.getFabVisibilityChange(binding.fabPurchaseSave);
     }
 
     @Override
@@ -288,7 +268,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         int hasCameraPerm = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                    PERMISSIONS_REQUEST_CAPTURE_IMAGES);
+                    RC_CAPTURE_IMAGES);
             return false;
         }
 

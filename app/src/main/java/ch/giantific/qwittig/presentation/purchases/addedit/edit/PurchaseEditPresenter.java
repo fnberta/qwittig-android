@@ -82,11 +82,9 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
-                        if (oldValuesSet) {
-                            updateRows();
-                        } else {
+                        if (!oldValuesSet) {
                             setOldPurchase(purchase);
-                            setOldArticles();
+                            setOldArticles(purchase.getArticles());
                             oldValuesSet = true;
                         }
                     }
@@ -118,15 +116,12 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
         viewModel.setReceipt(purchase.getReceipt());
     }
 
-    private void setOldArticles() {
-        final List<Article> oldArticles = editPurchase.getArticles();
+    private void setOldArticles(@NonNull List<Article> oldArticles) {
         for (Article article : oldArticles) {
             final Set<String> identities = article.getIdentitiesIds();
             final String price = moneyFormatter.format(article.getPriceForeign(viewModel.getExchangeRate()));
             final PurchaseAddEditArticleItemViewModel articleItem =
                     new PurchaseAddEditArticleItemViewModel(article.getName(), price, getArticleIdentities(identities));
-            articleItem.setMoneyFormatter(moneyFormatter);
-            articleItem.setPriceChangedListener(this);
             final int pos = getItemCount() - 2;
             items.add(pos, articleItem);
             listInteraction.notifyItemInserted(pos);
@@ -138,7 +133,7 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
         if (asDraft) {
             purchaseRepo.saveDraft(purchase, editPurchaseId);
         } else {
-            purchaseRepo.savePurchase(purchase, editPurchaseId, currentUserId, isDraft());
+            purchaseRepo.savePurchase(purchase, editPurchaseId, currentIdentity.getUser(), isDraft());
         }
     }
 
@@ -191,7 +186,7 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
             }
 
             final double oldPrice = articleOld.getPriceForeign(editPurchase.getExchangeRate());
-            final double newPrice = articleItem.parsePrice();
+            final double newPrice = articleItem.getPriceParsed();
             if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
                 return true;
             }

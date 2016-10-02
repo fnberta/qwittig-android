@@ -22,6 +22,8 @@ import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragme
 import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseEditComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditPresenterModule;
+import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.rxwrapper.android.RxAndroidViews;
 
 /**
  * Hosts {@link PurchaseAddFragment} or {@link PurchaseEditDraftFragment} that handle the
@@ -61,6 +63,20 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
 
     private boolean isDraft() {
         return getIntent().getBooleanExtra(Navigator.EXTRA_PURCHASE_EDIT_DRAFT, false);
+    }
+
+    @Override
+    protected void handleEnterTransition(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            if (Utils.isRunningLollipopAndHigher()) {
+                RxAndroidViews.observeTransition(getWindow().getEnterTransition())
+                        .subscribe(transitionSubject);
+            } else {
+                dispatchFakeEnterTransitionEnd();
+            }
+        } else {
+            dispatchFakeEnterTransitionEnd();
+        }
     }
 
     @NonNull

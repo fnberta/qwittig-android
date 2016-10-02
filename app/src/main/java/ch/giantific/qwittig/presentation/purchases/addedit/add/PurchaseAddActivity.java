@@ -22,6 +22,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseAddC
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddPresenterModule;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.rxwrapper.android.RxAndroidViews;
 
 /**
  * Hosts {@link PurchaseAddFragment} that handles the creation of a new purchase.
@@ -29,21 +30,6 @@ import ch.giantific.qwittig.utils.Utils;
  * Asks the user if he wants to discard the new purchase when dismissing the activity.
  */
 public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAddComponent> {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (savedInstanceState == null) {
-            if (Utils.isRunningLollipopAndHigher()) {
-                // check if activity was started from push notification, we have no activity
-                // transition then and need to show the fab
-                if (getIntent().hasExtra(FcmMessagingService.PUSH_OCR_DATA_ID)) {
-                    showFab();
-                }
-            }
-        }
-    }
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
@@ -61,6 +47,26 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
             presenter = component.getAddPresenter();
         }
         presenter.attachView(this);
+    }
+
+    @Override
+    protected void handleEnterTransition(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            if (Utils.isRunningLollipopAndHigher()) {
+                // check if activity was started from push notification, we have no activity
+                // transition then
+                if (getIntent().hasExtra(FcmMessagingService.PUSH_OCR_DATA_ID)) {
+                    dispatchFakeEnterTransitionEnd();
+                } else {
+                    RxAndroidViews.observeTransition(getWindow().getEnterTransition())
+                            .subscribe(transitionSubject);
+                }
+            } else {
+                dispatchFakeEnterTransitionEnd();
+            }
+        } else {
+            dispatchFakeEnterTransitionEnd();
+        }
     }
 
     @NonNull

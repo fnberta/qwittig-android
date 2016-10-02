@@ -49,6 +49,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.Purc
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditHeaderItemViewModel;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.utils.rxwrapper.android.transitions.TransitionEvent;
 import rx.Single;
 import rx.SingleSubscriber;
 import timber.log.Timber;
@@ -71,9 +72,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     private final GroupRepository groupRepo;
     protected List<Identity> identities;
     protected ListInteraction listInteraction;
-    protected Identity currentIdentity;
     protected NumberFormat moneyFormatter;
-    protected String currentUserId;
+    protected Identity currentIdentity;
     private boolean fetchingExchangeRates;
 
     public PurchaseAddPresenter(@Nullable Bundle savedState,
@@ -95,6 +95,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
             viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
             items = savedState.getParcelableArrayList(STATE_ROW_ITEMS);
             fetchingExchangeRates = savedState.getBoolean(STATE_FETCHING_RATES);
+            //noinspection ConstantConditions
+            moneyFormatter = MoneyUtils.getMoneyFormatter(viewModel.getCurrency(), false, true);
         } else {
             final List<String> currencies = Arrays.asList(configHelper.getSupportedCurrencyCodes());
             final Date date = new Date();
@@ -102,7 +104,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
             items = new ArrayList<>();
             initFixedRows();
         }
-
     }
 
     @Override
@@ -137,7 +138,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        currentUserId = currentUser.getUid();
         loadPurchase(currentUser);
     }
 
@@ -146,7 +146,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> value) {
-                        updateRows();
+                        // fill with one article row on first start
+                        addFirstArticleIfEmpty();
                     }
 
                     @Override
@@ -160,25 +161,17 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @NonNull
     protected final Single<List<Identity>> getInitialChain(@NonNull FirebaseUser currentUser) {
-        return userRepo.getUser(currentUser.getUid())
+        return view.getEnterTransition()
+                .filter(transitionEvent -> transitionEvent.getEventType() == TransitionEvent.EventType.END)
+                .toSingle()
+                .flatMap(transitionEvent -> view.showFab())
+                .flatMap(fab -> userRepo.getUser(currentUser.getUid()))
                 .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()))
                 .doOnSuccess(identity -> {
                     currentIdentity = identity;
-
-                    // if first run, set initial currency to group currency
-                    if (TextUtils.isEmpty(viewModel.getCurrency())) {
-                        viewModel.setCurrency(identity.getGroupCurrency(), true);
-                    }
-
-                    // create money formatter
-                    moneyFormatter = MoneyUtils.getMoneyFormatter(viewModel.getCurrency(), false, true);
-
-                    // if first run, set initial total and my share
-                    if (viewModel.getTotal() == 0.0d && TextUtils.isEmpty(viewModel.getMyShare())) {
-                        final String formatted = moneyFormatter.format(0);
-                        viewModel.setTotal(0, formatted);
-                        viewModel.setMyShare(formatted);
-                    }
+                    // if first run, set initial currency to group currency, create money formatter
+                    // and set initial total and my share
+                    setCurrencyOnFirstRun(identity.getGroupCurrency());
                 })
                 .flatMapObservable(identity -> groupRepo.getGroupIdentities(identity.getGroup(), true))
                 .toSortedList()
@@ -186,27 +179,30 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                 .doOnSuccess(identities -> this.identities = identities);
     }
 
-    protected final void updateRows() {
+    private void setCurrencyOnFirstRun(@NonNull String groupCurrency) {
+        if (TextUtils.isEmpty(viewModel.getCurrency())) {
+            viewModel.setCurrency(groupCurrency, true);
+            moneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, false, true);
+
+            final String formatted = moneyFormatter.format(0);
+            viewModel.setTotal(0, formatted);
+            viewModel.setMyShare(formatted);
+        }
+    }
+
+    private void addFirstArticleIfEmpty() {
         boolean hasArticles = false;
         for (int i = 0, size = items.size(); i < size; i++) {
             final BasePurchaseAddEditItemViewModel itemViewModel = items.get(i);
 
             if (itemViewModel.getViewType() == ViewType.ARTICLE) {
                 hasArticles = true;
-
-                final PurchaseAddEditArticleItemViewModel articleItem =
-                        (PurchaseAddEditArticleItemViewModel) itemViewModel;
-                articleItem.setMoneyFormatter(moneyFormatter);
-                articleItem.setPriceChangedListener(this);
                 continue;
             }
 
-            // fill with one row on first start
             if (itemViewModel.getViewType() == ViewType.ADD_ROW && !hasArticles) {
                 final PurchaseAddEditArticleItemViewModel articleItem =
                         new PurchaseAddEditArticleItemViewModel(getArticleIdentities());
-                articleItem.setMoneyFormatter(moneyFormatter);
-                articleItem.setPriceChangedListener(this);
                 items.add(i, articleItem);
                 listInteraction.notifyItemInserted(i);
                 return;
@@ -221,45 +217,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         }
 
         return getArticleIdentities(identitiesIds);
-    }
-
-    private void updateTotalAndMyShare() {
-        double total = 0;
-        double myShare = 0;
-        for (BasePurchaseAddEditItemViewModel itemViewModel : items) {
-            if (itemViewModel.getViewType() != ViewType.ARTICLE) {
-                continue;
-            }
-
-            final PurchaseAddEditArticleItemViewModel articleItem =
-                    (PurchaseAddEditArticleItemViewModel) itemViewModel;
-            final double itemPrice = articleItem.parsePrice();
-
-            // update total price
-            total += itemPrice;
-
-            // update my share
-            final PurchaseAddEditArticleIdentityItemViewModel[] articleIdentities =
-                    articleItem.getIdentities();
-            int selectedCount = 0;
-            boolean currentIdentityInvolved = false;
-            for (PurchaseAddEditArticleIdentityItemViewModel articleIdentity : articleIdentities) {
-                if (!articleIdentity.isSelected()) {
-                    continue;
-                }
-
-                selectedCount++;
-                if (Objects.equals(articleIdentity.getIdentityId(), currentIdentity.getId())) {
-                    currentIdentityInvolved = true;
-                }
-            }
-            if (currentIdentityInvolved) {
-                myShare += (itemPrice / selectedCount);
-            }
-        }
-
-        viewModel.setTotal(total, moneyFormatter.format(total));
-        viewModel.setMyShare(moneyFormatter.format(myShare));
     }
 
     protected final PurchaseAddEditArticleIdentityItemViewModel[] getArticleIdentities(@NonNull Set<String> identities) {
@@ -314,21 +271,79 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     }
 
     @Override
-    public void onRowPriceChanged() {
-        updateTotalAndMyShare();
-    }
-
-    @Override
     public void onAddRowClick(@NonNull BasePurchaseAddEditItemViewModel itemViewModel) {
         final int position = items.indexOf(itemViewModel);
 
         final PurchaseAddEditArticleItemViewModel articleItem =
                 new PurchaseAddEditArticleItemViewModel(getArticleIdentities());
-        articleItem.setMoneyFormatter(moneyFormatter);
-        articleItem.setPriceChangedListener(this);
         items.add(position, articleItem);
         listInteraction.notifyItemInserted(position);
         listInteraction.scrollToPosition(position + 1);
+    }
+
+    @Override
+    public void onArticleNameChanged(PurchaseAddEditArticleItemViewModel itemViewModel,
+                                     CharSequence name) {
+        itemViewModel.setName(name.toString());
+    }
+
+    @Override
+    public void onArticlePriceChanged(PurchaseAddEditArticleItemViewModel itemViewModel,
+                                      CharSequence price) {
+        final String priceString = price.toString();
+        itemViewModel.setPrice(priceString, MoneyUtils.parsePrice(priceString, moneyFormatter));
+
+        if (currentIdentity != null) {
+            updateTotalAndMyShare();
+        }
+    }
+
+    private void updateTotalAndMyShare() {
+        double total = 0;
+        double myShare = 0;
+        for (BasePurchaseAddEditItemViewModel itemViewModel : items) {
+            if (itemViewModel.getViewType() != ViewType.ARTICLE) {
+                continue;
+            }
+
+            final PurchaseAddEditArticleItemViewModel articleItem =
+                    (PurchaseAddEditArticleItemViewModel) itemViewModel;
+            final double itemPrice = articleItem.getPriceParsed();
+
+            // update total price
+            total += itemPrice;
+
+            // update my share
+            final PurchaseAddEditArticleIdentityItemViewModel[] articleIdentities =
+                    articleItem.getIdentities();
+            int selectedCount = 0;
+            boolean currentIdentityInvolved = false;
+            for (PurchaseAddEditArticleIdentityItemViewModel articleIdentity : articleIdentities) {
+                if (!articleIdentity.isSelected()) {
+                    continue;
+                }
+
+                selectedCount++;
+                if (Objects.equals(articleIdentity.getIdentityId(), currentIdentity.getId())) {
+                    currentIdentityInvolved = true;
+                }
+            }
+            if (currentIdentityInvolved) {
+                myShare += (itemPrice / selectedCount);
+            }
+        }
+
+        viewModel.setTotal(total, moneyFormatter.format(total));
+        viewModel.setMyShare(moneyFormatter.format(myShare));
+    }
+
+    @Override
+    public void onArticlePriceFocusChange(PurchaseAddEditArticleItemViewModel itemViewModel,
+                                          boolean hasFocus) {
+        if (!hasFocus) {
+            final double priceParsed = itemViewModel.getPriceParsed();
+            itemViewModel.setPrice(moneyFormatter.format(priceParsed), priceParsed);
+        }
     }
 
     @Override
@@ -396,7 +411,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
             final PurchaseAddEditArticleItemViewModel articleItem =
                     (PurchaseAddEditArticleItemViewModel) itemViewModel;
-            articleItem.toggleUser(userClicked);
+            articleItem.toggleIdentity(userClicked);
             articleItem.notifyPropertyChanged(BR.identities);
         }
 
@@ -412,7 +427,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
             items.remove(position);
             listInteraction.notifyItemRangeRemoved(position, 2);
         }
-        onRowPriceChanged();
+
+        updateTotalAndMyShare();
     }
 
     @Override
@@ -592,7 +608,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         if (asDraft) {
             purchaseRepo.saveDraft(purchase, null);
         } else {
-            purchaseRepo.savePurchase(purchase, null, currentUserId, false);
+            purchaseRepo.savePurchase(purchase, null, currentIdentity.getUser(), false);
         }
     }
 

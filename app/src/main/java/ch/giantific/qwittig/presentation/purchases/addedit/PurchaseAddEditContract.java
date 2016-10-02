@@ -3,6 +3,7 @@ package ch.giantific.qwittig.presentation.purchases.addedit;
 import android.app.Activity;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -21,6 +22,10 @@ import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAd
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleItemViewModel;
+import ch.giantific.qwittig.utils.rxwrapper.android.transitions.TransitionEvent;
+import rx.Completable;
+import rx.Observable;
+import rx.Single;
 
 /**
  * Created by fabio on 26.09.16.
@@ -31,7 +36,6 @@ public interface PurchaseAddEditContract {
     interface Presenter extends
             BasePresenter<ViewListener>,
             ListPresenter<BasePurchaseAddEditItemViewModel>,
-            PurchaseAddEditArticleItemViewModel.PriceChangedListener,
             NoteDialogFragment.DialogInteractionListener,
             DiscardChangesDialogFragment.DialogInteractionListener,
             ExchangeRateDialogFragment.DialogInteractionListener,
@@ -48,6 +52,13 @@ public interface PurchaseAddEditContract {
         void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 
         void onAddRowClick(@NonNull BasePurchaseAddEditItemViewModel itemViewModel);
+
+        void onArticleNameChanged(PurchaseAddEditArticleItemViewModel itemViewModel, CharSequence name);
+
+        void onArticlePriceChanged(PurchaseAddEditArticleItemViewModel itemViewModel, CharSequence price);
+
+        void onArticlePriceFocusChange(PurchaseAddEditArticleItemViewModel itemViewModel,
+                                       boolean hasFocus);
 
         void onToggleIdentitiesClick(@NonNull PurchaseAddEditArticleItemViewModel itemViewModel);
 
@@ -87,6 +98,10 @@ public interface PurchaseAddEditContract {
     }
 
     interface ViewListener extends BaseViewListener {
+
+        Observable<TransitionEvent> getEnterTransition();
+
+        Single<FloatingActionButton> showFab();
 
         void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency);
 

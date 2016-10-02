@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
 import java.text.NumberFormat;
 import java.util.Date;
 
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.BaseChildItemViewModel;
 import ch.giantific.qwittig.utils.DateUtils;
