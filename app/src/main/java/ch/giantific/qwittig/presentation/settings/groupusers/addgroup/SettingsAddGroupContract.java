@@ -36,6 +36,6 @@ public interface SettingsAddGroupContract {
 
         void setScreenResult(@NonNull String name);
 
-        void showAddUsersFragment();
+        void showAddUsers();
     }
 }

@@ -78,23 +78,12 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
     }
 
     @Override
-    public void showAddUsersFragment() {
-        final SettingsUsersFragment fragment = new SettingsUsersFragment();
-        if (Utils.isRunningLollipopAndHigher()) {
-            setExitTransition(new Slide(Gravity.START));
-            setAllowReturnTransitionOverlap(false);
-            fragment.setEnterTransition(new Slide(Gravity.END));
-            fragment.setAllowEnterTransitionOverlap(false);
-        }
-
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment, SettingsAddGroupActivity.ADD_USERS_FRAGMENT)
-                .commit();
-
-        activity.setUpIconAsDone();
+    public void showAddUsers() {
+        activity.showAddUsersFragment();
     }
 
     public interface ActivityListener extends BaseFragment.ActivityListener<SettingsGroupUsersComponent> {
-        void setUpIconAsDone();
+
+        void showAddUsersFragment();
     }
 }

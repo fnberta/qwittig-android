@@ -118,7 +118,7 @@ public class SettingsAddGroupPresenter extends BasePresenterImpl<SettingsAddGrou
             groupRepo.createGroup(currentIdentity.getUser(), name, viewModel.getCurrency(),
                     currentIdentity.getNickname(), currentIdentity.getAvatar());
             this.view.setScreenResult(name);
-            this.view.showAddUsersFragment();
+            this.view.showAddUsers();
         } else {
             this.view.showMessage(R.string.toast_group_already_in_list);
         }
