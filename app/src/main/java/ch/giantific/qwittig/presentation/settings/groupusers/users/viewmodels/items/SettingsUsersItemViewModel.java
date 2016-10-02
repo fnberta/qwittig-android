@@ -41,7 +41,7 @@ public class SettingsUsersItemViewModel extends BaseChildItemViewModel
 
     @Bindable
     public boolean isPending() {
-        return !pending;
+        return pending;
     }
 
     @Bindable
