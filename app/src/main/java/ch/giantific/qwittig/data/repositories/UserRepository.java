@@ -170,10 +170,9 @@ public class UserRepository {
                     final Map<String, Object> childUpdates = new HashMap<>();
                     final Set<String> identities = user.getIdentitiesIds();
                     for (String identityId : identities) {
-                        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_NICKNAME, nickname);
+                        childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId, Identity.PATH_NICKNAME), nickname);
                         if (avatarChanged) {
-                            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE
-                                            + "/" + identityId + "/" + Identity.PATH_AVATAR,
+                            childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId, Identity.PATH_AVATAR),
                                     !TextUtils.isEmpty(avatar)
                                     ? avatar : null);
                         }
@@ -220,10 +219,7 @@ public class UserRepository {
                                     final Set<String> identities = user.getIdentitiesIds();
                                     final Map<String, Object> childUpdates = new HashMap<>();
                                     for (String identityId1 : identities) {
-                                        childUpdates.put(Identity.BASE_PATH + "/"
-                                                + Identity.BASE_PATH_ACTIVE + "/"
-                                                + identityId1 + "/"
-                                                + Identity.PATH_AVATAR, url.toString());
+                                        childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId1, Identity.PATH_AVATAR), url.toString());
                                     }
                                     databaseRef.updateChildren(childUpdates);
                                 }

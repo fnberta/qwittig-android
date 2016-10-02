@@ -149,14 +149,14 @@ public class PurchaseRepository {
         final Map<String, Object> childUpdates = new HashMap<>();
         final String ocrDataId = purchase.getOcrData();
         if (!TextUtils.isEmpty(ocrDataId)) {
-            childUpdates.put(OcrData.BASE_PATH + "/" + userId + "/" + ocrDataId + "/" + OcrData.PATH_PROCESSED, true);
+            childUpdates.put(String.format("%s/%s/%s/%s", OcrData.BASE_PATH, userId, ocrDataId, OcrData.PATH_PROCESSED), true);
         }
         final Map<String, Object> purchaseMap = purchase.toMap();
         if (wasDraft) {
-            childUpdates.put(Purchase.BASE_PATH_DRAFTS + "/" + buyerId + "/" + key, null);
+            childUpdates.put(String.format("%s/%s/%s", Purchase.BASE_PATH_DRAFTS, buyerId, key), null);
             purchaseMap.put(Purchase.PATH_DRAFT, false);
         }
-        childUpdates.put(Purchase.BASE_PATH_PURCHASES + "/" + key, purchaseMap);
+        childUpdates.put(String.format("%s/%s", Purchase.BASE_PATH_PURCHASES, key), purchaseMap);
         databaseRef.updateChildren(childUpdates);
 
         final String receipt = purchase.getReceipt();
@@ -215,8 +215,8 @@ public class PurchaseRepository {
 
     public void discardOcrData(@NonNull String currentUserId, @NonNull String ocrDataId) {
         final Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(OcrData.BASE_PATH + "/" + currentUserId + "/" + ocrDataId + "/" + OcrData.PATH_PROCESSED, true);
-        childUpdates.put(OcrData.BASE_PATH + "/" + currentUserId + "/" + ocrDataId + "/" + OcrData.PATH_PURCHASE, null);
+        childUpdates.put(String.format("%s/%s/%s/%s", OcrData.BASE_PATH, currentUserId, ocrDataId, OcrData.PATH_PROCESSED), true);
+        childUpdates.put(String.format("%s/%s/%s/%s", OcrData.BASE_PATH, currentUserId, ocrDataId, OcrData.PATH_PURCHASE), null);
         databaseRef.updateChildren(childUpdates);
     }
 
@@ -226,7 +226,7 @@ public class PurchaseRepository {
     public Single<Uri> setOcrDataReceiptUrl(@NonNull final String currentUserId,
                                             @NonNull final String ocrDataId,
                                             @NonNull String purchaseId) {
-        return RxFirebaseStorage.getDownloadUrl(storageRef.child(purchaseId + ".jpg"))
+        return RxFirebaseStorage.getDownloadUrl(storageRef.child(String.format("%s.jpg", purchaseId)))
                 .doOnSuccess(uri -> databaseRef.child(OcrData.BASE_PATH)
                         .child(currentUserId)
                         .child(ocrDataId)

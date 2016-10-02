@@ -82,8 +82,8 @@ public class AssignmentRepository {
 
     public void deleteAssignment(@NonNull String assignmentId) {
         final Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(Assignment.BASE_PATH + "/" + assignmentId, null);
-        childUpdates.put(AssignmentHistory.BASE_PATH + "/" + assignmentId, null);
+        childUpdates.put(String.format("%s/%s", Assignment.BASE_PATH, assignmentId), null);
+        childUpdates.put(String.format("%s/%s", AssignmentHistory.BASE_PATH, assignmentId), null);
         databaseRef.updateChildren(childUpdates);
     }
 
@@ -95,7 +95,7 @@ public class AssignmentRepository {
         // add history event
         final String assignmentId = assignmentHistory.getAssignment();
         final String key = databaseRef.child(AssignmentHistory.BASE_PATH).child(assignmentId).push().getKey();
-        childUpdates.put(AssignmentHistory.BASE_PATH + "/" + assignmentId + "/" + key, assignmentHistory.toMap());
+        childUpdates.put(String.format("%s/%s/%s", AssignmentHistory.BASE_PATH, assignmentId, key), assignmentHistory.toMap());
 
         // update identities position
         final List<String> identityIds = Arrays.asList(identitiesSorted);
@@ -104,7 +104,7 @@ public class AssignmentRepository {
         for (int i = 0, size = identityIds.size(); i < size; i++) {
             identities.put(identityIds.get(i), i);
         }
-        childUpdates.put(Assignment.BASE_PATH + "/" + assignmentId + "/" + Assignment.PATH_IDENTITIES, identities);
+        childUpdates.put(String.format("%s/%s/%s", Assignment.BASE_PATH, assignmentId, Assignment.PATH_IDENTITIES), identities);
 
         // update deadline
         if (!Objects.equals(timeFrame, TimeFrame.AS_NEEDED)) {
@@ -126,7 +126,7 @@ public class AssignmentRepository {
             }
 
             DateUtils.resetToMidnight(deadline);
-            childUpdates.put(Assignment.BASE_PATH + "/" + assignmentId + "/" + Assignment.PATH_DEADLINE, deadline.getTimeInMillis());
+            childUpdates.put(String.format("%s/%s/%s", Assignment.BASE_PATH, assignmentId, Assignment.PATH_DEADLINE), deadline.getTimeInMillis());
         }
 
         databaseRef.updateChildren(childUpdates);

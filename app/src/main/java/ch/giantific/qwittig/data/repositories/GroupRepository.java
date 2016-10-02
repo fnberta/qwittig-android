@@ -21,11 +21,11 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.queues.GroupJoinQueue;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseDatabase;
 import rx.Observable;
 import rx.Single;
 
@@ -88,16 +88,16 @@ public class GroupRepository {
         return RxFirebaseDatabase.observeValueOnce(query, Group.class)
                 .doOnSuccess(group -> {
                     final Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_NAME, name);
+                    childUpdates.put(String.format("%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_NAME), name);
                     if (!TextUtils.isEmpty(currency)) {
-                        childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_CURRENCY, currency);
+                        childUpdates.put(String.format("%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_CURRENCY), currency);
                     }
 
                     final Set<String> identitiesIds = group.getIdentitiesIds();
                     for (String identityId : identitiesIds) {
-                        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_GROUP_NAME, name);
+                        childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId, Identity.PATH_GROUP_NAME), name);
                         if (!TextUtils.isEmpty(currency)) {
-                            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_GROUP_CURRENCY, currency);
+                            childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId, Identity.PATH_GROUP_CURRENCY), currency);
                         }
                     }
 
@@ -126,11 +126,11 @@ public class GroupRepository {
         balance.put(Identity.DENOMINATOR, 1L);
         final Identity identity = new Identity(true, groupId, name, currency, userId,
                 identityNickname, identityAvatar, balance, null);
-        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId, identity.toMap());
+        childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), identity.toMap());
 
         // add to user
-        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + identityId, true);
-        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, identityId);
+        childUpdates.put(String.format("%s/%s/%s/%s", User.BASE_PATH, userId, User.PATH_IDENTITIES, identityId), true);
+        childUpdates.put(String.format("%s/%s/%s", User.BASE_PATH, userId, User.PATH_CURRENT_IDENTITY), identityId);
 
         databaseRef.updateChildren(childUpdates);
         messaging.subscribeToTopic(groupId);
@@ -144,17 +144,17 @@ public class GroupRepository {
         final String joinIdentityId = joinIdentity.getId();
         final String joinGroupId = joinIdentity.getGroup();
         final Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + joinIdentityId, true);
-        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, joinIdentityId);
-        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + joinIdentityId + "/" + Identity.PATH_USER, userId);
-        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + joinIdentityId + "/" + Identity.PATH_INVITATION_LINK, null);
+        childUpdates.put(String.format("%s/%s/%s/%s", User.BASE_PATH, userId, User.PATH_IDENTITIES, joinIdentityId), true);
+        childUpdates.put(String.format("%s/%s/%s", User.BASE_PATH, userId, User.PATH_CURRENT_IDENTITY), joinIdentityId);
+        childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, joinIdentityId, Identity.PATH_USER), userId);
+        childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, joinIdentityId, Identity.PATH_INVITATION_LINK), null);
         if (!TextUtils.isEmpty(currentNickname)) {
-            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + joinIdentityId + "/" + Identity.PATH_NICKNAME, currentNickname);
+            childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, joinIdentityId, Identity.PATH_NICKNAME), currentNickname);
         }
         if (!TextUtils.isEmpty(currentAvatar)) {
-            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + joinIdentityId + "/" + Identity.PATH_AVATAR, currentAvatar);
+            childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, joinIdentityId, Identity.PATH_AVATAR), currentAvatar);
         }
-        childUpdates.put(Constants.PATH_PUSH_QUEUE + "/" + queueKey, new GroupJoinQueue(joinGroupId, joinIdentityId).toMap());
+        childUpdates.put(String.format("%s/%s", Constants.PATH_PUSH_QUEUE, queueKey), new GroupJoinQueue(joinGroupId, joinIdentityId).toMap());
 
         databaseRef.updateChildren(childUpdates);
         messaging.subscribeToTopic(joinGroupId);
@@ -170,14 +170,14 @@ public class GroupRepository {
                 .toSingle()
                 .doOnSuccess(newCurrentIdentity -> {
                     final Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId, null);
+                    childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), null);
                     final Map<String, Object> identityMap = identity.toMap();
                     identityMap.put(Identity.PATH_ACTIVE, false);
-                    childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_INACTIVE + "/" + identityId, identityMap);
-                    childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, null);
-                    childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + identityId, null);
-                    childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_ARCHIVED_IDENTITIES + "/" + identityId, true);
-                    childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, newCurrentIdentity);
+                    childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_INACTIVE, identityId), identityMap);
+                    childUpdates.put(String.format("%s/%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_IDENTITIES, identityId), null);
+                    childUpdates.put(String.format("%s/%s/%s/%s", User.BASE_PATH, userId, User.PATH_IDENTITIES, identityId), null);
+                    childUpdates.put(String.format("%s/%s/%s/%s", User.BASE_PATH, userId, User.PATH_ARCHIVED_IDENTITIES, identityId), true);
+                    childUpdates.put(String.format("%s/%s/%s", User.BASE_PATH, userId, User.PATH_CURRENT_IDENTITY), newCurrentIdentity);
                     databaseRef.updateChildren(childUpdates);
                     messaging.unsubscribeFromTopic(identity.getGroup());
                 });
@@ -196,8 +196,8 @@ public class GroupRepository {
                 currentIdentity.getGroupCurrency(), null, nickname, null, balance, invitationLink);
 
         final Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId, identity.toMap());
-        childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, true);
+        childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), identity.toMap());
+        childUpdates.put(String.format("%s/%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_IDENTITIES, identityId), true);
         databaseRef.updateChildren(childUpdates);
     }
 
@@ -231,12 +231,12 @@ public class GroupRepository {
         return RxFirebaseDatabase.observeValueOnce(query, Identity.class)
                 .doOnSuccess(identity -> {
                     final Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId, null);
+                    childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), null);
                     final Map<String, Object> identityMap = identity.toMap();
                     identityMap.put(Identity.PATH_ACTIVE, false);
                     identityMap.put(Identity.PATH_INVITATION_LINK, null);
-                    childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_INACTIVE + "/" + identityId, identityMap);
-                    childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, null);
+                    childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_INACTIVE, identityId), identityMap);
+                    childUpdates.put(String.format("%s/%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_IDENTITIES, identityId), null);
                     databaseRef.updateChildren(childUpdates);
                 });
     }
