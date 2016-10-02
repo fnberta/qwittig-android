@@ -124,7 +124,7 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
 
     @Exclude
     public boolean isPending() {
-        return active && !TextUtils.isEmpty(user);
+        return active && TextUtils.isEmpty(user);
     }
 
     @Exclude
