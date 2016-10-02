@@ -11,12 +11,12 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowAssignmentsBinding;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
-import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentHeaderItem;
-import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItem;
-import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItemModel;
-import ch.giantific.qwittig.presentation.assignments.list.itemmodels.AssignmentItemModel.Type;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentHeaderViewModel;
+import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentItemViewModel;
+import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel;
+import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel.ViewType;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 
 /**
  * Handles the display of recent tasks assigned to users in a group.
@@ -25,31 +25,31 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
  */
 public class AssignmentsRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final AssignmentsViewModel viewModel;
+    private final AssignmentsContract.Presenter presenter;
 
     /**
      * Constructs a new {@link AssignmentsRecyclerAdapter}.
      *
-     * @param viewModel the main view's model
+     * @param presenter the main view's model
      */
-    public AssignmentsRecyclerAdapter(@NonNull AssignmentsViewModel viewModel) {
+    public AssignmentsRecyclerAdapter(@NonNull AssignmentsContract.Presenter presenter) {
         super();
 
-        this.viewModel = viewModel;
+        this.presenter = presenter;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @Type int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @ViewType int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case Type.ASSIGNMENT: {
+            case ViewType.ASSIGNMENT: {
                 final RowAssignmentsBinding binding = RowAssignmentsBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.HEADER_MY:
+            case ViewType.HEADER_MY:
                 // fall through
-            case Type.HEADER_GROUP: {
+            case ViewType.HEADER_GROUP: {
                 final RowGenericHeaderBinding binding = RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
@@ -60,29 +60,29 @@ public class AssignmentsRecyclerAdapter extends BaseRecyclerAdapter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, @Type int position) {
-        final AssignmentItemModel assignmentItemModel = viewModel.getItemAtPosition(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, @ViewType int position) {
+        final BaseAssignmentItemViewModel viewModel = presenter.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
-            case Type.ASSIGNMENT: {
+            case ViewType.ASSIGNMENT: {
                 final BindingRow<RowAssignmentsBinding> assignmentRow =
                         (BindingRow<RowAssignmentsBinding>) viewHolder;
                 final RowAssignmentsBinding binding = assignmentRow.getBinding();
 
-                binding.setItemModel((AssignmentItem) assignmentItemModel);
-                binding.setViewModel(viewModel);
+                binding.setViewModel((AssignmentItemViewModel) viewModel);
+                binding.setPresenter(presenter);
                 binding.executePendingBindings();
 
                 break;
             }
-            case Type.HEADER_MY:
+            case ViewType.HEADER_MY:
                 // fall through
-            case Type.HEADER_GROUP: {
+            case ViewType.HEADER_GROUP: {
                 final BindingRow<RowGenericHeaderBinding> headerRow =
                         (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                binding.setItemModel((AssignmentHeaderItem) assignmentItemModel);
+                binding.setViewModel((AssignmentHeaderViewModel) viewModel);
                 binding.executePendingBindings();
 
                 break;
@@ -91,12 +91,12 @@ public class AssignmentsRecyclerAdapter extends BaseRecyclerAdapter {
     }
 
     @Override
-    public int getItemCount() {
-        return viewModel.getItemCount();
+    public int getItemViewType(int position) {
+        return presenter.getItemAtPosition(position).getViewType();
     }
 
     @Override
-    public int getItemViewType(int position) {
-        return viewModel.getItemViewType(position);
+    public int getItemCount() {
+        return presenter.getItemCount();
     }
 }

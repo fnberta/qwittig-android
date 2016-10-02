@@ -8,17 +8,17 @@ import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsFragment;
-import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsViewModel;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsContract;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesFragment;
-import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesViewModel;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesContract;
 import dagger.Subcomponent;
 
 /**
  * Provides the dependencies for the home screen.
  */
 @PerActivity
-@Subcomponent(modules = {HomeViewModelModule.class, GoogleApiClientDelegateModule.class,
-        PurchasesListViewModelModule.class, DraftsListViewModelModule.class})
+@Subcomponent(modules = {HomePresenterModule.class, GoogleApiClientDelegateModule.class,
+        PurchasesPresenterModule.class, DraftsPresenterModule.class})
 public interface HomeSubcomponent {
 
     void inject(HomeActivity homeActivity);
@@ -27,7 +27,7 @@ public interface HomeSubcomponent {
 
     void inject(DraftsFragment draftsFragment);
 
-    PurchasesViewModel getPurchasesViewModel();
+    PurchasesContract.Presenter getPurchasesPresenter();
 
-    DraftsViewModel getDraftsViewModel();
+    DraftsContract.Presenter getDraftsPresenter();
 }

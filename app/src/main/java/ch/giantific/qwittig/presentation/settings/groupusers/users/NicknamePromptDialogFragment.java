@@ -16,7 +16,7 @@ import android.widget.Button;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.DialogPromptNicknameBinding;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.BaseDialogFragment;
 
 /**
  * Provides a dialog that allows the user to enter his/her email address in order to request a
@@ -68,7 +68,8 @@ public class NicknamePromptDialogFragment extends BaseDialogFragment<NicknamePro
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final FragmentActivity activity = getActivity();
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity,
+                R.style.Theme_AppCompat_Light_Dialog_Alert_PrimaryAsAccent);
         binding = DialogPromptNicknameBinding.inflate(activity.getLayoutInflater());
 
         if (!TextUtils.isEmpty(nickname)) {

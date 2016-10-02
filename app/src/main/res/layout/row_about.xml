@@ -12,13 +12,13 @@
     <data>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.about.itemmodels.AboutItem"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.about.viewmodels.items.AboutItemViewModel"
             />
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.about.AboutViewModel"
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.about.AboutContract.Presenter"
             />
     </data>
 
@@ -29,11 +29,11 @@
         android:background="?selectableItemBackground"
         android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
         android:gravity="center_vertical"
-        android:onClick="@{() -> viewModel.onAboutItemClick(itemModel)}"
+        android:onClick="@{() -> presenter.onAboutItemClick(viewModel)}"
         android:paddingEnd="@dimen/key_line_1"
         android:paddingStart="@dimen/key_line_1"
-        android:text="@{itemModel.title}"
-        app:drawableStartBounds="@{itemModel.icon}"
+        android:text="@{viewModel.title}"
+        app:drawableStartBounds="@{viewModel.icon}"
         tools:text="Send Feedback"
         />
 

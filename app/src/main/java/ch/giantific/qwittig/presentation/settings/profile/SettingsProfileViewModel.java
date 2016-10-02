@@ -4,138 +4,199 @@
 
 package ch.giantific.qwittig.presentation.settings.profile;
 
-import android.app.Activity;
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.support.annotation.IntDef;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.view.View;
+import android.text.TextUtils;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.util.Objects;
 
-import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
-import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
-import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
+import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.utils.Utils;
 
 /**
- * Defines a observable view model for profile settings screen.
+ * Provides an implementation of the {@link SettingsProfileContract}.
  */
-public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewModel.ViewListener>,
-        GoogleUserWorkerListener, EmailUserWorkerListener, FacebookUserWorkerListener,
-        AvatarLoadListener,
-        DiscardChangesDialogFragment.DialogInteractionListener,
-        EmailReAuthenticateDialogFragment.DialogInteractionListener,
-        GoogleApiClientDelegate.GoogleLoginCallback {
+public class SettingsProfileViewModel extends BaseObservable implements Parcelable {
 
-    @Bindable
-    boolean isValidate();
+    public static final Parcelable.Creator<SettingsProfileViewModel> CREATOR = new Parcelable.Creator<SettingsProfileViewModel>() {
+        @Override
+        public SettingsProfileViewModel createFromParcel(Parcel source) {
+            return new SettingsProfileViewModel(source);
+        }
 
-    void setValidate(boolean validate);
+        @Override
+        public SettingsProfileViewModel[] newArray(int size) {
+            return new SettingsProfileViewModel[size];
+        }
+    };
+    private boolean validate;
+    private String avatar;
+    private String nickname;
+    private String email;
+    private String password;
+    private String passwordRepeat;
+    private boolean facebookUser;
+    private boolean googleUser;
+    private boolean unlinkSocialLogin;
 
-    @Bindable
-    String getAvatar();
-
-    void setAvatar(@NonNull String avatarUrl);
-
-    @Bindable
-    String getNickname();
-
-    void setNickname(@NonNull String nickname);
-
-    @Bindable
-    String getEmail();
-
-    void setEmail(@NonNull String email);
-
-    @Bindable
-    boolean isNicknameComplete();
-
-    @Bindable
-    boolean isEmailValid();
-
-    @Bindable
-    boolean isPasswordValid();
-
-    @Bindable
-    boolean isPasswordEqual();
-
-    @Bindable
-    boolean isEmailAndPasswordVisible();
-
-    boolean showUnlinkFacebook();
-
-    boolean showUnlinkGoogle();
-
-    void onPickAvatarMenuClick();
-
-    void onNewAvatarTaken(@NonNull String avatar);
-
-    void onDeleteAvatarMenuClick();
-
-    void onUnlinkThirdPartyLoginMenuClick();
-
-    void onFacebookSignedIn(@NonNull String token);
-
-    void onFacebookLoginFailed();
-
-    void onExitClick();
-
-    void onEmailChanged(CharSequence s, int start, int before, int count);
-
-    void onNicknameChanged(CharSequence s, int start, int before, int count);
-
-    void onPasswordChanged(CharSequence s, int start, int before, int count);
-
-    void onPasswordRepeatChanged(CharSequence s, int start, int before, int count);
-
-    void onFabSaveProfileClick(View view);
-
-    @IntDef({Activity.RESULT_OK, Activity.RESULT_CANCELED, Result.CHANGES_DISCARDED})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface Result {
-        int CHANGES_DISCARDED = 2;
+    public SettingsProfileViewModel() {
     }
 
-    /**
-     * Defines the interaction with the attached view.
-     */
-    interface ViewListener extends ViewModel.ViewListener {
+    private SettingsProfileViewModel(Parcel in) {
+        this.validate = in.readByte() != 0;
+        this.avatar = in.readString();
+        this.nickname = in.readString();
+        this.email = in.readString();
+        this.password = in.readString();
+        this.passwordRepeat = in.readString();
+        this.facebookUser = in.readByte() != 0;
+        this.googleUser = in.readByte() != 0;
+        this.unlinkSocialLogin = in.readByte() != 0;
+    }
 
-        void startPostponedEnterTransition();
+    @Bindable
+    public boolean isValidate() {
+        return validate;
+    }
 
-        void loadUnlinkGoogleWorker(@NonNull String email, @NonNull String password,
-                                    @NonNull String idToken);
+    public void setValidate(boolean validate) {
+        this.validate = validate;
+        notifyPropertyChanged(BR.validate);
+    }
 
-        void loadUnlinkFacebookWorker(@NonNull String email, @NonNull String password,
-                                      @NonNull String idToken);
+    public boolean isInputValid() {
+        setValidate(true);
+        return isEmailValid() && isPasswordValid() && isPasswordEqual() && isNicknameComplete();
+    }
 
-        void showDiscardChangesDialog();
+    @Bindable
+    public String getAvatar() {
+        return avatar;
+    }
 
-        void showSetPasswordMessage(@StringRes int message);
+    public void setAvatar(@NonNull String avatarUrl) {
+        avatar = avatarUrl;
+        notifyPropertyChanged(BR.avatar);
+    }
 
-        void dismissSetPasswordMessage();
+    @Bindable
+    public String getNickname() {
+        return nickname;
+    }
 
-        void reloadOptionsMenu();
+    public void setNickname(@NonNull String nickname) {
+        this.nickname = nickname;
+        notifyPropertyChanged(BR.nickname);
+        if (validate) {
+            notifyPropertyChanged(BR.validate);
+        }
+    }
 
-        void showProgressDialog(@StringRes int message);
+    @Bindable
+    public boolean isNicknameComplete() {
+        return !TextUtils.isEmpty(nickname);
+    }
 
-        void hideProgressDialog();
+    @Bindable
+    public String getEmail() {
+        return email;
+    }
 
-        void showReAuthenticateDialog(@NonNull String currentEmail);
+    public void setEmail(@NonNull String email) {
+        this.email = email;
+        notifyPropertyChanged(BR.email);
+        if (validate) {
+            notifyPropertyChanged(BR.validate);
+        }
+    }
 
-        void loadChangeEmailPasswordWorker(@NonNull String currentEmail,
-                                           @NonNull String currentPassword,
-                                           @Nullable String newEmail,
-                                           @Nullable String newPassword);
+    @Bindable
+    public boolean isEmailValid() {
+        return Utils.isEmailValid(email);
+    }
 
-        void reAuthenticateGoogle();
+    public String getPassword() {
+        return password;
+    }
 
-        void reAuthenticateFacebook();
+    public void setPassword(String password) {
+        this.password = password;
+        if (validate) {
+            notifyPropertyChanged(BR.validate);
+        }
+    }
+
+    public String getPasswordRepeat() {
+        return passwordRepeat;
+    }
+
+    public void setPasswordRepeat(String passwordRepeat) {
+        this.passwordRepeat = passwordRepeat;
+        if (validate) {
+            notifyPropertyChanged(BR.validate);
+        }
+    }
+
+    @Bindable
+    public boolean isPasswordValid() {
+        return TextUtils.isEmpty(password) || Utils.isPasswordValid(password);
+    }
+
+    @Bindable
+    public boolean isPasswordEqual() {
+        return Objects.equals(password, passwordRepeat);
+    }
+
+    public boolean isFacebookUser() {
+        return facebookUser;
+    }
+
+    public void setFacebookUser(boolean facebookUser) {
+        this.facebookUser = facebookUser;
+        notifyPropertyChanged(BR.emailAndPasswordVisible);
+    }
+
+    public boolean isGoogleUser() {
+        return googleUser;
+    }
+
+    public void setGoogleUser(boolean googleUser) {
+        this.googleUser = googleUser;
+        notifyPropertyChanged(BR.emailAndPasswordVisible);
+    }
+
+    public boolean isUnlinkSocialLogin() {
+        return unlinkSocialLogin;
+    }
+
+    public void setUnlinkSocialLogin(boolean unlinkSocialLogin) {
+        this.unlinkSocialLogin = unlinkSocialLogin;
+        notifyPropertyChanged(BR.emailAndPasswordVisible);
+    }
+
+    @Bindable
+    public boolean isEmailAndPasswordVisible() {
+        return !facebookUser && !googleUser || unlinkSocialLogin;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte(this.validate ? (byte) 1 : (byte) 0);
+        dest.writeString(this.avatar);
+        dest.writeString(this.nickname);
+        dest.writeString(this.email);
+        dest.writeString(this.password);
+        dest.writeString(this.passwordRepeat);
+        dest.writeByte(this.facebookUser ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.googleUser ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.unlinkSocialLogin ? (byte) 1 : (byte) 0);
     }
 }

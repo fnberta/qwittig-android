@@ -15,27 +15,21 @@ public class ExchangeRatesResult {
     private String date;
     private Map<String, Float> rates;
 
-    public String getBase() {
-        return base;
+    public ExchangeRatesResult(String base, String date, Map<String, Float> rates) {
+        this.base = base;
+        this.date = date;
+        this.rates = rates;
     }
 
-    public void setBase(String base) {
-        this.base = base;
+    public String getBase() {
+        return base;
     }
 
     public String getDate() {
         return date;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
     public Map<String, Float> getRates() {
         return rates;
-    }
-
-    public void setRates(Map<String, Float> rates) {
-        this.rates = rates;
     }
 }

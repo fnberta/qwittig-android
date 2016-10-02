@@ -10,9 +10,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowPurchaseDetailsIdentityBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsIdentityItemModel;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsIdentityItemViewModel;
 
 /**
  * Provides a {@link RecyclerView} adapter that manages the list of identities involved in a
@@ -22,10 +22,12 @@ import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDe
  */
 public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchaseDetailsIdentityBinding>> {
 
-    private final PurchaseDetailsViewModel viewModel;
+    private final PurchaseDetailsContract.Presenter presenter;
 
-    public PurchaseDetailsIdentitiesRecyclerAdapter(@NonNull PurchaseDetailsViewModel viewModel) {
-        this.viewModel = viewModel;
+    public PurchaseDetailsIdentitiesRecyclerAdapter(@NonNull PurchaseDetailsContract.Presenter presenter) {
+        super();
+
+        this.presenter = presenter;
     }
 
     @Override
@@ -39,14 +41,14 @@ public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapte
     @Override
     public void onBindViewHolder(BindingRow<RowPurchaseDetailsIdentityBinding> holder, int position) {
         final RowPurchaseDetailsIdentityBinding binding = holder.getBinding();
-        final PurchaseDetailsIdentityItemModel itemModel = viewModel.getIdentityAtPosition(position);
+        final PurchaseDetailsIdentityItemViewModel viewModel = presenter.getIdentityAtPosition(position);
 
-        binding.setItemModel(itemModel);
+        binding.setViewModel(viewModel);
         binding.executePendingBindings();
     }
 
     @Override
     public int getItemCount() {
-        return viewModel.getIdentitiesCount();
+        return presenter.getIdentityCount();
     }
 }

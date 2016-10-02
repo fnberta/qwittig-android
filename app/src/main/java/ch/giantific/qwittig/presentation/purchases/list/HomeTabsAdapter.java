@@ -11,7 +11,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
 
 /**
  * Handles fragments as tabs in a {@link ViewPager}.

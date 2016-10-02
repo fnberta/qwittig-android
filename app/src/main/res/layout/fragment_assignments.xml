@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.assignments.list.AssignmentsViewModel"
+            type="ch.giantific.qwittig.presentation.assignments.list.viewmodels.AssignmentsViewModel"
             />
     </data>
 
@@ -24,7 +24,7 @@
         >
 
         <include
-            android:id="@+id/srl_rv"
+            android:id="@+id/rv_pb"
             layout="@layout/include_rv_progress"
             app:viewModel="@{viewModel}"
             />

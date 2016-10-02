@@ -8,7 +8,6 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.preference.PreferenceManager;
 
 import javax.inject.Singleton;
@@ -38,12 +37,6 @@ public class ApplicationModule {
     @Singleton
     SharedPreferences providesSharedPreferences(Application application) {
         return PreferenceManager.getDefaultSharedPreferences(application);
-    }
-
-    @Provides
-    @Singleton
-    LocalBroadcastManager providesLocalBroadcastManager(Application application) {
-        return LocalBroadcastManager.getInstance(application);
     }
 
     @Provides

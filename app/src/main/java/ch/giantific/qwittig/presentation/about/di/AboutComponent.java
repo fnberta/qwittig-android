@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.about.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.about.AboutActivity;
 import ch.giantific.qwittig.presentation.about.AboutFragment;
@@ -17,7 +16,7 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {AboutViewModelModule.class, NavigatorModule.class, RepositoriesModule.class})
+        modules = {AboutPresenterModule.class, NavigatorModule.class})
 public interface AboutComponent {
 
     void inject(AboutActivity aboutActivity);

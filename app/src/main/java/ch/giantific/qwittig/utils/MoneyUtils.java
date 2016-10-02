@@ -48,8 +48,8 @@ public class MoneyUtils {
             moneyFormatter = NumberFormat.getInstance();
             moneyFormatter.setRoundingMode(RoundingMode.HALF_UP);
             final int fractionDigits = withDecimals
-                    ? Currency.getInstance(currencyCode).getDefaultFractionDigits()
-                    : 0;
+                                       ? Currency.getInstance(currencyCode).getDefaultFractionDigits()
+                                       : 0;
             moneyFormatter.setMinimumFractionDigits(fractionDigits);
             moneyFormatter.setMaximumFractionDigits(fractionDigits);
         }
@@ -85,6 +85,25 @@ public class MoneyUtils {
         } catch (NumberFormatException e) {
             try {
                 return parser.parse(price).doubleValue();
+            } catch (ParseException e1) {
+                return 0;
+            }
+        }
+    }
+
+    /**
+     * Returns a parsed double using the provided {@link NumberFormat} instance.
+     *
+     * @param price        the price string to parse
+     * @param numberFormat the number formatter to parse the string
+     * @return a parsed double
+     */
+    public static double parsePrice(@NonNull String price, @NonNull NumberFormat numberFormat) {
+        try {
+            return Double.parseDouble(price);
+        } catch (NumberFormatException e) {
+            try {
+                return numberFormat.parse(price).doubleValue();
             } catch (ParseException e1) {
                 return 0;
             }

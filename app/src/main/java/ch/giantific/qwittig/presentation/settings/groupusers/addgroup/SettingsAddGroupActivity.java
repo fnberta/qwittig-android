@@ -11,26 +11,29 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.MenuItem;
 
 import java.util.Arrays;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupViewModelModule;
+import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupPresenterModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersViewModelModule;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersViewModel;
+import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersPresenterModule;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersContract;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersFragment;
 import ch.giantific.qwittig.utils.AvatarUtils;
+import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Hosts {@link SettingsAddGroupFragment} that allows to user to create a new group.
@@ -46,10 +49,8 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
     public static final String ADD_USERS_FRAGMENT = "ADD_USERS_FRAGMENT";
     public static final String ADD_GROUP_FRAGMENT = "ADD_GROUP_FRAGMENT";
 
-    @Inject
-    SettingsAddGroupViewModel addGroupViewModel;
-    @Inject
-    SettingsUsersViewModel usersViewModel;
+    private SettingsAddGroupContract.Presenter groupPresenter;
+    private SettingsUsersContract.Presenter usersPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,15 +69,16 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
         component = DaggerSettingsGroupUsersComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .settingsAddGroupViewModelModule(new SettingsAddGroupViewModelModule(savedInstanceState))
-                .settingsUsersViewModelModule(new SettingsUsersViewModelModule(savedInstanceState))
+                .settingsAddGroupPresenterModule(new SettingsAddGroupPresenterModule(savedInstanceState))
+                .settingsUsersPresenterModule(new SettingsUsersPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
+        groupPresenter = component.getAddGroupPresenter();
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{addGroupViewModel, usersViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{groupPresenter, usersPresenter});
     }
 
     @Override
@@ -96,16 +98,36 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_PICK:
+            case Navigator.RC_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, path -> usersViewModel.onNewAvatarTaken(path));
+                    AvatarUtils.saveImageLocal(this, imageUri, path -> usersPresenter.onNewAvatarTaken(path));
                 }
         }
     }
 
     @Override
-    public void setUpIconAsDone() {
+    public void showAddUsersFragment() {
+        usersPresenter = component.getUsersPresenter();
+        setUpIconAsDone();
+
+        final FragmentManager fm = getSupportFragmentManager();
+        final SettingsAddGroupFragment groupFragment =
+                (SettingsAddGroupFragment) fm.findFragmentByTag(ADD_GROUP_FRAGMENT);
+        final SettingsUsersFragment usersFragment = new SettingsUsersFragment();
+        if (Utils.isRunningLollipopAndHigher()) {
+            groupFragment.setExitTransition(new Slide(Gravity.START));
+            groupFragment.setAllowReturnTransitionOverlap(false);
+            usersFragment.setEnterTransition(new Slide(Gravity.END));
+            usersFragment.setAllowEnterTransitionOverlap(false);
+        }
+
+        fm.beginTransaction()
+                .replace(R.id.container, usersFragment, SettingsAddGroupActivity.ADD_USERS_FRAGMENT)
+                .commit();
+    }
+
+    private void setUpIconAsDone() {
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);

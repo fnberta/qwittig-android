@@ -6,6 +6,7 @@ package ch.giantific.qwittig.presentation.purchases.addedit;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -13,18 +14,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel.ViewType;
 
 /**
  * Displays the interface where the user can add a new purchase by setting store, date, users
  * involved and the different items.
- * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditViewModel, S extends BaseRecyclerViewFragment.ActivityListener<U>>
-        extends BaseRecyclerViewFragment<U, T, S> {
+public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditContract.Presenter, S extends BaseFragment.ActivityListener<U>>
+        extends BaseFragment<U, T, S> {
 
     private FragmentPurchaseAddEditBinding binding;
 
@@ -39,7 +37,8 @@ public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditVi
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel.setListInteraction(recyclerAdapter);
+        final PurchaseAddEditRecyclerAdapter adapter = setupRecyclerView();
+        presenter.setListInteraction(adapter);
         final ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 0, ItemTouchHelper.END) {
             @Override
@@ -50,13 +49,13 @@ public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditVi
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                viewModel.onArticleDismiss(viewHolder.getAdapterPosition());
+                presenter.onArticleDismiss(viewHolder.getAdapterPosition());
             }
 
             @Override
             public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 final int position = viewHolder.getAdapterPosition();
-                if (viewModel.getItemViewType(position) != Type.ARTICLE) {
+                if (presenter.getItemAtPosition(position).getViewType() != ViewType.ARTICLE) {
                     return 0;
                 }
 
@@ -66,13 +65,17 @@ public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditVi
         touchHelper.attachToRecyclerView(binding.rvPurchaseAddEdit);
     }
 
-    @Override
-    protected RecyclerView getRecyclerView() {
-        return binding.rvPurchaseAddEdit;
+    private PurchaseAddEditRecyclerAdapter setupRecyclerView() {
+        binding.rvPurchaseAddEdit.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvPurchaseAddEdit.setHasFixedSize(true);
+        final PurchaseAddEditRecyclerAdapter adapter = new PurchaseAddEditRecyclerAdapter(presenter);
+        binding.rvPurchaseAddEdit.setAdapter(adapter);
+
+        return adapter;
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchaseAddEditRecyclerAdapter(viewModel);
+    protected View getSnackbarView() {
+        return binding.rvPurchaseAddEdit;
     }
 }

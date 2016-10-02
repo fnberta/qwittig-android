@@ -6,24 +6,22 @@ package ch.giantific.qwittig.presentation.purchases.list.purchases;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
 
 /**
  * Displays recent purchases in a {@link RecyclerView} list.
- * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent, PurchasesViewModel, BaseFragment.ActivityListener<HomeSubcomponent>>
-        implements PurchasesViewModel.ViewListener {
+public class PurchasesFragment extends BaseFragment<HomeSubcomponent, PurchasesContract.Presenter, BaseFragment.ActivityListener<HomeSubcomponent>>
+        implements PurchasesContract.ViewListener {
 
     private FragmentHomePurchasesBinding binding;
 
@@ -42,9 +40,10 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel.attachView(this);
-        viewModel.setListInteraction(recyclerAdapter);
-        binding.setViewModel(viewModel);
+        final PurchasesRecyclerAdapter adapter = setupRecyclerView();
+        presenter.attachView(this);
+        presenter.setListInteraction(adapter);
+        binding.setViewModel(presenter.getViewModel());
     }
 
     @Override
@@ -52,13 +51,17 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
         component.inject(this);
     }
 
-    @Override
-    protected RecyclerView getRecyclerView() {
-        return binding.srlRv.rvBase;
+    private PurchasesRecyclerAdapter setupRecyclerView() {
+        binding.rvPb.rvBase.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvPb.rvBase.setHasFixedSize(true);
+        final PurchasesRecyclerAdapter adapter = new PurchasesRecyclerAdapter(presenter);
+        binding.rvPb.rvBase.setAdapter(adapter);
+
+        return adapter;
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchasesRecyclerAdapter(viewModel);
+    protected View getSnackbarView() {
+        return binding.rvPb.rvBase;
     }
 }

@@ -18,20 +18,20 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
-import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.dialogs.EmailReAuthenticateDialogFragment;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.general.di.DaggerSettingsComponent;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
-import ch.giantific.qwittig.presentation.settings.general.di.SettingsViewModelModule;
+import ch.giantific.qwittig.presentation.settings.general.di.SettingsPresenterModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupFragment;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
+import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileContract;
 import rx.Single;
 
 /**
@@ -48,7 +48,7 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
         GoogleApiClientDelegate.GoogleLoginCallback {
 
     @Inject
-    SettingsViewModel settingsViewModel;
+    SettingsContract.Presenter presenter;
     @Inject
     GoogleApiClientDelegate googleApiDelegate;
 
@@ -76,14 +76,14 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, null))
-                .settingsViewModelModule(new SettingsViewModelModule(savedInstanceState))
+                .settingsPresenterModule(new SettingsPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{settingsViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     @Override
@@ -92,17 +92,17 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
         googleApiDelegate.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_SETTINGS_PROFILE:
+            case Navigator.RC_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         showMessage(R.string.toast_profile_update);
                         break;
-                    case SettingsProfileViewModel.Result.CHANGES_DISCARDED:
+                    case SettingsProfileContract.Result.CHANGES_DISCARDED:
                         showMessage(R.string.toast_changes_discarded);
                         break;
                 }
                 break;
-            case Navigator.INTENT_REQUEST_SETTINGS_ADD_GROUP:
+            case Navigator.RC_SETTINGS_ADD_GROUP:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         final String newGroupName =
@@ -116,12 +116,12 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
 
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
-        settingsViewModel.onValidEmailAndPasswordEntered(email, password);
+        presenter.onValidEmailAndPasswordEntered(email, password);
     }
 
     @Override
     public void onLeaveGroupSelected() {
-        settingsViewModel.onLeaveGroupSelected();
+        presenter.onLeaveGroupSelected();
     }
 
     @Override
@@ -131,31 +131,31 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
 
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
-        settingsViewModel.onGoogleLoginSuccessful(idToken);
+        presenter.onGoogleLoginSuccessful(idToken);
     }
 
     @Override
     public void onGoogleLoginFailed() {
-        settingsViewModel.onGoogleLoginFailed();
+        presenter.onGoogleLoginFailed();
     }
 
     @Override
     public void setEmailUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        settingsViewModel.setEmailUserStream(single, workerTag);
+        presenter.setEmailUserStream(single, workerTag);
     }
 
     @Override
     public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        settingsViewModel.setGoogleUserStream(single, workerTag);
+        presenter.setGoogleUserStream(single, workerTag);
     }
 
     @Override
     public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        settingsViewModel.setFacebookUserStream(single, workerTag);
+        presenter.setFacebookUserStream(single, workerTag);
     }
 
     @Override
     public void onDeleteAccountSelected() {
-        settingsViewModel.onDeleteAccountSelected();
+        presenter.onDeleteAccountSelected();
     }
 }

@@ -13,7 +13,7 @@ import dagger.Subcomponent;
  * Provides the dependencies for the task details screen.
  */
 @PerActivity
-@Subcomponent(modules = {AssignmentDetailsViewModelModule.class})
+@Subcomponent(modules = {AssignmentDetailsPresenterModule.class})
 public interface AssignmentDetailsSubcomponent {
 
     void inject(AssignmentDetailsActivity assignmentDetailsActivity);

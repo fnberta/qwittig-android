@@ -8,7 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.presentation.stats.StatsViewModel.StatsPeriod;
+import ch.giantific.qwittig.presentation.stats.StatsContract.StatsPeriod;
 
 
 /**

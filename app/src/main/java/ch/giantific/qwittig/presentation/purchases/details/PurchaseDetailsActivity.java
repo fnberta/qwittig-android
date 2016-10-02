@@ -26,13 +26,13 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.PurchaseResult;
+import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsPresenterModule;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
-import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsViewModelModule;
 
 /**
  * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and
@@ -43,10 +43,10 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsVie
  * Subclass of {@link BaseNavDrawerActivity}.
  */
 public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetailsSubcomponent>
-        implements PurchaseDetailsViewModel.ViewListener {
+        implements PurchaseDetailsContract.ViewListener {
 
     @Inject
-    PurchaseDetailsViewModel detailsViewModel;
+    PurchaseDetailsContract.Presenter presenter;
     private boolean showEditOptions;
     private boolean showExchangeRate;
     private ActivityPurchaseDetailsBinding binding;
@@ -55,7 +55,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_details);
-        binding.setViewModel(detailsViewModel);
+        binding.setViewModel(presenter.getViewModel());
 
         // disable default actionBar title
         final ActionBar actionBar = getSupportActionBar();
@@ -77,16 +77,16 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        component = navComp.plus(new PurchaseDetailsViewModelModule(savedInstanceState,
+        component = navComp.plus(new PurchaseDetailsPresenterModule(savedInstanceState,
                 getPurchaseId(), getIntent().getStringExtra(FcmMessagingService.PUSH_GROUP_ID)));
         component.inject(this);
-        detailsViewModel.attachView(this);
+        presenter.attachView(this);
     }
 
     private String getPurchaseId() {
         final Intent intent = getIntent();
         // started from HomeActivity
-        String purchaseId = intent.getStringExtra(Navigator.INTENT_PURCHASE_ID);
+        String purchaseId = intent.getStringExtra(Navigator.EXTRA_PURCHASE_ID);
         if (TextUtils.isEmpty(purchaseId)) {
             // started via push notification
             purchaseId = intent.getStringExtra(FcmMessagingService.PUSH_PURCHASE_ID);
@@ -96,8 +96,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{detailsViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
     }
 
     private void setupTabs() {
@@ -127,13 +127,13 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         int id = item.getItemId();
         switch (id) {
             case R.id.action_purchase_edit:
-                detailsViewModel.onEditPurchaseClick();
+                presenter.onEditPurchaseClick();
                 return true;
             case R.id.action_purchase_delete:
-                detailsViewModel.onDeletePurchaseClick();
+                presenter.onDeletePurchaseClick();
                 return true;
             case R.id.action_purchase_show_exchange_rate:
-                detailsViewModel.onShowExchangeRateClick();
+                presenter.onShowExchangeRateClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -144,12 +144,12 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == Navigator.INTENT_REQUEST_PURCHASE_MODIFY) {
+        if (requestCode == Navigator.RC_PURCHASE_MODIFY) {
             switch (resultCode) {
-                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_SAVED:
+                case PurchaseResult.PURCHASE_SAVED:
                     showMessage(R.string.toast_changes_saved);
                     break;
-                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DISCARDED:
+                case PurchaseResult.PURCHASE_DISCARDED:
                     showMessage(R.string.toast_changes_discarded);
                     break;
             }

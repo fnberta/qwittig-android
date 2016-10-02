@@ -9,7 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -26,10 +26,8 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentAssignmentDetailsBinding;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 
 /**
  * Shows the details of a task. Most of the information gets displayed in the
@@ -38,8 +36,8 @@ import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetail
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class AssignmentDetailsFragment extends BaseRecyclerViewFragment<AssignmentDetailsSubcomponent, AssignmentDetailsViewModel, BaseFragment.ActivityListener<AssignmentDetailsSubcomponent>>
-        implements AssignmentDetailsViewModel.ViewListener {
+public class AssignmentDetailsFragment extends BaseFragment<AssignmentDetailsSubcomponent, AssignmentDetailsContract.Presenter, BaseFragment.ActivityListener<AssignmentDetailsSubcomponent>>
+        implements AssignmentDetailsContract.ViewListener {
 
     private FragmentAssignmentDetailsBinding binding;
 
@@ -64,9 +62,10 @@ public class AssignmentDetailsFragment extends BaseRecyclerViewFragment<Assignme
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel.attachView(this);
-        viewModel.setListInteraction(recyclerAdapter);
-        binding.setViewModel(viewModel);
+        final AssignmentHistoryRecyclerAdapter adapter = setupRecyclerView();
+        presenter.attachView(this);
+        presenter.setListInteraction(adapter);
+        binding.setViewModel(presenter.getViewModel());
     }
 
     @Override
@@ -74,14 +73,18 @@ public class AssignmentDetailsFragment extends BaseRecyclerViewFragment<Assignme
         component.inject(this);
     }
 
-    @Override
-    protected RecyclerView getRecyclerView() {
-        return binding.rvAssignmentDetailsHistory;
+    private AssignmentHistoryRecyclerAdapter setupRecyclerView() {
+        binding.rvAssignmentDetailsHistory.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvAssignmentDetailsHistory.setHasFixedSize(true);
+        final AssignmentHistoryRecyclerAdapter adapter = new AssignmentHistoryRecyclerAdapter(presenter);
+        binding.rvAssignmentDetailsHistory.setAdapter(adapter);
+
+        return adapter;
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new AssignmentHistoryRecyclerAdapter(viewModel);
+    protected View getSnackbarView() {
+        return binding.rvAssignmentDetailsHistory;
     }
 
     @Override
@@ -96,10 +99,10 @@ public class AssignmentDetailsFragment extends BaseRecyclerViewFragment<Assignme
         final int id = item.getItemId();
         switch (id) {
             case R.id.action_assignment_delete:
-                viewModel.onDeleteAssignmentMenuClick();
+                presenter.onDeleteAssignmentMenuClick();
                 return true;
             case R.id.action_assignment_edit:
-                viewModel.onEditAssignmentMenuClick();
+                presenter.onEditAssignmentMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

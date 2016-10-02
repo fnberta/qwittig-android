@@ -22,11 +22,11 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.databinding.ActivityAssignmentDetailsBinding;
-import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditViewModel.AssignmentResult;
+import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditContract.AssignmentResult;
+import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsPresenterModule;
 import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsSubcomponent;
-import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsViewModelModule;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 
@@ -42,14 +42,15 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
     private static final String FRAGMENT_ASSIGNMENT_DETAILS = "FRAGMENT_ASSIGNMENT_DETAILS";
 
     @Inject
-    AssignmentDetailsViewModel detailsViewModel;
+    AssignmentDetailsContract.Presenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final ActivityAssignmentDetailsBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_assignment_details);
-        binding.setViewModel(detailsViewModel);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
 
         // disable default actionBar title
         ActionBar actionBar = getSupportActionBar();
@@ -69,7 +70,7 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
 
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
-        component = navComp.plus(new AssignmentDetailsViewModelModule(savedInstanceState,
+        component = navComp.plus(new AssignmentDetailsPresenterModule(savedInstanceState,
                 getAssignmentId()));
         component.inject(this);
     }
@@ -77,7 +78,7 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
     private String getAssignmentId() {
         final Intent intent = getIntent();
         // started from AssignmentActivity
-        String assignmentId = intent.getStringExtra(Navigator.INTENT_ASSIGNMENT_ID);
+        String assignmentId = intent.getStringExtra(Navigator.EXTRA_ASSIGNMENT_ID);
         if (TextUtils.isEmpty(assignmentId)) {
             // started via push notification
             assignmentId = intent.getStringExtra(FcmMessagingService.PUSH_ASSIGNMENT_ID);
@@ -87,8 +88,8 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{detailsViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
     }
 
     private void setUpNavigation() {
@@ -114,7 +115,7 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_ASSIGNMENT_MODIFY:
+            case Navigator.RC_ASSIGNMENT_MODIFY:
                 switch (resultCode) {
                     case AssignmentResult.DISCARDED:
                         showMessage(R.string.toast_changes_discarded);

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -19,8 +20,7 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomeDraftsBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
 
 /**
@@ -28,11 +28,9 @@ import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
  * <p/>
  * Long-click on a draft will start selection mode, allowing the user to select more drafts and
  * deleting them via the contextual {@link ActionBar}.
- * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, DraftsViewModel, DraftsFragment.ActivityListener>
-        implements ActionMode.Callback, DraftsViewModel.ViewListener {
+public class DraftsFragment extends BaseFragment<HomeSubcomponent, DraftsContract.Presenter, DraftsFragment.ActivityListener>
+        implements ActionMode.Callback, DraftsContract.ViewListener {
 
     private FragmentHomeDraftsBinding binding;
     private ActionMode actionMode;
@@ -52,9 +50,11 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel.attachView(this);
-        viewModel.setListInteraction(recyclerAdapter);
-        binding.setViewModel(viewModel);
+        final DraftsRecyclerAdapter adapter = setupRecyclerView();
+        presenter.attachView(this);
+        presenter.setListInteraction(adapter);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
     }
 
     @Override
@@ -62,14 +62,18 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
         component.inject(this);
     }
 
-    @Override
-    protected RecyclerView getRecyclerView() {
-        return binding.rvDrafts;
+    private DraftsRecyclerAdapter setupRecyclerView() {
+        binding.rvDrafts.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvDrafts.setHasFixedSize(true);
+        final DraftsRecyclerAdapter adapter = new DraftsRecyclerAdapter(presenter);
+        binding.rvDrafts.setAdapter(adapter);
+
+        return adapter;
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new DraftsRecyclerAdapter(viewModel);
+    protected View getSnackbarView() {
+        return binding.rvDrafts;
     }
 
     @Override
@@ -88,7 +92,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_draft_delete:
-                viewModel.onDeleteSelectedDraftsClick();
+                presenter.onDeleteSelectedDraftsClick();
                 return true;
             default:
                 return false;
@@ -97,7 +101,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-        viewModel.onSelectionModeEnded();
+        presenter.onSelectionModeEnded();
     }
 
     @Override
@@ -115,7 +119,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
         actionMode.setTitle(getString(title, draftsSelected));
     }
 
-    public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener<HomeSubcomponent> {
+    public interface ActivityListener extends BaseFragment.ActivityListener<HomeSubcomponent> {
         ActionMode startActionMode();
     }
 }

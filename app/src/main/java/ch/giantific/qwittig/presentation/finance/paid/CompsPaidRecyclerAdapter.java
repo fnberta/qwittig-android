@@ -10,9 +10,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowCompPaidBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompPaidItemModel;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewViewModel;
 
 
 /**
@@ -22,17 +22,17 @@ import ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompPaidItemMod
  */
 public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowCompPaidBinding>> {
 
-    private final CompsPaidViewModel viewModel;
+    private final CompsPaidContract.Presenter presenter;
 
     /**
      * Constructs a new {@link CompsPaidRecyclerAdapter}.
      *
-     * @param viewModel the view's model
+     * @param presenter the view's model
      */
-    public CompsPaidRecyclerAdapter(@NonNull CompsPaidViewModel viewModel) {
+    public CompsPaidRecyclerAdapter(@NonNull CompsPaidContract.Presenter presenter) {
         super();
 
-        this.viewModel = viewModel;
+        this.presenter = presenter;
     }
 
     @NonNull
@@ -47,19 +47,19 @@ public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
     @Override
     public void onBindViewHolder(BindingRow<RowCompPaidBinding> holder, int position) {
         final RowCompPaidBinding binding = holder.getBinding();
-        final CompPaidItemModel itemModel = viewModel.getItemAtPosition(position);
+        final CompPaidItemViewViewModel viewModel = presenter.getItemAtPosition(position);
 
-        binding.setItemModel(itemModel);
+        binding.setViewModel(viewModel);
         binding.executePendingBindings();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return viewModel.getItemViewType(position);
+        return presenter.getItemAtPosition(position).getViewType();
     }
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 }

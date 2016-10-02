@@ -13,7 +13,7 @@ import dagger.Subcomponent;
  * Provides the dependencies for the task list screen.
  */
 @PerActivity
-@Subcomponent(modules = {AssignmentsViewModelModule.class})
+@Subcomponent(modules = {AssignmentsPresenterModule.class})
 public interface AssignmentsSubcomponent {
 
     void inject(AssignmentsActivity assignmentsActivity);

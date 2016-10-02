@@ -14,7 +14,7 @@ import dagger.Subcomponent;
  * Provides the dependencies for the purchase details screen.
  */
 @PerActivity
-@Subcomponent(modules = {PurchaseDetailsViewModelModule.class})
+@Subcomponent(modules = {PurchaseDetailsPresenterModule.class})
 public interface PurchaseDetailsSubcomponent {
 
     void inject(PurchaseDetailsActivity purchaseDetailsActivity);

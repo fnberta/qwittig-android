@@ -26,17 +26,17 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.databinding.ActivityFinanceBinding;
-import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidViewModelModule;
-import ch.giantific.qwittig.presentation.finance.di.FinanceCompsUnpaidViewModelModule;
-import ch.giantific.qwittig.presentation.finance.di.FinanceHeaderViewModelModule;
+import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
+import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidPresenterModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceCompsUnpaidPresenterModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceHeaderPresenterModule;
 import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
+import ch.giantific.qwittig.presentation.finance.paid.CompsPaidContract;
 import ch.giantific.qwittig.presentation.finance.paid.CompsPaidFragment;
-import ch.giantific.qwittig.presentation.finance.paid.CompsPaidViewModel;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompConfirmAmountDialogFragment;
+import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidContract;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidFragment;
-import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.utils.Utils;
@@ -50,22 +50,22 @@ import ch.giantific.qwittig.utils.Utils;
  * Subclass of {@link BaseNavDrawerActivity}.
  */
 public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> implements
-        BalanceHeaderViewModel.ViewListener,
+        FinanceHeaderContract.ViewListener,
         CompConfirmAmountDialogFragment.DialogInteractionListener {
 
     @Inject
-    BalanceHeaderViewModel headerViewModel;
+    FinanceHeaderContract.Presenter headerPresenter;
     @Inject
-    CompsPaidViewModel compsPaidViewModel;
+    CompsPaidContract.Presenter paidPresenter;
     @Inject
-    CompsUnpaidViewModel compsUnpaidViewModel;
+    CompsUnpaidContract.Presenter unpaidPresenter;
     private ActivityFinanceBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_finance);
-        binding.setViewModel(headerViewModel);
+        binding.setViewModel(headerPresenter.getViewModel());
 
         checkNavDrawerItem(R.id.nav_finance);
 
@@ -83,17 +83,17 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
         final String groupId = getIntent().getStringExtra(FcmMessagingService.PUSH_GROUP_ID);
-        component = navComp.plus(new FinanceHeaderViewModelModule(savedInstanceState),
-                new FinanceCompsUnpaidViewModelModule(savedInstanceState),
-                new FinanceCompsPaidViewModelModule(savedInstanceState, groupId));
+        component = navComp.plus(new FinanceHeaderPresenterModule(savedInstanceState),
+                new FinanceCompsUnpaidPresenterModule(savedInstanceState),
+                new FinanceCompsPaidPresenterModule(savedInstanceState, groupId));
         component.inject(this);
-        headerViewModel.attachView(this);
+        headerPresenter.attachView(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{headerViewModel, compsUnpaidViewModel,
-                compsPaidViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{navPresenter, headerPresenter, unpaidPresenter,
+                paidPresenter});
     }
 
     private void setupTabs() {
@@ -113,20 +113,6 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        headerViewModel.onViewVisible();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        headerViewModel.onViewGone();
-    }
-
-    @Override
     protected int getSelfNavDrawerItem() {
         return R.id.nav_finance;
     }
@@ -140,9 +126,9 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
 
     @Override
     public void setColorTheme(@NonNull BigFraction balance) {
-        int color;
-        int colorDark;
-        int style;
+        final int color;
+        final int colorDark;
+        final int style;
         if (Utils.isPositive(balance)) {
             color = ContextCompat.getColor(this, R.color.green);
             colorDark = ContextCompat.getColor(this, R.color.green_dark);
@@ -160,7 +146,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
 
     @Override
     public void onAmountConfirmed(double amount) {
-        compsUnpaidViewModel.onAmountConfirmed(amount);
+        unpaidPresenter.onAmountConfirmed(amount);
     }
 
     @StringDef({FragmentTabs.COMPS_UNPAID, FragmentTabs.COMPS_PAID})

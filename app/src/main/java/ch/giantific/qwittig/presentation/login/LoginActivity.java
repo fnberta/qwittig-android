@@ -29,19 +29,30 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
-import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
+import ch.giantific.qwittig.presentation.login.accounts.LoginAccountsContract;
+import ch.giantific.qwittig.presentation.login.accounts.LoginAccountsFragment;
 import ch.giantific.qwittig.presentation.login.di.DaggerLoginComponent;
-import ch.giantific.qwittig.presentation.login.di.LoginAccountsViewModelModule;
+import ch.giantific.qwittig.presentation.login.di.LoginAccountsPresenterModule;
 import ch.giantific.qwittig.presentation.login.di.LoginComponent;
-import ch.giantific.qwittig.presentation.login.di.LoginEmailViewModelModule;
-import ch.giantific.qwittig.presentation.login.di.LoginFirstGroupViewModelModule;
-import ch.giantific.qwittig.presentation.login.di.LoginInvitationViewModelModule;
-import ch.giantific.qwittig.presentation.login.di.LoginProfileViewModelModule;
+import ch.giantific.qwittig.presentation.login.di.LoginEmailPresenterModule;
+import ch.giantific.qwittig.presentation.login.di.LoginFirstGroupPresenterModule;
+import ch.giantific.qwittig.presentation.login.di.LoginInvitationPresenterModule;
+import ch.giantific.qwittig.presentation.login.di.LoginProfilePresenterModule;
+import ch.giantific.qwittig.presentation.login.email.EmailPromptDialogFragment;
+import ch.giantific.qwittig.presentation.login.email.LoginEmailContract;
+import ch.giantific.qwittig.presentation.login.email.LoginEmailFragment;
+import ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupContract;
+import ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupFragment;
+import ch.giantific.qwittig.presentation.login.invitation.LoginInvitationContract;
+import ch.giantific.qwittig.presentation.login.invitation.LoginInvitationFragment;
+import ch.giantific.qwittig.presentation.login.profile.LoginProfileContract;
+import ch.giantific.qwittig.presentation.login.profile.LoginProfileFragment;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Single;
@@ -57,7 +68,8 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         LoginInvitationFragment.ActivityListener,
         LoginProfileFragment.ActivityListener,
         EmailPromptDialogFragment.DialogInteractionListener,
-        LoginWorkerListener, EmailUserWorkerListener,
+        LoginWorkerListener,
+        EmailUserWorkerListener,
         GoogleApiClientDelegate.GoogleLoginCallback, GoogleApiClientDelegate.GoogleInvitationCallback {
 
     private static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
@@ -67,11 +79,11 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     Navigator navigator;
     @Inject
     GoogleApiClientDelegate googleApiDelegate;
-    private LoginAccountsViewModel accountsViewModel;
-    private LoginEmailViewModel emailViewModel;
-    private LoginInvitationViewModel invitationViewModel;
-    private LoginProfileViewModel profileViewModel;
-    private LoginFirstGroupViewModel firstGroupViewModel;
+    private LoginAccountsContract.Presenter accountsPresenter;
+    private LoginEmailContract.Presenter emailPresenter;
+    private LoginInvitationContract.Presenter invitationPresenter;
+    private LoginProfileContract.Presenter profilePresenter;
+    private LoginFirstGroupContract.Presenter firstGroupPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,19 +105,19 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, this))
-                .loginAccountsViewModelModule(new LoginAccountsViewModelModule(savedInstanceState))
-                .loginEmailViewModelModule(new LoginEmailViewModelModule(savedInstanceState))
-                .loginInvitationViewModelModule(new LoginInvitationViewModelModule(savedInstanceState))
-                .loginProfileViewModelModule(new LoginProfileViewModelModule(savedInstanceState))
-                .loginFirstGroupViewModelModule(new LoginFirstGroupViewModelModule(savedInstanceState))
+                .loginAccountsPresenterModule(new LoginAccountsPresenterModule(savedInstanceState))
+                .loginEmailPresenterModule(new LoginEmailPresenterModule(savedInstanceState))
+                .loginInvitationPresenterModule(new LoginInvitationPresenterModule(savedInstanceState))
+                .loginProfilePresenterModule(new LoginProfilePresenterModule(savedInstanceState))
+                .loginFirstGroupPresenterModule(new LoginFirstGroupPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{accountsViewModel, emailViewModel,
-                invitationViewModel, profileViewModel, firstGroupViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{accountsPresenter, emailPresenter,
+                invitationPresenter, profilePresenter, firstGroupPresenter});
     }
 
     private void checkFirstRun() {
@@ -118,7 +130,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     }
 
     private void addAccountsFragment() {
-        accountsViewModel = component.getLoginAccountsViewModel();
+        accountsPresenter = component.getLoginAccountsPresenter();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, new LoginAccountsFragment(), FRAGMENT_LOGIN)
                 .commit();
@@ -126,7 +138,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     private void showInvitationFragment(@NonNull String groupName,
                                         @NonNull String inviterNickname) {
-        invitationViewModel = component.getLoginInvitationViewModel();
+        invitationPresenter = component.getLoginInvitationPresenter();
         final Fragment fragment = LoginInvitationFragment.newInstance(groupName, inviterNickname);
         if (Utils.isRunningLollipopAndHigher()) {
             fragment.setEnterTransition(new Slide(Gravity.BOTTOM));
@@ -144,10 +156,10 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         googleApiDelegate.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_PICK:
+            case Navigator.RC_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, path -> profileViewModel.onNewAvatarTaken(path));
+                    AvatarUtils.saveImageLocal(this, imageUri, path -> profilePresenter.onNewAvatarTaken(path));
                 }
         }
     }
@@ -157,18 +169,18 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         final String identityId = deepLink.getQueryParameter(GroupRepository.INVITATION_IDENTITY);
         final String groupName = deepLink.getQueryParameter(GroupRepository.INVITATION_GROUP);
         final String inviterNickname = deepLink.getQueryParameter(GroupRepository.INVITATION_INVITER);
-        accountsViewModel.setInvitationIdentityId(identityId);
+        accountsPresenter.setInvitationIdentityId(identityId);
         showInvitationFragment(groupName, inviterNickname);
     }
 
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
-        accountsViewModel.onGoogleLoginSuccessful(idToken);
+        accountsPresenter.onGoogleLoginSuccessful(idToken);
     }
 
     @Override
     public void onGoogleLoginFailed() {
-        accountsViewModel.onGoogleLoginFailed();
+        accountsPresenter.onGoogleLoginFailed();
     }
 
     @Override
@@ -178,7 +190,8 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     @Override
     public void showEmailFragment(@NonNull String identityId) {
-        emailViewModel = component.getLoginEmailViewModel();
+        emailPresenter = component.getLoginEmailPresenter();
+
         final FragmentManager fm = getSupportFragmentManager();
         final LoginEmailFragment fragment = LoginEmailFragment.newInstance(identityId);
         if (Utils.isRunningLollipopAndHigher()) {
@@ -195,7 +208,8 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     @Override
     public void showProfileFragment(boolean withInvitation) {
-        profileViewModel = component.getLoginProfileViewModel();
+        profilePresenter = component.getLoginProfilePresenter();
+
         final FragmentManager fm = getSupportFragmentManager();
         final LoginProfileFragment fragment = LoginProfileFragment.newInstance(withInvitation);
         if (Utils.isRunningLollipopAndHigher()) {
@@ -214,7 +228,8 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     @Override
     public void showFirstGroupFragment() {
-        firstGroupViewModel = component.getLoginFirstGroupViewModel();
+        firstGroupPresenter = component.getLoginFirstGroupPresenter();
+
         final FragmentManager fm = getSupportFragmentManager();
         final LoginFirstGroupFragment fragment = new LoginFirstGroupFragment();
         if (Utils.isRunningLollipopAndHigher()) {
@@ -234,7 +249,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     @Override
     public void popBackStack(boolean accepted) {
         if (!accepted) {
-            accountsViewModel.setInvitationIdentityId("");
+            accountsPresenter.setInvitationIdentityId("");
         }
         getSupportFragmentManager().popBackStack();
     }
@@ -246,23 +261,23 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
             case LoginWorker.LoginType.LOGIN_EMAIL:
                 // fall through
             case LoginWorker.LoginType.SIGN_UP_EMAIL:
-                emailViewModel.setUserLoginStream(single, workerTag, type);
+                emailPresenter.setUserLoginStream(single, workerTag, type);
                 break;
             case LoginWorker.LoginType.LOGIN_FACEBOOK:
                 // fall through
             case LoginWorker.LoginType.LOGIN_GOOGLE:
-                accountsViewModel.setUserLoginStream(single, workerTag, type);
+                accountsPresenter.setUserLoginStream(single, workerTag, type);
                 break;
         }
     }
 
     @Override
     public void setEmailUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        emailViewModel.setEmailUserStream(single, workerTag);
+        emailPresenter.setEmailUserStream(single, workerTag);
     }
 
     @Override
     public void onValidEmailEntered(@NonNull String email) {
-        emailViewModel.onValidEmailEntered(email);
+        emailPresenter.onValidEmailEntered(email);
     }
 }

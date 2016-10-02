@@ -12,8 +12,8 @@
     <data>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsIdentityItemModel"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsIdentityItemViewModel"
             />
     </data>
 
@@ -31,7 +31,7 @@
             android:layout_height="@dimen/avatar_size"
             android:layout_marginBottom="@dimen/min_space"
             android:contentDescription="@string/user_avatar"
-            app:avatar="@{itemModel.avatar}"
+            app:avatar="@{viewModel.avatar}"
             app:fallback="@{@drawable/ic_account_circle_black_40dp}"
             tools:src="@drawable/ic_account_circle_black_40dp"
             />
@@ -43,8 +43,8 @@
             android:ellipsize="marquee"
             android:gravity="center_horizontal"
             android:lines="1"
-            android:text="@{itemModel.nickname}"
-            app:bold="@{itemModel.nicknameBold}"
+            android:text="@{viewModel.nickname}"
+            app:bold="@{viewModel.nicknameBold}"
             tools:text="Vera"
             />
 

@@ -17,7 +17,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.DialogCompensationConfirmAmountBinding;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.BaseDialogFragment;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
@@ -88,7 +88,8 @@ public class CompConfirmAmountDialogFragment extends BaseDialogFragment<CompConf
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final FragmentActivity activity = getActivity();
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity,
+                R.style.Theme_AppCompat_Light_Dialog_Alert_PrimaryAsAccent);
         binding = DialogCompensationConfirmAmountBinding.inflate(activity.getLayoutInflater());
         final String amountNoSymbol = MoneyUtils.getMoneyFormatter(currency, false, true).format(amount);
         binding.etDialogCompConfirmAmount.setText(amountNoSymbol);

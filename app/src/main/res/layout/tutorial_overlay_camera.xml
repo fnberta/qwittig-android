@@ -5,8 +5,8 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.camera.CameraViewModel"/>
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.camera.CameraContract.Presenter"/>
     </data>
 
     <ScrollView
@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/normal_space"
-                android:onClick="@{viewModel::onTutorialOkClick}"
+                android:onClick="@{presenter::onTutorialOkClick}"
                 android:src="@drawable/ic_done_black_24dp"
                 />
 

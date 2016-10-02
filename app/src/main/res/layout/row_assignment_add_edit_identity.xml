@@ -13,13 +13,13 @@
     <data>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.assignments.addedit.itemmodels.AssignmentAddEditIdentityItemModel"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel"
             />
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditViewModel"
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditContract.Presenter"
             />
     </data>
 
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_avatar_with_text"
         android:background="?selectableItemBackground"
-        android:onClick="@{() -> viewModel.onIdentitiesRowItemClick(itemModel)}"
+        android:onClick="@{() -> presenter.onIdentitiesRowItemClick(viewModel)}"
         >
 
         <ImageView
@@ -38,9 +38,9 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
             android:layout_marginStart="@dimen/key_line_1"
-            android:alpha="@{itemModel.alpha}"
+            android:alpha="@{viewModel.alpha}"
             android:contentDescription="@string/user_avatar"
-            app:avatar="@{itemModel.avatar}"
+            app:avatar="@{viewModel.avatar}"
             app:fallback="@{@drawable/ic_account_circle_black_40dp}"
             tools:src="@drawable/ic_account_circle_black_40dp"
             />
@@ -51,9 +51,9 @@
             android:layout_height="match_parent"
             android:layout_toEndOf="@id/user_avatar"
             android:layout_toStartOf="@+id/iv_reorder"
-            android:alpha="@{itemModel.alpha}"
+            android:alpha="@{viewModel.alpha}"
             android:gravity="center_vertical"
-            android:text="@{itemModel.nickname}"
+            android:text="@{viewModel.nickname}"
             tools:text="Vera"
             />
 

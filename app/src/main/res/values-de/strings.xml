@@ -9,10 +9,10 @@
     <string name="tab_purchases">Einkäufe</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_add_purchase">Neuer Einkauf</string>
-    <string name="header_items">Artikel</string>
-    <string name="hint_item_name">Artikelname</string>
-    <string name="hint_item_price">Preis</string>
-    <string name="button_add_item">Artikel hinzufügen</string>
+    <string name="header_articles">Artikel</string>
+    <string name="hint_article_name">Artikelname</string>
+    <string name="hint_article_price">Preis</string>
+    <string name="button_add_article">Artikel hinzufügen</string>
     <string name="toast_purchase_added">Neuer Einkauf hinzugefügt</string>
     <string name="toast_purchase_discarded">Einkauf verworfen</string>
     <string name="header_users">Personen</string>
@@ -44,8 +44,8 @@
     <string name="title_activity_settings_users">Nutzer</string>
     <string name="error_group_name">Bitte gib einen Gruppennamen an</string>
     <string name="error_email">Bitte gib eine gültige Email Adresse ein</string>
-    <string name="error_item_name">Bitte gib einen Artikelnamen an</string>
-    <string name="error_item_price">Bitte gib einen gültigen Preis an</string>
+    <string name="error_article_name">Bitte gib einen Artikelnamen an</string>
+    <string name="error_article_price">Bitte gib einen gültigen Preis an</string>
     <string name="pref_group_leave_group">%1$s verlassen</string>
     <string name="dialog_group_leave_message">Willst du diese Gruppe wirklich verlassen?</string>
     <string name="title_activity_edit_purchase">Einkauf bearbeiten</string>
@@ -92,7 +92,7 @@
     <string name="push_compensation_payment_done_title">Bezahlung erledigt</string>
     <string name="push_compensation_payment_done_alert">%1$s hat deine Zahlung über %2$s akzeptiert</string>
     <string name="toast_min_one_user">Bitte wähle mindestens einen Nutzer an.</string>
-    <string name="toast_min_one_item">Füge mindestens einen Artikel hinzu</string>
+    <string name="toast_min_one_article">Füge mindestens einen Artikel hinzu</string>
     <string name="pref_category_me">Ich</string>
     <string name="pref_category_current_group">Aktuelle Gruppe</string>
     <string name="toast_leave_group_balance_not_zero">Bitte fordere dein Guthaben ein und begleiche alle Schulden bevor du diese Gruppe verlässt</string>

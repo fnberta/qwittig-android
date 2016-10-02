@@ -9,14 +9,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowAboutBinding;
-import ch.giantific.qwittig.presentation.about.itemmodels.AboutHeader;
-import ch.giantific.qwittig.presentation.about.itemmodels.AboutItem;
-import ch.giantific.qwittig.presentation.about.itemmodels.AboutItemModel;
-import ch.giantific.qwittig.presentation.about.itemmodels.AboutItemModel.Type;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
+import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
+import ch.giantific.qwittig.presentation.about.viewmodels.items.AboutHeaderViewModel;
+import ch.giantific.qwittig.presentation.about.viewmodels.items.AboutItemViewModel;
+import ch.giantific.qwittig.presentation.about.viewmodels.items.BaseAboutItemViewModel;
+import ch.giantific.qwittig.presentation.about.viewmodels.items.BaseAboutItemViewModel.ViewType;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 
 /**
  * Handles the display of information about Qwittig.
@@ -25,16 +25,17 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
  */
 public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final AboutViewModel viewModel;
+    private final AboutContract.Presenter presenter;
 
     /**
      * Constructs a new {@link AboutRecyclerAdapter}.
      *
-     * @param viewModel the view model of the main view
+     * @param presenter the view model of the main view
      */
-    public AboutRecyclerAdapter(@NonNull AboutViewModel viewModel) {
+    public AboutRecyclerAdapter(@NonNull AboutContract.Presenter presenter) {
+        super();
 
-        this.viewModel = viewModel;
+        this.presenter = presenter;
     }
 
     @NonNull
@@ -42,12 +43,12 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case Type.ABOUT: {
+            case ViewType.ABOUT: {
                 final RowAboutBinding binding =
                         RowAboutBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 final RowGenericHeaderBinding binding =
                         RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
@@ -60,25 +61,25 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final AboutItemModel itemModel = viewModel.getItemAtPosition(position);
+        final BaseAboutItemViewModel viewModel = presenter.getItemAtPosition(position);
 
         int viewType = getItemViewType(position);
         switch (viewType) {
-            case Type.ABOUT: {
+            case ViewType.ABOUT: {
                 final BindingRow<RowAboutBinding> row = (BindingRow<RowAboutBinding>) viewHolder;
                 final RowAboutBinding binding = row.getBinding();
 
-                binding.setItemModel((AboutItem) itemModel);
-                binding.setViewModel(viewModel);
+                binding.setViewModel((AboutItemViewModel) viewModel);
+                binding.setPresenter(presenter);
                 binding.executePendingBindings();
                 break;
             }
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 final BindingRow<RowGenericHeaderBinding> headerRow =
                         (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                binding.setItemModel((AboutHeader) itemModel);
+                binding.setViewModel((AboutHeaderViewModel) viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -87,11 +88,11 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return viewModel.getItemAtPosition(position).getType();
+        return presenter.getItemAtPosition(position).getViewType();
     }
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 }

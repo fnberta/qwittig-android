@@ -14,9 +14,9 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowSettingsUsersUserBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserItemModel;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
 
 /**
  * Provides a {@link RecyclerView} adapter that manages the list of items on the manage users
@@ -26,10 +26,10 @@ import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.Se
  */
 public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUsersRecyclerAdapter.GroupUserRow> {
 
-    private final SettingsUsersViewModel viewModel;
+    private final SettingsUsersContract.Presenter presenter;
 
-    public SettingsUsersRecyclerAdapter(@NonNull SettingsUsersViewModel viewModel) {
-        this.viewModel = viewModel;
+    public SettingsUsersRecyclerAdapter(@NonNull SettingsUsersContract.Presenter presenter) {
+        this.presenter = presenter;
     }
 
     @Override
@@ -37,13 +37,13 @@ public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUs
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final RowSettingsUsersUserBinding binding =
                 RowSettingsUsersUserBinding.inflate(inflater, parent, false);
-        return new GroupUserRow(binding, viewModel);
+        return new GroupUserRow(binding, presenter);
     }
 
     @Override
     public void onBindViewHolder(GroupUserRow holder, int position) {
         final RowSettingsUsersUserBinding binding = holder.getBinding();
-        final SettingsUsersUserItemModel viewModel = this.viewModel.getItemAtPosition(position);
+        final SettingsUsersItemViewModel viewModel = presenter.getItemAtPosition(position);
 
         holder.setMenuVisibility(viewModel.isPending());
         binding.setViewModel(viewModel);
@@ -52,7 +52,7 @@ public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUs
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 
     public interface AdapterInteractionListener {

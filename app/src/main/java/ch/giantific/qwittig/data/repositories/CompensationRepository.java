@@ -18,9 +18,9 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.queues.CompRemindQueue;
 import ch.giantific.qwittig.data.queues.CompRemindQueue.RemindType;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseDatabase;
 import rx.Observable;
 import rx.Single;
 
@@ -67,7 +67,7 @@ public class CompensationRepository {
                 .doOnSuccess(compensation -> {
                     final Map<String, Object> childUpdates = new HashMap<>();
 
-                    childUpdates.put(Compensation.BASE_PATH + "/" + Compensation.BASE_PATH_UNPAID + "/" + compensationId, null);
+                    childUpdates.put(String.format("%s/%s/%s", Compensation.BASE_PATH, Compensation.BASE_PATH_UNPAID, compensationId), null);
                     final Map<String, Object> compMap = compensation.toMap();
 
                     final Map<String, Object> amountMap = new HashMap<>(2);
@@ -79,7 +79,7 @@ public class CompensationRepository {
                     compMap.put(Compensation.PATH_PAID_AT, ServerValue.TIMESTAMP);
                     compMap.put(Compensation.PATH_AMOUNT_CHANGED, amountChanged);
 
-                    childUpdates.put(Compensation.BASE_PATH + "/" + Compensation.BASE_PATH_PAID + "/" + compensationId, compMap);
+                    childUpdates.put(String.format("%s/%s/%s", Compensation.BASE_PATH, Compensation.BASE_PATH_PAID, compensationId), compMap);
                     databaseRef.updateChildren(childUpdates);
                 });
 

@@ -14,7 +14,12 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.DraftsViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsContract.Presenter"
             />
     </data>
 

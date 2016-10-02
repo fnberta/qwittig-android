@@ -14,6 +14,11 @@
             name="viewModel"
             type="ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel"
             />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.settings.profile.SettingsProfileContract.Presenter"
+            />
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -60,7 +65,7 @@
                         android:scaleType="centerCrop"
                         app:avatarSquare="@{viewModel.avatar}"
                         app:fallback="@{@drawable/ic_account_box_black_144dp}"
-                        app:listener="@{viewModel}"
+                        app:listener="@{presenter}"
                         />
 
                     <View
@@ -97,7 +102,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/normal_space"
-            android:onClick="@{viewModel::onFabSaveProfileClick}"
+            android:onClick="@{presenter::onSaveProfileClick}"
             android:src="@drawable/ic_save_black_24dp"
             app:layout_anchor="@id/appbar"
             app:layout_anchorGravity="bottom|end"

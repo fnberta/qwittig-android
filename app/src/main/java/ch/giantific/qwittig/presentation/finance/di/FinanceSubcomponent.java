@@ -14,8 +14,8 @@ import dagger.Subcomponent;
  * Provides the dependencies for the finance screen.
  */
 @PerActivity
-@Subcomponent(modules = {FinanceHeaderViewModelModule.class,
-        FinanceCompsUnpaidViewModelModule.class, FinanceCompsPaidViewModelModule.class})
+@Subcomponent(modules = {FinanceHeaderPresenterModule.class,
+        FinanceCompsUnpaidPresenterModule.class, FinanceCompsPaidPresenterModule.class})
 public interface FinanceSubcomponent {
 
     void inject(FinanceActivity financeActivity);

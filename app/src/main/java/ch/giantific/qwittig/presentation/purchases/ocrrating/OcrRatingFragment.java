@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.FragmentOrcRatingBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.ocrrating.di.OcrRatingComponent;
 
 /**
@@ -19,7 +19,7 @@ import ch.giantific.qwittig.presentation.purchases.ocrrating.di.OcrRatingCompone
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class OcrRatingFragment extends BaseFragment<OcrRatingComponent, OcrRatingViewModel, BaseFragment.ActivityListener<OcrRatingComponent>> {
+public class OcrRatingFragment extends BaseFragment<OcrRatingComponent, OcrRatingContract.Presenter, BaseFragment.ActivityListener<OcrRatingComponent>> {
 
     private FragmentOrcRatingBinding binding;
 
@@ -38,7 +38,7 @@ public class OcrRatingFragment extends BaseFragment<OcrRatingComponent, OcrRatin
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        binding.setViewModel(viewModel);
+        binding.setPresenter(presenter);
     }
 
     @Override

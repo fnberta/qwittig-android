@@ -17,10 +17,12 @@ import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseAddComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
-import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddViewModelModule;
+import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddPresenterModule;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.rxwrapper.android.RxAndroidViews;
 
 /**
  * Hosts {@link PurchaseAddFragment} that handles the creation of a new purchase.
@@ -30,49 +32,54 @@ import ch.giantific.qwittig.utils.Utils;
 public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAddComponent> {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (savedInstanceState == null) {
-            if (Utils.isRunningLollipopAndHigher()) {
-                // check if activity was started from push notification, we have no activity
-                // transition then and need to show the fab
-                if (getIntent().hasExtra(FcmMessagingService.PUSH_OCR_DATA_ID)) {
-                    showFab();
-                }
-            }
-        }
-    }
-
-    @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
         component = DaggerPurchaseAddComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .purchaseAddViewModelModule(new PurchaseAddViewModelModule(savedInstanceState))
+                .purchaseAddPresenterModule(new PurchaseAddPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
         final String ocrDataId = getOcrDataId();
         if (!TextUtils.isEmpty(ocrDataId)) {
-            addEditViewModel = component.getAddOcrViewModel();
-            ((PurchaseAddOcrViewModel) addEditViewModel).setOcrDataId(ocrDataId);
+            presenter = component.getAddOcrPresenter();
+            ((PurchaseAddEditContract.AddOcrPresenter) presenter).setOcrDataId(ocrDataId);
         } else {
-            addEditViewModel = component.getAddViewModel();
+            presenter = component.getAddPresenter();
         }
-        addEditViewModel.attachView(this);
+        presenter.attachView(this);
+    }
+
+    @Override
+    protected void handleEnterTransition(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            if (Utils.isRunningLollipopAndHigher()) {
+                // check if activity was started from push notification, we have no activity
+                // transition then
+                if (getIntent().hasExtra(FcmMessagingService.PUSH_OCR_DATA_ID)) {
+                    dispatchFakeEnterTransitionEnd();
+                } else {
+                    subscriptions.add(RxAndroidViews.observeTransition(getWindow().getEnterTransition())
+                            .subscribe(transitionSubject));
+                }
+            } else {
+                dispatchFakeEnterTransitionEnd();
+            }
+        } else {
+            dispatchFakeEnterTransitionEnd();
+        }
     }
 
     @NonNull
     protected BasePurchaseAddEditFragment getPurchaseAddEditFragment() {
         return TextUtils.isEmpty(getOcrDataId())
-                ? new PurchaseAddFragment()
-                : new PurchaseAddOcrFragment();
+               ? new PurchaseAddFragment()
+               : new PurchaseAddOcrFragment();
     }
 
     @Nullable
     private String getOcrDataId() {
         final Intent intent = getIntent();
-        String ocrDataId = intent.getStringExtra(Navigator.INTENT_OCR_PURCHASE_ID);
+        String ocrDataId = intent.getStringExtra(Navigator.EXTRA_OCR_PURCHASE_ID);
         if (TextUtils.isEmpty(ocrDataId)) {
             ocrDataId = intent.getStringExtra(FcmMessagingService.PUSH_OCR_DATA_ID);
         }
@@ -83,7 +90,7 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
     @Override
     protected BasePurchaseAddEditReceiptFragment getReceiptFragment() {
         return TextUtils.isEmpty(getOcrDataId())
-                ? new PurchaseAddReceiptFragment()
-                : new PurchaseAddOcrReceiptFragment();
+               ? new PurchaseAddReceiptFragment()
+               : new PurchaseAddOcrReceiptFragment();
     }
 }

@@ -9,25 +9,23 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsUsersBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
 
 /**
  * Displays the user invite screen, where the user can invite new users to the group and sees
  * everybody that is currently invited but has not yet accepted/declined the invitation.
- * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsGroupUsersComponent, SettingsUsersViewModel, BaseRecyclerViewFragment.ActivityListener<SettingsGroupUsersComponent>>
-        implements SettingsUsersViewModel.ViewListener {
+public class SettingsUsersFragment extends BaseFragment<SettingsGroupUsersComponent, SettingsUsersContract.Presenter, BaseFragment.ActivityListener<SettingsGroupUsersComponent>>
+        implements SettingsUsersContract.ViewListener {
 
     private FragmentSettingsUsersBinding binding;
     private ProgressDialog progressDialog;
@@ -48,9 +46,11 @@ public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsGrou
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel.attachView(this);
-        viewModel.setListInteraction(recyclerAdapter);
-        binding.setViewModel(viewModel);
+        final SettingsUsersRecyclerAdapter adapter = setupRecyclerView();
+        presenter.attachView(this);
+        presenter.setListInteraction(adapter);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
 
         shareLink = new Intent(Intent.ACTION_SEND);
         shareLink.setType("text/plain");
@@ -61,14 +61,23 @@ public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsGrou
         component.inject(this);
     }
 
+    private SettingsUsersRecyclerAdapter setupRecyclerView() {
+        binding.rvSettingsUsers.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvSettingsUsers.setHasFixedSize(true);
+        final SettingsUsersRecyclerAdapter adapter = new SettingsUsersRecyclerAdapter(presenter);
+        binding.rvSettingsUsers.setAdapter(adapter);
+
+        return adapter;
+    }
+
     @Override
-    protected RecyclerView getRecyclerView() {
+    protected View getSnackbarView() {
         return binding.rvSettingsUsers;
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new SettingsUsersRecyclerAdapter(viewModel);
+    public void startEnterTransition() {
+        ActivityCompat.startPostponedEnterTransition(getActivity());
     }
 
     @Override
@@ -90,5 +99,10 @@ public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsGrou
     @Override
     public void showChangeNicknameDialog(@NonNull String nickname, int position) {
         NicknamePromptDialogFragment.display(getFragmentManager(), nickname, position);
+    }
+
+    @Override
+    public String getGoogleApiKey() {
+        return getString(R.string.google_api_key);
     }
 }

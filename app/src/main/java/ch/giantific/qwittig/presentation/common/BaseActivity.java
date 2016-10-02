@@ -19,11 +19,12 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
+import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Provides an abstract base class that sets up the {@link Toolbar} and commonly used methods.
@@ -31,20 +32,21 @@ import ch.giantific.qwittig.utils.WorkerUtils;
  * Subclass of {@link AppCompatActivity}.
  */
 public abstract class BaseActivity<T> extends AppCompatActivity
-        implements BaseFragment.ActivityListener<T>, BaseWorkerListener, ViewModel.ViewListener {
+        implements BaseFragment.ActivityListener<T>, BaseWorkerListener, BaseViewListener {
 
+    protected final CompositeSubscription subscriptions = new CompositeSubscription();
     protected Toolbar toolbar;
     protected T component;
     @Inject
     RemoteConfigHelper configHelper;
-    private List<ViewModel> viewModels;
+    private List<BasePresenter> presenters;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         injectDependencies(savedInstanceState);
-        viewModels = getViewModels();
+        presenters = getPresenters();
 
         configHelper.fetchAndActivate();
     }
@@ -56,24 +58,50 @@ public abstract class BaseActivity<T> extends AppCompatActivity
         return component;
     }
 
-    protected abstract List<ViewModel> getViewModels();
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        for (ViewModel viewModel : viewModels) {
-            if (viewModel != null) {
-                viewModel.saveState(outState);
-            }
-        }
-    }
+    protected abstract List<BasePresenter> getPresenters();
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
 
         setupToolbar();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        for (BasePresenter presenter : presenters) {
+            if (presenter != null) {
+                presenter.saveState(outState);
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        for (BasePresenter presenter : presenters) {
+            if (presenter != null) {
+                presenter.onViewVisible();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (subscriptions.hasSubscriptions()) {
+            subscriptions.clear();
+        }
+
+        for (BasePresenter presenter : presenters) {
+            if (presenter != null) {
+                presenter.onViewGone();
+            }
+        }
     }
 
     private void setupToolbar() {
@@ -117,9 +145,9 @@ public abstract class BaseActivity<T> extends AppCompatActivity
 
     @Override
     public void onWorkerError(@NonNull String workerTag) {
-        for (ViewModel viewModel : viewModels) {
-            if (viewModel != null) {
-                viewModel.onWorkerError(workerTag);
+        for (BasePresenter presenter : presenters) {
+            if (presenter != null) {
+                presenter.onWorkerError(workerTag);
             }
         }
     }

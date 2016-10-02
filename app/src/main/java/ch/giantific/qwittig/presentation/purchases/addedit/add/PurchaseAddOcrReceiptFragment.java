@@ -6,8 +6,9 @@ package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
 
 /**
@@ -15,7 +16,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddCompone
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class PurchaseAddOcrReceiptFragment extends BasePurchaseAddEditReceiptFragment<PurchaseAddComponent, PurchaseAddOcrViewModel> {
+public class PurchaseAddOcrReceiptFragment extends BasePurchaseAddEditReceiptFragment<PurchaseAddComponent, PurchaseAddEditContract.AddOcrPresenter> {
 
     public PurchaseAddOcrReceiptFragment() {
         // required empty constructor

@@ -54,7 +54,7 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Retain this fragment across configuration changes.
+        // retain this fragment across configuration changes.
         setRetainInstance(true);
 
         // inject dependencies

@@ -10,7 +10,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency;
+import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.models.Currency;
 
 /**
  * Created by fabio on 03.07.16.

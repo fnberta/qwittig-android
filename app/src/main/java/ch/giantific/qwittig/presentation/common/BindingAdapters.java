@@ -33,7 +33,7 @@ import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditArticleIdentity;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
 import ch.giantific.qwittig.presentation.stats.widgets.BarChart;
@@ -147,13 +147,13 @@ public class BindingAdapters {
     }
 
     @BindingAdapter({"articleIdentities"})
-    public static void loadItemUsers(ImageView view, PurchaseAddEditArticleIdentity[] users) {
+    public static void loadItemUsers(ImageView view, PurchaseAddEditArticleIdentityItemViewModel[] users) {
         final Context context = view.getContext();
         final int padding = context.getResources().getDimensionPixelSize(R.dimen.small_space);
         final Drawable fallback = ContextCompat.getDrawable(view.getContext(), R.drawable.ic_group_black_24dp);
         int selected = 0;
-        PurchaseAddEditArticleIdentity articleIdentity = null;
-        for (PurchaseAddEditArticleIdentity user : users) {
+        PurchaseAddEditArticleIdentityItemViewModel articleIdentity = null;
+        for (PurchaseAddEditArticleIdentityItemViewModel user : users) {
             if (user.isSelected()) {
                 articleIdentity = user;
                 selected++;

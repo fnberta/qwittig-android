@@ -34,18 +34,18 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.jobs.UploadAvatarJob;
-import ch.giantific.qwittig.data.rest.DeleteUserData;
+import ch.giantific.qwittig.data.rest.UserDataDeletion;
 import ch.giantific.qwittig.data.rest.UserIdToken;
-import ch.giantific.qwittig.data.rxwrapper.firebase.DataMapper;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseAuth;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseStorage;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseUser;
-import ch.giantific.qwittig.data.rxwrapper.googleapi.GoogleApiClientSignOut;
-import ch.giantific.qwittig.data.rxwrapper.googleapi.GoogleApiClientUnlink;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.DataMapper;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseAuth;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseDatabase;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseStorage;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseUser;
+import ch.giantific.qwittig.utils.rxwrapper.googleapi.GoogleApiClientSignOut;
+import ch.giantific.qwittig.utils.rxwrapper.googleapi.GoogleApiClientUnlink;
 import rx.Observable;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
@@ -64,19 +64,19 @@ public class UserRepository {
     private final DatabaseReference databaseRef;
     private final StorageReference storageRef;
     private final FirebaseJobDispatcher jobDispatcher;
-    private final DeleteUserData deleteUserData;
+    private final UserDataDeletion userDataDeletion;
 
     @Inject
     public UserRepository(@NonNull FirebaseAuth auth,
                           @NonNull FirebaseDatabase firebaseDatabase,
                           @NonNull FirebaseStorage firebaseStorage,
                           @NonNull FirebaseJobDispatcher jobDispatcher,
-                          @NonNull DeleteUserData deleteUserData) {
+                          @NonNull UserDataDeletion userDataDeletion) {
         this.auth = auth;
         databaseRef = firebaseDatabase.getReference();
         storageRef = firebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL).child("avatars");
         this.jobDispatcher = jobDispatcher;
-        this.deleteUserData = deleteUserData;
+        this.userDataDeletion = userDataDeletion;
     }
 
     @Nullable
@@ -170,10 +170,9 @@ public class UserRepository {
                     final Map<String, Object> childUpdates = new HashMap<>();
                     final Set<String> identities = user.getIdentitiesIds();
                     for (String identityId : identities) {
-                        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_NICKNAME, nickname);
+                        childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId, Identity.PATH_NICKNAME), nickname);
                         if (avatarChanged) {
-                            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE
-                                            + "/" + identityId + "/" + Identity.PATH_AVATAR,
+                            childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId, Identity.PATH_AVATAR),
                                     !TextUtils.isEmpty(avatar)
                                     ? avatar : null);
                         }
@@ -220,10 +219,7 @@ public class UserRepository {
                                     final Set<String> identities = user.getIdentitiesIds();
                                     final Map<String, Object> childUpdates = new HashMap<>();
                                     for (String identityId1 : identities) {
-                                        childUpdates.put(Identity.BASE_PATH + "/"
-                                                + Identity.BASE_PATH_ACTIVE + "/"
-                                                + identityId1 + "/"
-                                                + Identity.PATH_AVATAR, url.toString());
+                                        childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId1, Identity.PATH_AVATAR), url.toString());
                                     }
                                     databaseRef.updateChildren(childUpdates);
                                 }
@@ -363,7 +359,7 @@ public class UserRepository {
                         return Single.error(new Throwable("could not get id token!"));
                     }
 
-                    return deleteUserData.deleteUserData(new UserIdToken(idToken))
+                    return userDataDeletion.deleteUserData(new UserIdToken(idToken))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread());
                 })

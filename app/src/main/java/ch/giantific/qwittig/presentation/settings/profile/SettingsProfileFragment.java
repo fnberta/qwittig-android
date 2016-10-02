@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,9 +29,9 @@ import java.util.Arrays;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsProfileBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
@@ -43,8 +42,8 @@ import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileComp
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class SettingsProfileFragment extends BaseFragment<SettingsProfileComponent, SettingsProfileViewModel, SettingsProfileFragment.ActivityListener> implements
-        SettingsProfileViewModel.ViewListener,
+public class SettingsProfileFragment extends BaseFragment<SettingsProfileComponent, SettingsProfileContract.Presenter, SettingsProfileFragment.ActivityListener> implements
+        SettingsProfileContract.ViewListener,
         EmailReAuthenticateDialogFragment.DialogInteractionListener {
 
     private FragmentSettingsProfileBinding binding;
@@ -65,17 +64,17 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         LoginManager.getInstance().registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                viewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
+                presenter.onFacebookSignedIn(loginResult.getAccessToken().getToken());
             }
 
             @Override
             public void onCancel() {
-                viewModel.onFacebookLoginFailed();
+                presenter.onFacebookLoginFailed();
             }
 
             @Override
             public void onError(FacebookException exception) {
-                viewModel.onFacebookLoginFailed();
+                presenter.onFacebookLoginFailed();
             }
         });
     }
@@ -91,8 +90,9 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel.attachView(this);
-        binding.setViewModel(viewModel);
+        presenter.attachView(this);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
     }
 
     @Override
@@ -105,13 +105,13 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         inflater.inflate(R.menu.menu_settings_profile, menu);
 
         final MenuItem deleteAvatar = menu.findItem(R.id.action_settings_profile_avatar_delete);
-        deleteAvatar.setVisible(!TextUtils.isEmpty(viewModel.getAvatar()));
+        deleteAvatar.setVisible(presenter.showDeleteAvatar());
 
         final MenuItem unlinkFacebook = menu.findItem(R.id.action_settings_profile_unlink_facebook);
-        unlinkFacebook.setVisible(viewModel.showUnlinkFacebook());
+        unlinkFacebook.setVisible(presenter.showUnlinkFacebook());
 
         final MenuItem unlinkGoogle = menu.findItem(R.id.action_settings_profile_unlink_google);
-        unlinkGoogle.setVisible(viewModel.showUnlinkGoogle());
+        unlinkGoogle.setVisible(presenter.showUnlinkGoogle());
     }
 
     @Override
@@ -119,15 +119,15 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings_profile_avatar_edit:
-                viewModel.onPickAvatarMenuClick();
+                presenter.onPickAvatarMenuClick();
                 return true;
             case R.id.action_settings_profile_avatar_delete:
-                viewModel.onDeleteAvatarMenuClick();
+                presenter.onDeleteAvatarMenuClick();
                 return true;
             case R.id.action_settings_profile_unlink_facebook:
                 // fall through
             case R.id.action_settings_profile_unlink_google:
-                viewModel.onUnlinkThirdPartyLoginMenuClick();
+                presenter.onUnlinkThirdPartyLoginMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -204,7 +204,7 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
 
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
-        viewModel.onValidEmailAndPasswordEntered(email, password);
+        presenter.onValidEmailAndPasswordEntered(email, password);
     }
 
     @Override

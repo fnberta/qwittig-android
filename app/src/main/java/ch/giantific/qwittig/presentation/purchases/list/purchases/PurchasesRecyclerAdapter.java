@@ -10,9 +10,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowPurchasesBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchaseItemModel;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.items.PurchaseItemViewModel;
 
 /**
  * Handles the display of recent purchases.
@@ -21,17 +21,17 @@ import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.Pur
  */
 public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchasesBinding>> {
 
-    private final PurchasesViewModel viewModel;
+    private final PurchasesContract.Presenter presenter;
 
     /**
      * Constructs a new {@link PurchasesRecyclerAdapter}.
      *
-     * @param viewModel the view's model
+     * @param presenter the view's model
      */
-    public PurchasesRecyclerAdapter(@NonNull PurchasesViewModel viewModel) {
+    public PurchasesRecyclerAdapter(@NonNull PurchasesContract.Presenter presenter) {
         super();
 
-        this.viewModel = viewModel;
+        this.presenter = presenter;
     }
 
     @NonNull
@@ -45,19 +45,19 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
     @Override
     public void onBindViewHolder(BindingRow<RowPurchasesBinding> holder, int position) {
         final RowPurchasesBinding binding = holder.getBinding();
-        final PurchaseItemModel itemModel = viewModel.getItemAtPosition(position);
-        binding.setItemModel(itemModel);
+        final PurchaseItemViewModel viewModel = presenter.getItemAtPosition(position);
+        binding.setPresenter(presenter);
         binding.setViewModel(viewModel);
         binding.executePendingBindings();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return viewModel.getItemViewType(position);
+        return presenter.getItemAtPosition(position).getViewType();
     }
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 }

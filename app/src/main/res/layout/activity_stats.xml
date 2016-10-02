@@ -11,8 +11,8 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.stats.StatsViewModel"
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.stats.StatsContract.Presenter"
             />
     </data>
 
@@ -50,7 +50,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginEnd="@dimen/normal_space"
-                        android:onItemSelected="@{viewModel::onTypeSelected}"
+                        android:onItemSelected="@{presenter::onTypeSelected}"
                         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                         />
 
@@ -61,7 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"
                     android:layout_marginStart="@dimen/key_line_2"
-                    android:onItemSelected="@{viewModel::onPeriodSelected}"
+                    android:onItemSelected="@{presenter::onPeriodSelected}"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     />

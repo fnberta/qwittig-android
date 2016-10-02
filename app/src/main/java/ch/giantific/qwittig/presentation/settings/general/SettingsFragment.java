@@ -37,17 +37,15 @@ import java.util.Arrays;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupActivity;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersActivity;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 
@@ -61,7 +59,7 @@ import ch.giantific.qwittig.utils.WorkerUtils;
 @SuppressWarnings("unchecked")
 public class SettingsFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener,
-        SettingsViewModel.ViewListener {
+        SettingsContract.ViewListener {
 
     private static final String PREF_PROFILE = "PREF_PROFILE";
     private static final String PREF_GROUP_CURRENT = "PREF_GROUP_CURRENT";
@@ -72,9 +70,11 @@ public class SettingsFragment extends PreferenceFragmentCompat
     private static final String PREF_GROUP_USERS = "PREF_GROUP_USERS";
 
     @Inject
-    SettingsViewModel settingsViewModel;
+    SettingsContract.Presenter presenter;
     @Inject
     SharedPreferences sharedPrefs;
+    @Inject
+    Navigator navigator;
     private ActivityListener activity;
     private PreferenceCategory categoryCurrentGroup;
     private ListPreference listPreferenceGroupCurrent;
@@ -108,17 +108,17 @@ public class SettingsFragment extends PreferenceFragmentCompat
         LoginManager.getInstance().registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                settingsViewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
+                presenter.onFacebookSignedIn(loginResult.getAccessToken().getToken());
             }
 
             @Override
             public void onCancel() {
-                settingsViewModel.onFacebookLoginFailed();
+                presenter.onFacebookLoginFailed();
             }
 
             @Override
             public void onError(FacebookException exception) {
-                settingsViewModel.onFacebookLoginFailed();
+                presenter.onFacebookLoginFailed();
             }
         });
     }
@@ -138,34 +138,23 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 findPreference(PREF_GROUP_NAME);
         preferenceGroupLeave = findPreference(PREF_GROUP_LEAVE);
         preferenceGroupLeave.setOnPreferenceClickListener(preference -> {
-            settingsViewModel.onLeaveGroupClick();
+            presenter.onLeaveGroupClick();
             return true;
         });
 
         final Preference prefProfile = findPreference(PREF_PROFILE);
         prefProfile.setOnPreferenceClickListener(preference -> {
-            final Intent intent = new Intent(activity, SettingsProfileActivity.class);
-            final ActivityOptionsCompat activityOptionsCompat =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-            activity.startActivityForResult(intent, Navigator.INTENT_REQUEST_SETTINGS_PROFILE,
-                    activityOptionsCompat.toBundle());
+            navigator.startProfileSettings();
             return true;
         });
         final Preference prefGroupNew = findPreference(PREF_GROUP_ADD_NEW);
         prefGroupNew.setOnPreferenceClickListener(preference -> {
-            final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
-            final ActivityOptionsCompat activityOptionsCompat =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-            activity.startActivityForResult(intent, Navigator.INTENT_REQUEST_SETTINGS_ADD_GROUP,
-                    activityOptionsCompat.toBundle());
+            navigator.startGroupAddSettings();
             return true;
         });
         final Preference prefGroupAddUser = findPreference(PREF_GROUP_USERS);
         prefGroupAddUser.setOnPreferenceClickListener(preference -> {
-            final Intent intent = new Intent(activity, SettingsUsersActivity.class);
-            final ActivityOptionsCompat activityOptionsCompat =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-            activity.startActivity(intent, activityOptionsCompat.toBundle());
+            navigator.startUsersSettings();
             return true;
         });
     }
@@ -174,7 +163,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        settingsViewModel.saveState(outState);
+        presenter.saveState(outState);
     }
 
     @Override
@@ -182,15 +171,15 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onActivityCreated(savedInstanceState);
 
         activity.getComponent().inject(this);
-        settingsViewModel.attachView(this);
-        settingsViewModel.onPreferencesLoaded();
+        presenter.attachView(this);
+        presenter.onPreferencesLoaded();
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        settingsViewModel.onViewVisible();
+        presenter.onViewVisible();
     }
 
     @Override
@@ -205,11 +194,11 @@ public class SettingsFragment extends PreferenceFragmentCompat
         switch (key) {
             case PREF_GROUP_CURRENT:
                 final String groupId = sharedPrefs.getString(key, "");
-                settingsViewModel.onGroupSelected(groupId);
+                presenter.onGroupSelected(groupId);
                 break;
             case PREF_GROUP_NAME:
                 final String name = sharedPrefs.getString(key, "");
-                settingsViewModel.onGroupNameChanged(name);
+                presenter.onGroupNameChanged(name);
                 break;
         }
     }
@@ -223,10 +212,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_logout:
-                settingsViewModel.onLogoutMenuClick();
+                presenter.onLogoutMenuClick();
                 return true;
             case R.id.action_account_delete:
-                settingsViewModel.onDeleteAccountMenuClick();
+                presenter.onDeleteAccountMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -244,7 +233,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public void onStop() {
         super.onStop();
 
-        settingsViewModel.onViewGone();
+        presenter.onViewGone();
     }
 
     @Override

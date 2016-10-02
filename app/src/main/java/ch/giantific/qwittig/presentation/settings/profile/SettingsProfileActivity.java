@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
@@ -24,19 +23,19 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivitySettingsProfileBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
-import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.EmailReAuthenticateDialogFragment;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
 import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileComponent;
-import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileViewModelModule;
+import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfilePresenterModule;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import rx.Single;
 
@@ -59,7 +58,7 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         GoogleApiClientDelegate.GoogleLoginCallback {
 
     @Inject
-    SettingsProfileViewModel profileViewModel;
+    SettingsProfileContract.Presenter presenter;
     @Inject
     GoogleApiClientDelegate googleApiDelegate;
 
@@ -68,7 +67,8 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         super.onCreate(savedInstanceState);
         final ActivitySettingsProfileBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_settings_profile);
-        binding.setViewModel(profileViewModel);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
 
         supportPostponeEnterTransition();
 
@@ -92,14 +92,14 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, null))
-                .settingsProfileViewModelModule(new SettingsProfileViewModelModule(savedInstanceState))
+                .settingsProfilePresenterModule(new SettingsProfilePresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{profileViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
     @Override
@@ -107,7 +107,7 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                profileViewModel.onExitClick();
+                presenter.onExitClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -116,7 +116,7 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
 
     @Override
     public void onBackPressed() {
-        profileViewModel.onExitClick();
+        presenter.onExitClick();
     }
 
     @Override
@@ -125,17 +125,17 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         googleApiDelegate.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_PICK:
+            case Navigator.RC_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, path -> profileViewModel.onNewAvatarTaken(path));
+                    AvatarUtils.saveImageLocal(this, imageUri, path -> presenter.onNewAvatarTaken(path));
                 }
         }
     }
 
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
-        profileViewModel.onValidEmailAndPasswordEntered(email, password);
+        presenter.onValidEmailAndPasswordEntered(email, password);
     }
 
     @Override
@@ -145,31 +145,31 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
 
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
-        profileViewModel.onGoogleLoginSuccessful(idToken);
+        presenter.onGoogleLoginSuccessful(idToken);
     }
 
     @Override
     public void onGoogleLoginFailed() {
-        profileViewModel.onGoogleLoginFailed();
+        presenter.onGoogleLoginFailed();
     }
 
     @Override
     public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        profileViewModel.setGoogleUserStream(single, workerTag);
+        presenter.setGoogleUserStream(single, workerTag);
     }
 
     @Override
     public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        profileViewModel.setFacebookUserStream(single, workerTag);
+        presenter.setFacebookUserStream(single, workerTag);
     }
 
     @Override
     public void setEmailUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        profileViewModel.setEmailUserStream(single, workerTag);
+        presenter.setEmailUserStream(single, workerTag);
     }
 
     @Override
     public void onDiscardChangesSelected() {
-        profileViewModel.onDiscardChangesSelected();
+        presenter.onDiscardChangesSelected();
     }
 }

@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.assignments.list;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,16 +20,13 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentAssignmentsBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.assignments.list.di.AssignmentsSubcomponent;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 
 /**
  * Displays a {@link RecyclerView} list of all the ongoing Assignments in a group in card base interface.
- * <p/>
- * Subclass {@link BaseRecyclerViewFragment}.
  */
-public class AssignmentsFragment extends BaseRecyclerViewFragment<AssignmentsSubcomponent, AssignmentsViewModel, BaseRecyclerViewFragment.ActivityListener<AssignmentsSubcomponent>>
-        implements AssignmentsViewModel.ViewListener {
+public class AssignmentsFragment extends BaseFragment<AssignmentsSubcomponent, AssignmentsContract.Presenter, BaseFragment.ActivityListener<AssignmentsSubcomponent>>
+        implements AssignmentsContract.ViewListener {
 
     private FragmentAssignmentsBinding binding;
 
@@ -47,9 +45,10 @@ public class AssignmentsFragment extends BaseRecyclerViewFragment<AssignmentsSub
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel.attachView(this);
-        viewModel.setListInteraction(recyclerAdapter);
-        binding.setViewModel(viewModel);
+        final AssignmentsRecyclerAdapter adapter = setupRecyclerView();
+        presenter.attachView(this);
+        presenter.setListInteraction(adapter);
+        binding.setViewModel(presenter.getViewModel());
     }
 
     @Override
@@ -57,14 +56,18 @@ public class AssignmentsFragment extends BaseRecyclerViewFragment<AssignmentsSub
         component.inject(this);
     }
 
-    @Override
-    protected RecyclerView getRecyclerView() {
-        return binding.srlRv.rvBase;
+    private AssignmentsRecyclerAdapter setupRecyclerView() {
+        binding.rvPb.rvBase.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvPb.rvBase.setHasFixedSize(true);
+        final AssignmentsRecyclerAdapter adapter = new AssignmentsRecyclerAdapter(presenter);
+        binding.rvPb.rvBase.setAdapter(adapter);
+
+        return adapter;
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new AssignmentsRecyclerAdapter(viewModel);
+    protected View getSnackbarView() {
+        return binding.rvPb.rvBase;
     }
 
     @Override

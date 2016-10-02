@@ -7,7 +7,6 @@ package ch.giantific.qwittig.data.push.di;
 import ch.giantific.qwittig.data.push.FcmInstanceIdService;
 import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerService;
 import dagger.Component;
 
@@ -17,8 +16,7 @@ import dagger.Component;
  * @see {@link FcmInstanceIdService}
  */
 @PerService
-@Component(dependencies = {ApplicationComponent.class},
-        modules = {RepositoriesModule.class})
+@Component(dependencies = {ApplicationComponent.class})
 public interface FcmServiceComponent {
 
     void inject(FcmInstanceIdService fcmInstanceIdService);

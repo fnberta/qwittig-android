@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -17,13 +18,11 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentAssignmentAddEditBinding;
-import ch.giantific.qwittig.presentation.common.ListDragInteraction;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.DatePickerDialogFragment;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.DatePickerDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.StringResSpinnerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListDragInteraction;
 
 /**
  * Provides an interface for the user to add a new task. Allows the selection of the time
@@ -32,8 +31,8 @@ import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChanges
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public abstract class BaseAssignmentAddEditFragment<T> extends BaseRecyclerViewFragment<T, AssignmentAddEditViewModel, BaseFragment.ActivityListener<T>>
-        implements AssignmentAddEditViewModel.ViewListener {
+public abstract class BaseAssignmentAddEditFragment<T> extends BaseFragment<T, AssignmentAddEditContract.Presenter, BaseFragment.ActivityListener<T>>
+        implements AssignmentAddEditContract.ViewListener {
 
     private FragmentAssignmentAddEditBinding binding;
     private ListDragInteraction itemTouchHelper;
@@ -63,13 +62,13 @@ public abstract class BaseAssignmentAddEditFragment<T> extends BaseRecyclerViewF
                     return false;
                 }
 
-                viewModel.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
+                presenter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
                 return true;
             }
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                viewModel.onItemDismiss(viewHolder.getAdapterPosition());
+                presenter.onItemDismiss(viewHolder.getAdapterPosition());
             }
 
             @Override
@@ -84,28 +83,35 @@ public abstract class BaseAssignmentAddEditFragment<T> extends BaseRecyclerViewF
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel.attachView(this);
-        viewModel.setListInteraction(recyclerAdapter);
-        viewModel.setListDragInteraction(itemTouchHelper);
-        binding.setViewModel(viewModel);
+        final AssignmentAddEditIdentitiesRecyclerAdapter adapter = setupRecyclerView();
+        presenter.attachView(this);
+        presenter.setListInteraction(adapter);
+        presenter.setListDragInteraction(itemTouchHelper);
+        binding.setPresenter(presenter);
+        binding.setViewModel(presenter.getViewModel());
         setupTimeFrameSpinner();
+    }
+
+    private AssignmentAddEditIdentitiesRecyclerAdapter setupRecyclerView() {
+        binding.rvAssignmentIdentities.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvAssignmentIdentities.setHasFixedSize(true);
+        final AssignmentAddEditIdentitiesRecyclerAdapter adapter =
+                new AssignmentAddEditIdentitiesRecyclerAdapter(presenter);
+        binding.rvAssignmentIdentities.setAdapter(adapter);
+
+        return adapter;
     }
 
     private void setupTimeFrameSpinner() {
         final StringResSpinnerAdapter timeFrameAdapter =
                 new StringResSpinnerAdapter(getActivity(), R.layout.spinner_item,
-                        viewModel.getTimeFrames());
+                        presenter.getViewModel().getTimeFrames());
         binding.spAssignmentTimeFrame.setAdapter(timeFrameAdapter);
     }
 
     @Override
-    protected RecyclerView getRecyclerView() {
+    protected View getSnackbarView() {
         return binding.rvAssignmentIdentities;
-    }
-
-    @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new AssignmentAddEditIdentitiesRecyclerAdapter(viewModel);
     }
 
     @Override

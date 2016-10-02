@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.purchases.ocrrating.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingActivity;
@@ -18,7 +17,7 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {RepositoriesModule.class, NavigatorModule.class, OcrRatingViewModelModule.class})
+        modules = {OcrRatingPresenterModule.class, NavigatorModule.class})
 public interface OcrRatingComponent {
 
     void inject(OcrRatingActivity ocrRatingActivity);

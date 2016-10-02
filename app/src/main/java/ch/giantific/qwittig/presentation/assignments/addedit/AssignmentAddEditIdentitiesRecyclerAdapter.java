@@ -12,9 +12,9 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowAssignmentAddEditIdentityBinding;
-import ch.giantific.qwittig.presentation.assignments.addedit.itemmodels.AssignmentAddEditIdentityItemModel;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 
 
 /**
@@ -25,15 +25,15 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
  */
 public class AssignmentAddEditIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<AssignmentAddEditIdentitiesRecyclerAdapter.AssignmentIdentityRow> {
 
-    private final AssignmentAddEditViewModel viewModel;
+    private final AssignmentAddEditContract.Presenter presenter;
 
     /**
      * Constructs a new {@link AssignmentAddEditIdentitiesRecyclerAdapter}.
      *
-     * @param viewModel the view model for the view
+     * @param presenter the view model for the view
      */
-    public AssignmentAddEditIdentitiesRecyclerAdapter(@NonNull AssignmentAddEditViewModel viewModel) {
-        this.viewModel = viewModel;
+    public AssignmentAddEditIdentitiesRecyclerAdapter(@NonNull AssignmentAddEditContract.Presenter presenter) {
+        this.presenter = presenter;
     }
 
     @NonNull
@@ -42,21 +42,22 @@ public class AssignmentAddEditIdentitiesRecyclerAdapter extends BaseRecyclerAdap
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final RowAssignmentAddEditIdentityBinding binding =
                 RowAssignmentAddEditIdentityBinding.inflate(inflater, parent, false);
-        return new AssignmentIdentityRow(binding, viewModel);
+        return new AssignmentIdentityRow(binding, presenter);
     }
 
     @Override
     public void onBindViewHolder(AssignmentIdentityRow holder, int position) {
         final RowAssignmentAddEditIdentityBinding binding = holder.getBinding();
-        final AssignmentAddEditIdentityItemModel itemModel = viewModel.getItemAtPosition(position);
+        final AssignmentAddEditIdentityItemViewModel viewModel = presenter.getItemAtPosition(position);
 
-        binding.setItemModel(itemModel);
+        binding.setPresenter(presenter);
+        binding.setViewModel(viewModel);
         binding.executePendingBindings();
     }
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 
     /**

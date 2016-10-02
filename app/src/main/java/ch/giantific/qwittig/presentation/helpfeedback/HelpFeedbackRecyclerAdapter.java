@@ -11,12 +11,12 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowHelpFeedbackBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackHeader;
-import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItem;
-import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItemModel;
-import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItemModel.Type;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.BaseHelpFeedbackItemViewModel;
+import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.BaseHelpFeedbackItemViewModel.ViewType;
+import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.HelpFeedbackHeaderViewModel;
+import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.HelpFeedbackItemViewModel;
 
 /**
  * Handles the display of help and feedback items.
@@ -25,16 +25,17 @@ import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackIte
  */
 public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final HelpFeedbackViewModel viewModel;
+    private final HelpFeedbackContract.Presenter presenter;
 
     /**
      * Constructs a new {@link HelpFeedbackRecyclerAdapter}.
      *
-     * @param viewModel the view model of the main view
+     * @param presenter the view model of the main view
      */
-    public HelpFeedbackRecyclerAdapter(@NonNull HelpFeedbackViewModel viewModel) {
+    public HelpFeedbackRecyclerAdapter(@NonNull HelpFeedbackContract.Presenter presenter) {
+        super();
 
-        this.viewModel = viewModel;
+        this.presenter = presenter;
     }
 
     @NonNull
@@ -42,12 +43,12 @@ public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case Type.HELP_FEEDBACK: {
+            case ViewType.HELP_FEEDBACK: {
                 final RowHelpFeedbackBinding binding =
                         RowHelpFeedbackBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 final RowGenericHeaderBinding binding =
                         RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
@@ -60,25 +61,25 @@ public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final HelpFeedbackItemModel item = viewModel.getItemAtPosition(position);
+        final BaseHelpFeedbackItemViewModel viewModel = presenter.getItemAtPosition(position);
 
         int viewType = getItemViewType(position);
         switch (viewType) {
-            case Type.HELP_FEEDBACK: {
+            case ViewType.HELP_FEEDBACK: {
                 final BindingRow<RowHelpFeedbackBinding> row = (BindingRow<RowHelpFeedbackBinding>) viewHolder;
                 final RowHelpFeedbackBinding binding = row.getBinding();
 
-                binding.setItemModel((HelpFeedbackItem) item);
-                binding.setViewModel(viewModel);
+                binding.setViewModel((HelpFeedbackItemViewModel) viewModel);
+                binding.setPresenter(presenter);
                 binding.executePendingBindings();
                 break;
             }
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 final BindingRow<RowGenericHeaderBinding> headerRow =
                         (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                binding.setItemModel((HelpFeedbackHeader) item);
+                binding.setViewModel((HelpFeedbackHeaderViewModel) viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -87,11 +88,11 @@ public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return viewModel.getItemAtPosition(position).getType();
+        return presenter.getItemAtPosition(position).getViewType();
     }
 
     @Override
     public int getItemCount() {
-        return viewModel.getItemCount();
+        return presenter.getItemCount();
     }
 }

@@ -11,8 +11,8 @@
     <data>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.common.itemmodels.HeaderItemModel"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.common.viewmodels.items.HeaderItemViewModel"
             />
     </data>
 
@@ -24,7 +24,7 @@
         android:gravity="center_vertical"
         android:paddingEnd="@dimen/key_line_1"
         android:paddingStart="@dimen/key_line_1"
-        android:text="@{itemModel.header}"
+        android:text="@{viewModel.header}"
         tools:text="Items"
         />
 
