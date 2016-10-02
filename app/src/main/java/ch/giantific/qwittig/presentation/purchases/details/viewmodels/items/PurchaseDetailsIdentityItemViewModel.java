@@ -14,7 +14,8 @@ import ch.giantific.qwittig.domain.models.Identity;
  * Provides a row showing an identity with the avatar and the nickname (bold for the buyer of the
  * purchase).
  */
-public class PurchaseDetailsIdentityItemViewModel extends BaseObservable {
+public class PurchaseDetailsIdentityItemViewModel extends BaseObservable
+        implements Comparable<PurchaseDetailsIdentityItemViewModel> {
 
     private final String nickname;
     private final String avatar;
@@ -47,6 +48,11 @@ public class PurchaseDetailsIdentityItemViewModel extends BaseObservable {
 
     public boolean isActive() {
         return active;
+    }
+
+    @Override
+    public int compareTo(@NonNull PurchaseDetailsIdentityItemViewModel o) {
+        return nickname.compareToIgnoreCase(o.getNickname());
     }
 
     @Override

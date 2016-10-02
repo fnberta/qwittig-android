@@ -139,7 +139,7 @@ public class PurchaseDetailsPresenter extends BasePresenterImpl<PurchaseDetailsC
                             final boolean isBuyer = Objects.equals(purchase.getBuyer(), identity.getId());
                             return new PurchaseDetailsIdentityItemViewModel(identity, isBuyer);
                         })
-                        .toList())
+                        .toSortedList())
                 .subscribe(new IndefiniteSubscriber<List<PurchaseDetailsIdentityItemViewModel>>() {
                     @Override
                     public void onError(Throwable e) {
