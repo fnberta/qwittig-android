@@ -89,6 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/small_space"
+                android:error="@{!viewModel.validate ? null : viewModel.passwordEqual ? null : @string/error_password_match}"
                 android:transitionGroup="true"
                 android:visibility="@{viewModel.signUp ? View.VISIBLE : View.GONE}"
                 >

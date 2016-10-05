@@ -6,19 +6,18 @@ package ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items;
 
 import android.databinding.BaseObservable;
 import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * Provides a list item with no content for the add or edit purchase screen. The content is
  * delivered through the screen's main view model.
  */
 public class PurchaseAddEditGenericItemViewModel extends BaseObservable
-        implements BasePurchaseAddEditItemViewModel, Parcelable {
+        implements BasePurchaseAddEditItemViewModel {
 
     public static final Creator<PurchaseAddEditGenericItemViewModel> CREATOR = new Creator<PurchaseAddEditGenericItemViewModel>() {
         @Override
-        public PurchaseAddEditGenericItemViewModel createFromParcel(Parcel source) {
-            return new PurchaseAddEditGenericItemViewModel(source);
+        public PurchaseAddEditGenericItemViewModel createFromParcel(Parcel in) {
+            return new PurchaseAddEditGenericItemViewModel(in);
         }
 
         @Override
@@ -54,8 +53,9 @@ public class PurchaseAddEditGenericItemViewModel extends BaseObservable
         return new PurchaseAddEditGenericItemViewModel(ViewType.TOTAL);
     }
 
-    public int getViewType() {
-        return type;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(type);
     }
 
     @Override
@@ -63,8 +63,8 @@ public class PurchaseAddEditGenericItemViewModel extends BaseObservable
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(type);
+    public int getViewType() {
+        return type;
     }
+
 }

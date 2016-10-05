@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.databinding.RowCompPaidBinding;
 import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewViewModel;
+import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewModel;
 
 
 /**
@@ -47,7 +47,7 @@ public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
     @Override
     public void onBindViewHolder(BindingRow<RowCompPaidBinding> holder, int position) {
         final RowCompPaidBinding binding = holder.getBinding();
-        final CompPaidItemViewViewModel viewModel = presenter.getItemAtPosition(position);
+        final CompPaidItemViewModel viewModel = presenter.getItemAtPosition(position);
 
         binding.setViewModel(viewModel);
         binding.executePendingBindings();

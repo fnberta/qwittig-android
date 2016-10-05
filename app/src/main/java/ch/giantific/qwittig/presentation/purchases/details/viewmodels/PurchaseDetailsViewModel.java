@@ -23,10 +23,10 @@ import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsContra
 public class PurchaseDetailsViewModel extends BaseObservable
         implements LoadingViewModel, EmptyViewModel, PurchaseReceiptViewModel, Parcelable {
 
-    public static final Parcelable.Creator<PurchaseDetailsViewModel> CREATOR = new Parcelable.Creator<PurchaseDetailsViewModel>() {
+    public static final Creator<PurchaseDetailsViewModel> CREATOR = new Creator<PurchaseDetailsViewModel>() {
         @Override
-        public PurchaseDetailsViewModel createFromParcel(Parcel source) {
-            return new PurchaseDetailsViewModel(source);
+        public PurchaseDetailsViewModel createFromParcel(Parcel in) {
+            return new PurchaseDetailsViewModel(in);
         }
 
         @Override
@@ -52,8 +52,37 @@ public class PurchaseDetailsViewModel extends BaseObservable
     }
 
     private PurchaseDetailsViewModel(Parcel in) {
-        this.loading = in.readByte() != 0;
-        this.empty = in.readByte() != 0;
+        loading = in.readByte() != 0;
+        empty = in.readByte() != 0;
+        store = in.readString();
+        date = in.readString();
+        receipt = in.readString();
+        total = in.readString();
+        totalForeign = in.readString();
+        myShare = in.readString();
+        myShareForeign = in.readString();
+        note = in.readString();
+        exchangeRate = in.readDouble();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (loading ? 1 : 0));
+        dest.writeByte((byte) (empty ? 1 : 0));
+        dest.writeString(store);
+        dest.writeString(date);
+        dest.writeString(receipt);
+        dest.writeString(total);
+        dest.writeString(totalForeign);
+        dest.writeString(myShare);
+        dest.writeString(myShareForeign);
+        dest.writeString(note);
+        dest.writeDouble(exchangeRate);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -183,14 +212,4 @@ public class PurchaseDetailsViewModel extends BaseObservable
         this.exchangeRate = exchangeRate;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.empty ? (byte) 1 : (byte) 0);
-    }
 }

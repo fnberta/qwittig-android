@@ -33,7 +33,6 @@ import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.it
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
 import rx.SingleSubscriber;
-import rx.Subscriber;
 import timber.log.Timber;
 
 /**
@@ -48,7 +47,6 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
     private final SortedList<SettingsUsersItemViewModel> items;
     private final SortedListCallback<SettingsUsersItemViewModel> listCallback;
     private final GroupRepository groupRepo;
-    private boolean initialDataLoaded;
     private Identity currentIdentity;
     private String avatarIdentityId;
 
@@ -109,47 +107,27 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
                         viewModel.setGroupName(identity.getGroupName());
                         items.clear();
 
-                        initialDataLoaded = false;
                         final String groupId = identity.getGroup();
                         addDataListener(groupId);
-                        loadInitialData(groupId);
                     }
                 })
         );
     }
 
     private void addDataListener(@NonNull String groupId) {
+        final Observable<List<SettingsUsersItemViewModel>> initialData = groupRepo.getGroupIdentities(groupId, true)
+                .flatMap((identity) -> getItemViewModel(EventType.NONE, identity))
+                .toList()
+                .doOnNext(settingsUsersItemViewModels -> {
+                    items.addAll(settingsUsersItemViewModels);
+                    viewModel.setEmpty(getItemCount() == 0);
+                    view.startEnterTransition();
+                });
         subscriptions.add(groupRepo.observeGroupIdentityChildren(groupId)
-                .filter(childEvent -> initialDataLoaded)
+                .skipUntil(initialData)
                 .flatMap(event -> getItemViewModel(event.getEventType(), event.getValue()))
                 .subscribe(new ChildEventSubscriber<>(items, viewModel, e ->
                         view.showMessage(R.string.toast_error_users_load)))
-        );
-    }
-
-    private void loadInitialData(@NonNull String groupId) {
-        subscriptions.add(groupRepo.getGroupIdentities(groupId, true)
-                .flatMap((identity) -> getItemViewModel(EventType.NONE, identity))
-                .toList()
-                .subscribe(new Subscriber<List<SettingsUsersItemViewModel>>() {
-                    @Override
-                    public void onCompleted() {
-                        initialDataLoaded = true;
-                        viewModel.setEmpty(getItemCount() == 0);
-                        view.startEnterTransition();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e, "failed to load initial users with error:");
-                        view.showMessage(R.string.toast_error_users_load);
-                    }
-
-                    @Override
-                    public void onNext(List<SettingsUsersItemViewModel> purchaseItemModels) {
-                        items.addAll(purchaseItemModels);
-                    }
-                })
         );
     }
 

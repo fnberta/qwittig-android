@@ -30,7 +30,6 @@
         android:clipToPadding="false"
         android:fillViewport="true"
         android:paddingBottom="@dimen/small_space"
-        android:transitionGroup="true"
         tools:targetApi="lollipop"
         >
 

@@ -16,12 +16,13 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 /**
  * Represents a user with an object id, a nickname, an avatar and whether it is selected or not.
  */
-public class PurchaseAddEditArticleIdentityItemViewModel extends BaseObservable implements Parcelable {
+public class PurchaseAddEditArticleIdentityItemViewModel extends BaseObservable
+        implements Parcelable {
 
     public static final Creator<PurchaseAddEditArticleIdentityItemViewModel> CREATOR = new Creator<PurchaseAddEditArticleIdentityItemViewModel>() {
         @Override
-        public PurchaseAddEditArticleIdentityItemViewModel createFromParcel(Parcel source) {
-            return new PurchaseAddEditArticleIdentityItemViewModel(source);
+        public PurchaseAddEditArticleIdentityItemViewModel createFromParcel(Parcel in) {
+            return new PurchaseAddEditArticleIdentityItemViewModel(in);
         }
 
         @Override
@@ -42,11 +43,24 @@ public class PurchaseAddEditArticleIdentityItemViewModel extends BaseObservable 
         this.selected = selected;
     }
 
-    private PurchaseAddEditArticleIdentityItemViewModel(Parcel in) {
+    protected PurchaseAddEditArticleIdentityItemViewModel(Parcel in) {
         identityId = in.readString();
         nickname = in.readString();
         avatar = in.readString();
         selected = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(identityId);
+        dest.writeString(nickname);
+        dest.writeString(avatar);
+        dest.writeByte((byte) (selected ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public String getIdentityId() {
@@ -76,16 +90,4 @@ public class PurchaseAddEditArticleIdentityItemViewModel extends BaseObservable 
         this.selected = selected;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(identityId);
-        dest.writeString(nickname);
-        dest.writeString(avatar);
-        dest.writeByte(selected ? (byte) 1 : (byte) 0);
-    }
 }

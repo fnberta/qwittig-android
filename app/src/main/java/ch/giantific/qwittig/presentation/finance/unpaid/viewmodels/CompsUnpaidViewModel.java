@@ -18,8 +18,8 @@ public class CompsUnpaidViewModel extends BaseObservable implements Parcelable,
 
     public static final Creator<CompsUnpaidViewModel> CREATOR = new Creator<CompsUnpaidViewModel>() {
         @Override
-        public CompsUnpaidViewModel createFromParcel(Parcel source) {
-            return new CompsUnpaidViewModel(source);
+        public CompsUnpaidViewModel createFromParcel(Parcel in) {
+            return new CompsUnpaidViewModel(in);
         }
 
         @Override
@@ -36,8 +36,19 @@ public class CompsUnpaidViewModel extends BaseObservable implements Parcelable,
     }
 
     private CompsUnpaidViewModel(Parcel in) {
-        this.empty = in.readByte() != 0;
-        this.loading = in.readByte() != 0;
+        empty = in.readByte() != 0;
+        loading = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (empty ? 1 : 0));
+        dest.writeByte((byte) (loading ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -64,14 +75,4 @@ public class CompsUnpaidViewModel extends BaseObservable implements Parcelable,
         notifyPropertyChanged(BR.loading);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.empty ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
-    }
 }

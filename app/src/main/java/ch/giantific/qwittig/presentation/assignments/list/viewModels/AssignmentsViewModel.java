@@ -22,10 +22,10 @@ import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 public class AssignmentsViewModel extends BaseObservable
         implements Parcelable, LoadingViewModel, EmptyViewModel {
 
-    public static final Parcelable.Creator<AssignmentsViewModel> CREATOR = new Parcelable.Creator<AssignmentsViewModel>() {
+    public static final Creator<AssignmentsViewModel> CREATOR = new Creator<AssignmentsViewModel>() {
         @Override
-        public AssignmentsViewModel createFromParcel(Parcel source) {
-            return new AssignmentsViewModel(source);
+        public AssignmentsViewModel createFromParcel(Parcel in) {
+            return new AssignmentsViewModel(in);
         }
 
         @Override
@@ -44,9 +44,21 @@ public class AssignmentsViewModel extends BaseObservable
     }
 
     private AssignmentsViewModel(Parcel in) {
-        this.loading = in.readByte() != 0;
-        this.empty = in.readByte() != 0;
-        this.deadline = in.readParcelable(AssignmentDeadline.class.getClassLoader());
+        loading = in.readByte() != 0;
+        empty = in.readByte() != 0;
+        deadline = in.readParcelable(AssignmentDeadline.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (loading ? 1 : 0));
+        dest.writeByte((byte) (empty ? 1 : 0));
+        dest.writeParcelable(deadline, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -81,15 +93,4 @@ public class AssignmentsViewModel extends BaseObservable
         this.deadline = deadline;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.empty ? (byte) 1 : (byte) 0);
-        dest.writeParcelable(this.deadline, flags);
-    }
 }

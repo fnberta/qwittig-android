@@ -61,6 +61,7 @@ public class FinanceHeaderPresenter extends BasePresenterImpl<FinanceHeaderContr
                         final BigFraction balance = identity.getBalanceFraction();
                         viewModel.setBalance(moneyFormatter.format(balance));
                         view.setColorTheme(balance);
+                        view.startEnterTransition();
                     }
                 })
         );

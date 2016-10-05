@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.about.viewmodels.items;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.os.Parcel;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 
@@ -15,69 +14,42 @@ import android.support.annotation.StringRes;
  */
 public class AboutItemViewModel extends BaseObservable implements BaseAboutItemViewModel {
 
-    public static final Creator<AboutItemViewModel> CREATOR = new Creator<AboutItemViewModel>() {
-        @Override
-        public AboutItemViewModel createFromParcel(Parcel source) {
-            return new AboutItemViewModel(source);
-        }
-
-        @Override
-        public AboutItemViewModel[] newArray(int size) {
-            return new AboutItemViewModel[size];
-        }
-    };
     @StringRes
-    private int mTitle;
+    private int title;
     @DrawableRes
-    private int mIcon;
+    private int icon;
 
     public AboutItemViewModel(@StringRes int title, @DrawableRes int icon) {
-        mTitle = title;
-        mIcon = icon;
+        this.title = title;
+        this.icon = icon;
     }
 
     public AboutItemViewModel(@StringRes int title) {
-        mTitle = title;
-    }
-
-    private AboutItemViewModel(Parcel in) {
-        mTitle = in.readInt();
-        mIcon = in.readInt();
+        this.title = title;
     }
 
     @Bindable
     @StringRes
     public int getTitle() {
-        return mTitle;
+        return title;
     }
 
     public void setTitle(@StringRes int title) {
-        mTitle = title;
+        this.title = title;
     }
 
     @Bindable
     @DrawableRes
     public int getIcon() {
-        return mIcon;
+        return icon;
     }
 
     public void setIcon(@DrawableRes int icon) {
-        mIcon = icon;
+        this.icon = icon;
     }
 
     @Override
     public int getViewType() {
         return ViewType.ABOUT;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(mTitle);
-        dest.writeInt(mIcon);
     }
 }

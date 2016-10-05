@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.transition.Fade;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +57,8 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        postponeEnterTransition();
 
         // set default Result to OK, if logout is triggered it will be set to LOGOUT in order to
         // finish HomeActivity as well

@@ -13,13 +13,13 @@ import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 /**
  * Created by fabio on 13.05.16.
  */
-public class LoginFirstGroupViewModel extends BaseObservable implements Parcelable,
-        LoadingViewModel {
+public class LoginFirstGroupViewModel extends BaseObservable
+        implements Parcelable, LoadingViewModel {
 
-    public static final Parcelable.Creator<LoginFirstGroupViewModel> CREATOR = new Parcelable.Creator<LoginFirstGroupViewModel>() {
+    public static final Creator<LoginFirstGroupViewModel> CREATOR = new Creator<LoginFirstGroupViewModel>() {
         @Override
-        public LoginFirstGroupViewModel createFromParcel(Parcel source) {
-            return new LoginFirstGroupViewModel(source);
+        public LoginFirstGroupViewModel createFromParcel(Parcel in) {
+            return new LoginFirstGroupViewModel(in);
         }
 
         @Override
@@ -38,11 +38,25 @@ public class LoginFirstGroupViewModel extends BaseObservable implements Parcelab
     }
 
     private LoginFirstGroupViewModel(Parcel in) {
-        this.loading = in.readByte() != 0;
-        this.validate = in.readByte() != 0;
-        this.groupName = in.readString();
-        this.groupCurrency = in.readString();
-        this.selectedGroupCurrency = in.readInt();
+        loading = in.readByte() != 0;
+        validate = in.readByte() != 0;
+        groupName = in.readString();
+        groupCurrency = in.readString();
+        selectedGroupCurrency = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (loading ? 1 : 0));
+        dest.writeByte((byte) (validate ? 1 : 0));
+        dest.writeString(groupName);
+        dest.writeString(groupCurrency);
+        dest.writeInt(selectedGroupCurrency);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -76,7 +90,7 @@ public class LoginFirstGroupViewModel extends BaseObservable implements Parcelab
         this.groupName = groupName;
         notifyPropertyChanged(BR.groupName);
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.groupNameComplete);
         }
     }
 
@@ -103,17 +117,4 @@ public class LoginFirstGroupViewModel extends BaseObservable implements Parcelab
         notifyPropertyChanged(BR.selectedGroupCurrency);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.validate ? (byte) 1 : (byte) 0);
-        dest.writeString(this.groupName);
-        dest.writeString(this.groupCurrency);
-        dest.writeInt(this.selectedGroupCurrency);
-    }
 }

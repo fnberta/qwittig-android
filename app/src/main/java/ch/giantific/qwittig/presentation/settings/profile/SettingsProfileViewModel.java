@@ -19,12 +19,13 @@ import ch.giantific.qwittig.utils.Utils;
 /**
  * Provides an implementation of the {@link SettingsProfileContract}.
  */
-public class SettingsProfileViewModel extends BaseObservable implements Parcelable {
+public class SettingsProfileViewModel extends BaseObservable
+        implements Parcelable {
 
-    public static final Parcelable.Creator<SettingsProfileViewModel> CREATOR = new Parcelable.Creator<SettingsProfileViewModel>() {
+    public static final Creator<SettingsProfileViewModel> CREATOR = new Creator<SettingsProfileViewModel>() {
         @Override
-        public SettingsProfileViewModel createFromParcel(Parcel source) {
-            return new SettingsProfileViewModel(source);
+        public SettingsProfileViewModel createFromParcel(Parcel in) {
+            return new SettingsProfileViewModel(in);
         }
 
         @Override
@@ -46,15 +47,33 @@ public class SettingsProfileViewModel extends BaseObservable implements Parcelab
     }
 
     private SettingsProfileViewModel(Parcel in) {
-        this.validate = in.readByte() != 0;
-        this.avatar = in.readString();
-        this.nickname = in.readString();
-        this.email = in.readString();
-        this.password = in.readString();
-        this.passwordRepeat = in.readString();
-        this.facebookUser = in.readByte() != 0;
-        this.googleUser = in.readByte() != 0;
-        this.unlinkSocialLogin = in.readByte() != 0;
+        validate = in.readByte() != 0;
+        avatar = in.readString();
+        nickname = in.readString();
+        email = in.readString();
+        password = in.readString();
+        passwordRepeat = in.readString();
+        facebookUser = in.readByte() != 0;
+        googleUser = in.readByte() != 0;
+        unlinkSocialLogin = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (validate ? 1 : 0));
+        dest.writeString(avatar);
+        dest.writeString(nickname);
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeString(passwordRepeat);
+        dest.writeByte((byte) (facebookUser ? 1 : 0));
+        dest.writeByte((byte) (googleUser ? 1 : 0));
+        dest.writeByte((byte) (unlinkSocialLogin ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Bindable
@@ -91,7 +110,7 @@ public class SettingsProfileViewModel extends BaseObservable implements Parcelab
         this.nickname = nickname;
         notifyPropertyChanged(BR.nickname);
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.nicknameComplete);
         }
     }
 
@@ -109,7 +128,7 @@ public class SettingsProfileViewModel extends BaseObservable implements Parcelab
         this.email = email;
         notifyPropertyChanged(BR.email);
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.emailValid);
         }
     }
 
@@ -125,7 +144,7 @@ public class SettingsProfileViewModel extends BaseObservable implements Parcelab
     public void setPassword(String password) {
         this.password = password;
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.passwordValid);
         }
     }
 
@@ -136,7 +155,7 @@ public class SettingsProfileViewModel extends BaseObservable implements Parcelab
     public void setPasswordRepeat(String passwordRepeat) {
         this.passwordRepeat = passwordRepeat;
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.passwordEqual);
         }
     }
 
@@ -182,21 +201,4 @@ public class SettingsProfileViewModel extends BaseObservable implements Parcelab
         return !facebookUser && !googleUser || unlinkSocialLogin;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.validate ? (byte) 1 : (byte) 0);
-        dest.writeString(this.avatar);
-        dest.writeString(this.nickname);
-        dest.writeString(this.email);
-        dest.writeString(this.password);
-        dest.writeString(this.passwordRepeat);
-        dest.writeByte(this.facebookUser ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.googleUser ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.unlinkSocialLogin ? (byte) 1 : (byte) 0);
-    }
 }

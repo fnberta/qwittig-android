@@ -76,19 +76,6 @@ public class Navigator {
         ActivityCompat.finishAfterTransition(activity);
     }
 
-    public void startProfileSettings() {
-        final Intent intent = new Intent(activity, SettingsProfileActivity.class);
-        final ActivityOptionsCompat options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, RC_SETTINGS_PROFILE,
-                options.toBundle());
-    }
-
-    public void startHome() {
-        final Intent intent = new Intent(activity, HomeActivity.class);
-        activity.startActivity(intent);
-    }
-
     public void startLogin() {
         final Intent intentLogin = new Intent(activity, LoginActivity.class);
         intentLogin.setData(activity.getIntent().getData());
@@ -97,6 +84,11 @@ public class Navigator {
 //        ActivityOptionsCompat activityOptionsCompat =
 //                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
         activity.startActivityForResult(intentLogin, RC_LOGIN);
+    }
+
+    public void startHome() {
+        final Intent intent = new Intent(activity, HomeActivity.class);
+        activity.startActivity(intent);
     }
 
     public void startPurchaseAdd(@Nullable String ocrPurchaseId) {
@@ -176,19 +168,41 @@ public class Navigator {
         activity.startActivityForResult(intent, RC_SETTINGS);
     }
 
+    public void startProfileSettings() {
+        final Intent intent = new Intent(activity, SettingsProfileActivity.class);
+        final ActivityOptionsCompat options =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, RC_SETTINGS_PROFILE,
+                options.toBundle());
+    }
+
+    public void startAddGroupSettings() {
+        final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
+        final ActivityOptionsCompat options =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, Navigator.RC_SETTINGS_ADD_GROUP,
+                options.toBundle());
+    }
+
+    public void startUsersSettings() {
+        final Intent intent = new Intent(activity, SettingsUsersActivity.class);
+        final ActivityOptionsCompat options =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivity(intent, options.toBundle());
+    }
+
     public void startHelpFeedback() {
         final Intent intent = new Intent(activity, HelpFeedbackActivity.class);
         activity.startActivity(intent);
     }
 
-    public void startFirstRun() {
-        final Intent intent = new Intent(activity, AppIntroActivity.class);
+    public void startAbout() {
+        final Intent intent = new Intent(activity, AboutActivity.class);
         activity.startActivity(intent);
     }
 
-    public void startSystemSettings() {
-        final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.parse("package:" + activity.getPackageName()));
+    public void startFirstRun() {
+        final Intent intent = new Intent(activity, AppIntroActivity.class);
         activity.startActivity(intent);
     }
 
@@ -203,28 +217,14 @@ public class Navigator {
         activity.startActivityForResult(intent, RC_IMAGE_CAPTURE);
     }
 
+    public void startSystemSettings() {
+        final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + activity.getPackageName()));
+        activity.startActivity(intent);
+    }
+
     public void openWebsite(@NonNull String url) {
         final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         activity.startActivity(intent);
-    }
-
-    public void startAbout() {
-        final Intent intent = new Intent(activity, AboutActivity.class);
-        activity.startActivity(intent);
-    }
-
-    public void startGroupAddSettings() {
-        final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
-        final ActivityOptionsCompat activityOptionsCompat =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, Navigator.RC_SETTINGS_ADD_GROUP,
-                activityOptionsCompat.toBundle());
-    }
-
-    public void startUsersSettings() {
-        final Intent intent = new Intent(activity, SettingsUsersActivity.class);
-        final ActivityOptionsCompat activityOptionsCompat =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivity(intent, activityOptionsCompat.toBundle());
     }
 }

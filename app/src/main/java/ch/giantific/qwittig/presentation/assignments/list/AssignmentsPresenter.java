@@ -37,8 +37,6 @@ import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
-import rx.Subscriber;
-import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link AssignmentsContract} interface.
@@ -52,7 +50,6 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
     private final SortedListCallback<BaseAssignmentItemViewModel> listCallback;
     private final ChildEventSubscriber<BaseAssignmentItemViewModel, AssignmentsViewModel> subscriber;
     private final AssignmentRepository assignmentRepo;
-    private boolean initialDataLoaded;
     private String currentGroupId;
     private String currentIdentityId;
 
@@ -114,7 +111,6 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
-                        initialDataLoaded = false;
                         currentIdentityId = identity.getId();
                         final String groupId = identity.getGroup();
                         if (!Objects.equals(currentGroupId, groupId)) {
@@ -122,47 +118,27 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
                         }
                         currentGroupId = groupId;
                         addDataListener();
-                        loadInitialData();
                     }
                 })
         );
     }
 
     private void addDataListener() {
+        final Observable<List<BaseAssignmentItemViewModel>> initialData = assignmentRepo.getAssignments(currentGroupId, currentIdentityId, viewModel.getDeadline().getDate())
+                .flatMap(assignment -> getItemViewModel(assignment, EventType.NONE, currentIdentityId))
+                .toList()
+                .doOnNext(itemViewModels -> {
+//                    items.add(new AssignmentHeaderItem(R.string.assignment_header_my, Type.HEADER_MY));
+//                    items.add(new AssignmentHeaderItem(R.string.assignment_header_group, Type.HEADER_GROUP));
+                    items.addAll(itemViewModels);
+                    viewModel.setEmpty(getItemCount() == 0);
+                    viewModel.setLoading(false);
+                });
         subscriptions.add(assignmentRepo.observeAssignmentChildren(currentGroupId, currentIdentityId, viewModel.getDeadline().getDate())
-                .filter(childEvent -> initialDataLoaded)
+                .skipUntil(initialData)
                 .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), currentIdentityId))
                 .subscribe(subscriber)
-        );
-    }
-
-    private void loadInitialData() {
-        subscriptions.add(assignmentRepo.getAssignments(currentGroupId, currentIdentityId, viewModel.getDeadline().getDate())
-                        .takeWhile(assignment -> Objects.equals(assignment.getGroup(), currentGroupId))
-                        .flatMap(assignment -> getItemViewModel(assignment, EventType.NONE, currentIdentityId))
-                        .toList()
-                        .subscribe(new Subscriber<List<BaseAssignmentItemViewModel>>() {
-                            @Override
-                            public void onCompleted() {
-                                initialDataLoaded = true;
-                                viewModel.setEmpty(getItemCount() == 0);
-                                viewModel.setLoading(false);
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Timber.e(e, "failed to load initial assignments with error:");
-                                view.showMessage(R.string.toast_error_assignments_load);
-                            }
-
-                            @Override
-                            public void onNext(List<BaseAssignmentItemViewModel> itemViewModels) {
-//                        items.add(new AssignmentHeaderItem(R.string.assignment_header_my, Type.HEADER_MY));
-//                        items.add(new AssignmentHeaderItem(R.string.assignment_header_group, Type.HEADER_GROUP));
-                                items.addAll(itemViewModels);
-                            }
-                        })
         );
     }
 
@@ -234,7 +210,6 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
         viewModel.setEmpty(true);
         viewModel.setLoading(true);
         addDataListener();
-        loadInitialData();
     }
 
     @Override

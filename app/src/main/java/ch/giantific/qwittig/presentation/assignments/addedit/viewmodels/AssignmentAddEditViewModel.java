@@ -9,9 +9,7 @@ import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.SparseIntArray;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import ch.giantific.qwittig.BR;
@@ -25,10 +23,10 @@ import ch.giantific.qwittig.presentation.common.viewmodels.EmptyViewModel;
 public class AssignmentAddEditViewModel extends BaseObservable
         implements Parcelable, EmptyViewModel {
 
-    public static final Parcelable.Creator<AssignmentAddEditViewModel> CREATOR = new Parcelable.Creator<AssignmentAddEditViewModel>() {
+    public static final Creator<AssignmentAddEditViewModel> CREATOR = new Creator<AssignmentAddEditViewModel>() {
         @Override
-        public AssignmentAddEditViewModel createFromParcel(Parcel source) {
-            return new AssignmentAddEditViewModel(source);
+        public AssignmentAddEditViewModel createFromParcel(Parcel in) {
+            return new AssignmentAddEditViewModel(in);
         }
 
         @Override
@@ -56,12 +54,23 @@ public class AssignmentAddEditViewModel extends BaseObservable
     }
 
     private AssignmentAddEditViewModel(Parcel in) {
-        this.empty = in.readByte() != 0;
-        long tmpDeadline = in.readLong();
-        this.deadline = tmpDeadline == -1 ? null : new Date(tmpDeadline);
-        this.deadlineFormatted = in.readString();
-        this.title = in.readString();
-        this.timeFrame = in.readInt();
+        empty = in.readByte() != 0;
+        deadlineFormatted = in.readString();
+        title = in.readString();
+        timeFrame = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (empty ? 1 : 0));
+        dest.writeString(deadlineFormatted);
+        dest.writeString(title);
+        dest.writeInt(timeFrame);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public int[] getTimeFrames() {
@@ -132,17 +141,4 @@ public class AssignmentAddEditViewModel extends BaseObservable
         return -1;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.empty ? (byte) 1 : (byte) 0);
-        dest.writeLong(this.deadline != null ? this.deadline.getTime() : -1);
-        dest.writeString(this.deadlineFormatted);
-        dest.writeString(this.title);
-        dest.writeInt(this.timeFrame);
-    }
 }

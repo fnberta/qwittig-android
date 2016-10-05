@@ -23,10 +23,10 @@ import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 public class AssignmentDetailsViewModel extends BaseObservable
         implements LoadingViewModel, EmptyViewModel, Parcelable {
 
-    public static final Parcelable.Creator<AssignmentDetailsViewModel> CREATOR = new Parcelable.Creator<AssignmentDetailsViewModel>() {
+    public static final Creator<AssignmentDetailsViewModel> CREATOR = new Creator<AssignmentDetailsViewModel>() {
         @Override
-        public AssignmentDetailsViewModel createFromParcel(Parcel source) {
-            return new AssignmentDetailsViewModel(source);
+        public AssignmentDetailsViewModel createFromParcel(Parcel in) {
+            return new AssignmentDetailsViewModel(in);
         }
 
         @Override
@@ -48,8 +48,25 @@ public class AssignmentDetailsViewModel extends BaseObservable
     }
 
     private AssignmentDetailsViewModel(Parcel in) {
-        this.loading = in.readByte() != 0;
-        this.empty = in.readByte() != 0;
+        loading = in.readByte() != 0;
+        empty = in.readByte() != 0;
+        title = in.readString();
+        timeFrame = in.readInt();
+        responsible = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (loading ? 1 : 0));
+        dest.writeByte((byte) (empty ? 1 : 0));
+        dest.writeString(title);
+        dest.writeInt(timeFrame);
+        dest.writeByte((byte) (responsible ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -117,14 +134,4 @@ public class AssignmentDetailsViewModel extends BaseObservable
         notifyPropertyChanged(BR.responsible);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.empty ? (byte) 1 : (byte) 0);
-    }
 }

@@ -110,6 +110,7 @@ public class SettingsPresenter extends BasePresenterImpl<SettingsContract.ViewLi
                             groupNames.add(groupName);
                         }
                         setIdentitySelection();
+                        view.startEnterTransition();
                     }
                 })
         );
@@ -170,6 +171,21 @@ public class SettingsPresenter extends BasePresenterImpl<SettingsContract.ViewLi
                     })
             );
         }
+    }
+
+    @Override
+    public void onProfileClick() {
+        navigator.startProfileSettings();
+    }
+
+    @Override
+    public void onAddGroupClick() {
+        navigator.startAddGroupSettings();
+    }
+
+    @Override
+    public void onUsersClick() {
+        navigator.startUsersSettings();
     }
 
     @Override

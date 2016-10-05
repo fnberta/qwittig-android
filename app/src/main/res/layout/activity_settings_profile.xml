@@ -27,6 +27,7 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:fitsSystemWindows="true"
+        android:transitionGroup="true"
         tools:context=".presentation.settings.profile.SettingsProfileActivity"
         tools:ignore="MergeRootFrame"
         >

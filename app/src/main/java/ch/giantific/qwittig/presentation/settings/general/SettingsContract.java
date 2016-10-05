@@ -40,6 +40,12 @@ public interface SettingsContract {
 
         void onGroupNameChanged(@NonNull String newName);
 
+        void onProfileClick();
+
+        void onAddGroupClick();
+
+        void onUsersClick();
+
         void onLeaveGroupClick();
 
         void onLogoutMenuClick();
@@ -52,6 +58,8 @@ public interface SettingsContract {
     }
 
     interface ViewListener extends BaseViewListener {
+
+        void startEnterTransition();
 
         void setupGroupSelection(@NonNull CharSequence[] entries, @NonNull CharSequence[] values,
                                  @NonNull String selectedValue);

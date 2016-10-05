@@ -19,7 +19,6 @@ import java.util.Objects;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -31,8 +30,8 @@ import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber
 import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.DraftsViewModel;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.DraftItemViewModel;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import rx.Subscriber;
-import timber.log.Timber;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
+import rx.Observable;
 
 /**
  * Provides an implementation of the {@link DraftsContract}.
@@ -50,7 +49,6 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
     private final PurchaseRepository purchaseRepo;
     private final ArrayList<String> draftsSelected;
     private ListInteraction listInteraction;
-    private boolean initialDataLoaded;
     private boolean selectionModeEnabled;
     private boolean deleteSelectedItems;
     private NumberFormat moneyFormatter;
@@ -122,7 +120,6 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
                         moneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(),
                                 false, true);
 
-                        initialDataLoaded = false;
                         final String identityId = identity.getId();
                         final String groupId = identity.getGroup();
                         if (!Objects.equals(currentGroupId, groupId)) {
@@ -130,15 +127,23 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
                         }
                         currentGroupId = groupId;
                         addDataListener(identityId, groupId);
-                        loadInitialData(identityId, groupId);
                     }
                 })
         );
     }
 
     private void addDataListener(@NonNull String identityId, @NonNull String groupId) {
+        final Observable<List<DraftItemViewModel>> initialData = purchaseRepo.getPurchases(groupId, identityId, true)
+                .map(draft -> getItemViewModel(draft, EventType.NONE, draftsSelected.contains(draft.getId())))
+                .toList()
+                .doOnNext(draftItemViewModels -> {
+                    items.addAll(draftItemViewModels);
+                    viewModel.setEmpty(getItemCount() == 0);
+                    viewModel.setLoading(false);
+                    scrollToFirstSelectedItem();
+                });
         subscriptions.add(purchaseRepo.observePurchaseChildren(groupId, identityId, true)
-                .filter(childEvent -> initialDataLoaded)
+                .skipUntil(initialData)
                 .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .map(event -> {
                     final Purchase draft = event.getValue();
@@ -146,34 +151,6 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
                             draftsSelected.contains(draft.getId()));
                 })
                 .subscribe(subscriber)
-        );
-    }
-
-    private void loadInitialData(@NonNull String identityId, @NonNull String groupId) {
-        subscriptions.add(purchaseRepo.getPurchases(groupId, identityId, true)
-                .takeWhile(purchase -> Objects.equals(purchase.getGroup(), currentGroupId))
-                .map(draft -> getItemViewModel(draft, EventType.NONE, draftsSelected.contains(draft.getId())))
-                .toList()
-                .subscribe(new Subscriber<List<DraftItemViewModel>>() {
-                    @Override
-                    public void onCompleted() {
-                        initialDataLoaded = true;
-                        viewModel.setEmpty(getItemCount() == 0);
-                        viewModel.setLoading(false);
-                        scrollToFirstSelectedItem();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e, "failed to load initial drafts with error:");
-                        view.showMessage(R.string.toast_error_drafts_load);
-                    }
-
-                    @Override
-                    public void onNext(List<DraftItemViewModel> draftItemModels) {
-                        items.addAll(draftItemModels);
-                    }
-                })
         );
     }
 

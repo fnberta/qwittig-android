@@ -27,7 +27,6 @@
         android:clipToPadding="false"
         android:paddingTop="@dimen/normal_space"
         android:paddingBottom="@dimen/small_space"
-        android:transitionGroup="true"
         tools:targetApi="lollipop"
         >
 

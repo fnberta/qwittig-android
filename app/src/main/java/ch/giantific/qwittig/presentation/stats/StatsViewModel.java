@@ -19,12 +19,13 @@ import ch.giantific.qwittig.presentation.stats.formatters.DateAxisFormatter;
  * Created by fabio on 29.09.16.
  */
 
-public class StatsViewModel extends BaseObservable implements Parcelable, LoadingViewModel {
+public class StatsViewModel extends BaseObservable
+        implements Parcelable, LoadingViewModel {
 
-    public static final Parcelable.Creator<StatsViewModel> CREATOR = new Parcelable.Creator<StatsViewModel>() {
+    public static final Creator<StatsViewModel> CREATOR = new Creator<StatsViewModel>() {
         @Override
-        public StatsViewModel createFromParcel(Parcel source) {
-            return new StatsViewModel(source);
+        public StatsViewModel createFromParcel(Parcel in) {
+            return new StatsViewModel(in);
         }
 
         @Override
@@ -48,8 +49,23 @@ public class StatsViewModel extends BaseObservable implements Parcelable, Loadin
     }
 
     private StatsViewModel(Parcel in) {
-        this.loading = in.readByte() != 0;
-        this.empty = in.readByte() != 0;
+        loading = in.readByte() != 0;
+        empty = in.readByte() != 0;
+        pieTotal = in.readString();
+        barAverage = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (loading ? 1 : 0));
+        dest.writeByte((byte) (empty ? 1 : 0));
+        dest.writeString(pieTotal);
+        dest.writeString(barAverage);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -144,14 +160,4 @@ public class StatsViewModel extends BaseObservable implements Parcelable, Loadin
         notifyPropertyChanged(BR.chartCurrencyFormatter);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.empty ? (byte) 1 : (byte) 0);
-    }
 }

@@ -37,6 +37,8 @@
 
     <style name="AppTheme.SlideBottom" parent="AppTheme"/>
 
+    <style name="AppTheme.SlideTop" parent="AppTheme"/>
+
     <style name="AppTheme.SlideEnd" parent="AppTheme"/>
 
     <style name="AppTheme.PrimaryAsAccent" parent="AppTheme">
@@ -46,6 +48,10 @@
     <style name="AppTheme.DrawStatusBar" parent="AppTheme"/>
 
     <style name="AppTheme.DrawStatusBar.Explode" parent="AppTheme.DrawStatusBar"/>
+
+    <style name="AppTheme.DrawStatusBar.SlideTop" parent="AppTheme.DrawStatusBar"/>
+
+    <style name="AppTheme.DrawStatusBar.SlideBottom" parent="AppTheme.DrawStatusBar"/>
 
     <style name="AppTheme.DrawStatusBar.Green" parent="AppTheme.DrawStatusBar">
         <item name="colorPrimary">@color/green</item>

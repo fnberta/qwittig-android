@@ -18,13 +18,13 @@ import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsers
 /**
  * Provides an implementation of the {@link SettingsUsersContract}.
  */
-public class SettingsUsersViewModel extends BaseObservable implements Parcelable,
-        EmptyViewModel {
+public class SettingsUsersViewModel extends BaseObservable
+        implements Parcelable, EmptyViewModel {
 
     public static final Creator<SettingsUsersViewModel> CREATOR = new Creator<SettingsUsersViewModel>() {
         @Override
-        public SettingsUsersViewModel createFromParcel(Parcel source) {
-            return new SettingsUsersViewModel(source);
+        public SettingsUsersViewModel createFromParcel(Parcel in) {
+            return new SettingsUsersViewModel(in);
         }
 
         @Override
@@ -38,13 +38,27 @@ public class SettingsUsersViewModel extends BaseObservable implements Parcelable
     private boolean validate;
 
     public SettingsUsersViewModel() {
+        this.empty = true;
     }
 
     private SettingsUsersViewModel(Parcel in) {
-        this.empty = in.readByte() != 0;
-        this.groupName = in.readString();
-        this.nickname = in.readString();
-        this.validate = in.readByte() != 0;
+        empty = in.readByte() != 0;
+        groupName = in.readString();
+        nickname = in.readString();
+        validate = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (empty ? 1 : 0));
+        dest.writeString(groupName);
+        dest.writeString(nickname);
+        dest.writeByte((byte) (validate ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -78,7 +92,7 @@ public class SettingsUsersViewModel extends BaseObservable implements Parcelable
         this.nickname = nickname;
         notifyPropertyChanged(BR.nickname);
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.nicknameComplete);
         }
     }
 
@@ -102,16 +116,4 @@ public class SettingsUsersViewModel extends BaseObservable implements Parcelable
         return isNicknameComplete();
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.empty ? (byte) 1 : (byte) 0);
-        dest.writeString(this.groupName);
-        dest.writeString(this.nickname);
-        dest.writeByte(this.validate ? (byte) 1 : (byte) 0);
-    }
 }

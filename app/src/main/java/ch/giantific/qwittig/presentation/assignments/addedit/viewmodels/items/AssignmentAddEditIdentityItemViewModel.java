@@ -24,8 +24,8 @@ public class AssignmentAddEditIdentityItemViewModel extends BaseObservable imple
 
     public static final Creator<AssignmentAddEditIdentityItemViewModel> CREATOR = new Creator<AssignmentAddEditIdentityItemViewModel>() {
         @Override
-        public AssignmentAddEditIdentityItemViewModel createFromParcel(Parcel source) {
-            return new AssignmentAddEditIdentityItemViewModel(source);
+        public AssignmentAddEditIdentityItemViewModel createFromParcel(Parcel in) {
+            return new AssignmentAddEditIdentityItemViewModel(in);
         }
 
         @Override
@@ -50,6 +50,19 @@ public class AssignmentAddEditIdentityItemViewModel extends BaseObservable imple
         nickname = in.readString();
         avatar = in.readString();
         selected = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(identityId);
+        dest.writeString(nickname);
+        dest.writeString(avatar);
+        dest.writeByte((byte) (selected ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public String getIdentityId() {
@@ -84,16 +97,4 @@ public class AssignmentAddEditIdentityItemViewModel extends BaseObservable imple
         return nickname.compareToIgnoreCase(o.getNickname());
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(identityId);
-        dest.writeString(nickname);
-        dest.writeString(avatar);
-        dest.writeByte(selected ? (byte) 1 : (byte) 0);
-    }
 }

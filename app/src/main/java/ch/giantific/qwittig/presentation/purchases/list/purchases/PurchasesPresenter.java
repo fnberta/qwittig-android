@@ -19,7 +19,6 @@ import java.util.Objects;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -32,9 +31,8 @@ import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.Pur
 import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.items.PurchaseItemViewModel;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
-import rx.Subscriber;
-import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link PurchasesContract}.
@@ -48,7 +46,6 @@ public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.View
     private final SortedListCallback<PurchaseItemViewModel> listCallback;
     private final ChildEventSubscriber<PurchaseItemViewModel, PurchasesViewModel> subscriber;
     private final PurchaseRepository purchaseRepo;
-    private boolean initialDataLoaded;
     private NumberFormat moneyFormatter;
     private DateFormat dateFormatter;
     private String currentGroupId;
@@ -110,7 +107,6 @@ public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.View
                         moneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
                         dateFormatter = DateUtils.getDateFormatter(true);
 
-                        initialDataLoaded = false;
                         final String identityId = identity.getId();
                         final String groupId = identity.getGroup();
                         if (!Objects.equals(currentGroupId, groupId)) {
@@ -118,46 +114,26 @@ public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.View
                         }
                         currentGroupId = groupId;
                         addDataListener(identityId, groupId);
-                        loadInitialData(identityId, groupId);
                     }
                 })
         );
     }
 
     private void addDataListener(@NonNull final String identityId, @NonNull String groupId) {
+        final Observable<List<PurchaseItemViewModel>> initialData = purchaseRepo.getPurchases(groupId, identityId, false)
+                .flatMap(purchase -> getItemViewModel(purchase, EventType.NONE, identityId))
+                .toList()
+                .doOnNext(purchaseItemViewModels -> {
+                    items.addAll(purchaseItemViewModels);
+                    viewModel.setEmpty(getItemCount() == 0);
+                    viewModel.setLoading(false);
+                });
         subscriptions.add(purchaseRepo.observePurchaseChildren(groupId, identityId, false)
-                .filter(purchaseRxChildEvent -> initialDataLoaded)
+                .skipUntil(initialData)
                 .takeWhile(purchaseRxChildEvent ->
                         Objects.equals(purchaseRxChildEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), identityId))
                 .subscribe(subscriber)
-        );
-    }
-
-    private void loadInitialData(@NonNull final String identityId, @NonNull String groupId) {
-        subscriptions.add(purchaseRepo.getPurchases(groupId, identityId, false)
-                .takeWhile(purchase -> Objects.equals(purchase.getGroup(), currentGroupId))
-                .flatMap(purchase -> getItemViewModel(purchase, EventType.NONE, identityId))
-                .toList()
-                .subscribe(new Subscriber<List<PurchaseItemViewModel>>() {
-                    @Override
-                    public void onCompleted() {
-                        initialDataLoaded = true;
-                        viewModel.setEmpty(getItemCount() == 0);
-                        viewModel.setLoading(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e, "failed to load initial purchases with error:");
-                        view.showMessage(R.string.toast_error_purchases_load);
-                    }
-
-                    @Override
-                    public void onNext(List<PurchaseItemViewModel> purchaseItemModels) {
-                        items.addAll(purchaseItemModels);
-                    }
-                })
         );
     }
 

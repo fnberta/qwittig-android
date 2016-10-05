@@ -19,7 +19,6 @@ import java.util.Objects;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.CompensationRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -29,11 +28,10 @@ import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.finance.paid.viewmodels.CompsPaidViewModel;
-import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewViewModel;
+import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewModel;
 import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
-import rx.Subscriber;
-import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link CompsPaidContract}.
@@ -43,10 +41,9 @@ public class CompsPaidPresenter extends BasePresenterImpl<CompsPaidContract.View
 
     private static final String STATE_VIEW_MODEL = CompsPaidViewModel.class.getCanonicalName();
     private final CompsPaidViewModel viewModel;
-    private final SortedList<CompPaidItemViewViewModel> items;
-    private final SortedListCallback<CompPaidItemViewViewModel> listCallback;
+    private final SortedList<CompPaidItemViewModel> items;
+    private final SortedListCallback<CompPaidItemViewModel> listCallback;
     private final CompensationRepository compsRepo;
-    private boolean initialDataLoaded;
     private String compGroupId;
     private NumberFormat moneyFormatter;
     private String currentGroupId;
@@ -61,13 +58,13 @@ public class CompsPaidPresenter extends BasePresenterImpl<CompsPaidContract.View
         this.compsRepo = compsRepo;
         this.compGroupId = compGroupId;
 
-        listCallback = new SortedListCallback<CompPaidItemViewViewModel>() {
+        listCallback = new SortedListCallback<CompPaidItemViewModel>() {
             @Override
-            public int compare(CompPaidItemViewViewModel o1, CompPaidItemViewViewModel o2) {
+            public int compare(CompPaidItemViewModel o1, CompPaidItemViewModel o2) {
                 return o1.compareTo(o2);
             }
         };
-        items = new SortedList<>(CompPaidItemViewViewModel.class, listCallback);
+        items = new SortedList<>(CompPaidItemViewModel.class, listCallback);
 
         if (savedState != null) {
             viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
@@ -105,7 +102,6 @@ public class CompsPaidPresenter extends BasePresenterImpl<CompsPaidContract.View
                         moneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(),
                                 true, true);
 
-                        initialDataLoaded = false;
                         final String identityId = identity.getId();
                         final String groupId = identity.getGroup();
                         if (!Objects.equals(currentGroupId, groupId)) {
@@ -113,7 +109,6 @@ public class CompsPaidPresenter extends BasePresenterImpl<CompsPaidContract.View
                         }
                         currentGroupId = groupId;
                         addDataListener(identityId, groupId);
-                        loadInitialData(identityId, groupId);
                     }
                 })
         );
@@ -136,8 +131,16 @@ public class CompsPaidPresenter extends BasePresenterImpl<CompsPaidContract.View
     }
 
     private void addDataListener(@NonNull final String identityId, @NonNull String groupId) {
+        final Observable<List<CompPaidItemViewModel>> initialData = compsRepo.getCompensations(groupId, identityId, true)
+                .flatMap(compensation -> getItemViewModel(compensation, EventType.NONE, identityId))
+                .toList()
+                .doOnNext((items1) -> {
+                    items.addAll(items1);
+                    viewModel.setEmpty(getItemCount() == 0);
+                    viewModel.setLoading(false);
+                });
         subscriptions.add(compsRepo.observeCompensationChildren(groupId, identityId, true)
-                .filter(compensationRxChildEvent -> initialDataLoaded)
+                .skipUntil(initialData)
                 .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), identityId))
                 .subscribe(new ChildEventSubscriber<>(items, viewModel, e ->
@@ -145,47 +148,19 @@ public class CompsPaidPresenter extends BasePresenterImpl<CompsPaidContract.View
         );
     }
 
-    private void loadInitialData(@NonNull final String identityId, @NonNull String groupId) {
-        subscriptions.add(compsRepo.getCompensations(groupId, identityId, true)
-                .takeWhile(compensation -> Objects.equals(compensation.getGroup(), currentGroupId))
-                .flatMap(compensation -> getItemViewModel(compensation, EventType.NONE, identityId))
-                .toList()
-                .subscribe(new Subscriber<List<CompPaidItemViewViewModel>>() {
-                    @Override
-                    public void onCompleted() {
-                        initialDataLoaded = true;
-                        viewModel.setEmpty(getItemCount() == 0);
-
-                        viewModel.setLoading(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e, "failed to load initial paid compensations with error:");
-                        view.showMessage(R.string.toast_error_comps_load);
-                    }
-
-                    @Override
-                    public void onNext(List<CompPaidItemViewViewModel> compPaidItemViewModels) {
-                        items.addAll(compPaidItemViewModels);
-                    }
-                })
-        );
-    }
-
     @NonNull
-    private Observable<CompPaidItemViewViewModel> getItemViewModel(@NonNull final Compensation compensation,
-                                                                   final int eventType,
-                                                                   @NonNull String identityId) {
+    private Observable<CompPaidItemViewModel> getItemViewModel(@NonNull final Compensation compensation,
+                                                               final int eventType,
+                                                               @NonNull String identityId) {
         final String creditorId = compensation.getCreditor();
         final boolean isCredit = Objects.equals(creditorId, identityId);
         return userRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
-                .map(identity -> new CompPaidItemViewViewModel(eventType, compensation, identity, isCredit, moneyFormatter))
+                .map(identity -> new CompPaidItemViewModel(eventType, compensation, identity, isCredit, moneyFormatter))
                 .toObservable();
     }
 
     @Override
-    public CompPaidItemViewViewModel getItemAtPosition(int position) {
+    public CompPaidItemViewModel getItemAtPosition(int position) {
         return items.get(position);
     }
 

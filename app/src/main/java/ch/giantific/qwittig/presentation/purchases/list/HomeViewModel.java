@@ -16,12 +16,13 @@ import ch.giantific.qwittig.BR;
 /**
  * Provides an implementation of the {@link HomeContract}.
  */
-public class HomeViewModel extends BaseObservable implements Parcelable {
+public class HomeViewModel extends BaseObservable
+        implements Parcelable {
 
-    public static final Parcelable.Creator<HomeViewModel> CREATOR = new Parcelable.Creator<HomeViewModel>() {
+    public static final Creator<HomeViewModel> CREATOR = new Creator<HomeViewModel>() {
         @Override
-        public HomeViewModel createFromParcel(Parcel source) {
-            return new HomeViewModel(source);
+        public HomeViewModel createFromParcel(Parcel in) {
+            return new HomeViewModel(in);
         }
 
         @Override
@@ -36,8 +37,19 @@ public class HomeViewModel extends BaseObservable implements Parcelable {
     }
 
     private HomeViewModel(Parcel in) {
-        this.draftsAvailable = in.readByte() != 0;
-        this.ocrPurchaseId = in.readString();
+        draftsAvailable = in.readByte() != 0;
+        ocrPurchaseId = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (draftsAvailable ? 1 : 0));
+        dest.writeString(ocrPurchaseId);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Bindable
@@ -64,14 +76,4 @@ public class HomeViewModel extends BaseObservable implements Parcelable {
         return !TextUtils.isEmpty(ocrPurchaseId);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.draftsAvailable ? (byte) 1 : (byte) 0);
-        dest.writeString(this.ocrPurchaseId);
-    }
 }

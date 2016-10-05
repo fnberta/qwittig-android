@@ -20,8 +20,8 @@ import ch.giantific.qwittig.utils.DateUtils;
 /**
  * Provides a view model for a paid compensation list row.
  */
-public class CompPaidItemViewViewModel extends BaseChildItemViewModel
-        implements Comparable<CompPaidItemViewViewModel> {
+public class CompPaidItemViewModel extends BaseChildItemViewModel
+        implements Comparable<CompPaidItemViewModel> {
 
     private final Date date;
     private final String amount;
@@ -30,11 +30,11 @@ public class CompPaidItemViewViewModel extends BaseChildItemViewModel
     private final String nickname;
     private final String avatar;
 
-    public CompPaidItemViewViewModel(@EventType int eventType,
-                                     @NonNull Compensation compensation,
-                                     @NonNull Identity identity,
-                                     boolean isPos,
-                                     @NonNull NumberFormat numberFormat) {
+    public CompPaidItemViewModel(@EventType int eventType,
+                                 @NonNull Compensation compensation,
+                                 @NonNull Identity identity,
+                                 boolean isPos,
+                                 @NonNull NumberFormat numberFormat) {
         super(eventType, identity.getId());
 
         date = compensation.getPaidAtDate();
@@ -76,7 +76,7 @@ public class CompPaidItemViewViewModel extends BaseChildItemViewModel
     }
 
     @Override
-    public int compareTo(@NonNull CompPaidItemViewViewModel compPaidItemViewModel) {
+    public int compareTo(@NonNull CompPaidItemViewModel compPaidItemViewModel) {
         return date.compareTo(compPaidItemViewModel.getDate());
     }
 
@@ -85,7 +85,7 @@ public class CompPaidItemViewViewModel extends BaseChildItemViewModel
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        final CompPaidItemViewViewModel that = (CompPaidItemViewViewModel) o;
+        final CompPaidItemViewModel that = (CompPaidItemViewModel) o;
 
         if (amountPos != that.isAmountPos()) return false;
         if (!date.equals(that.getDate())) return false;

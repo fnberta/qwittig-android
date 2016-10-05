@@ -14,7 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
@@ -39,13 +39,11 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.common.MessageAction;
-import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersActivity;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 
@@ -73,8 +71,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
     SettingsContract.Presenter presenter;
     @Inject
     SharedPreferences sharedPrefs;
-    @Inject
-    Navigator navigator;
     private ActivityListener activity;
     private PreferenceCategory categoryCurrentGroup;
     private ListPreference listPreferenceGroupCurrent;
@@ -123,7 +119,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         });
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
         final FragmentActivity activity = getActivity();
@@ -144,17 +139,17 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
         final Preference prefProfile = findPreference(PREF_PROFILE);
         prefProfile.setOnPreferenceClickListener(preference -> {
-            navigator.startProfileSettings();
+            presenter.onProfileClick();
             return true;
         });
         final Preference prefGroupNew = findPreference(PREF_GROUP_ADD_NEW);
         prefGroupNew.setOnPreferenceClickListener(preference -> {
-            navigator.startGroupAddSettings();
+            presenter.onAddGroupClick();
             return true;
         });
         final Preference prefGroupAddUser = findPreference(PREF_GROUP_USERS);
         prefGroupAddUser.setOnPreferenceClickListener(preference -> {
-            navigator.startUsersSettings();
+            presenter.onUsersClick();
             return true;
         });
     }
@@ -248,6 +243,11 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onActivityResult(requestCode, resultCode, data);
 
         facebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void startEnterTransition() {
+        ActivityCompat.startPostponedEnterTransition(getActivity());
     }
 
     @Override

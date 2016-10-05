@@ -31,7 +31,6 @@ import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnp
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.SingleSubscriber;
-import rx.Subscriber;
 import timber.log.Timber;
 
 public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.ViewListener>
@@ -43,7 +42,6 @@ public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.
     private final SortedList<CompUnpaidItemViewModel> items;
     private final SortedListCallback<CompUnpaidItemViewModel> listCallback;
     private final CompensationRepository compsRepo;
-    private boolean initialDataLoaded;
     private String currentGroupId;
     private String compConfirmingId;
     private String groupCurrency;
@@ -104,7 +102,6 @@ public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.
                         groupCurrency = identity.getGroupCurrency();
                         moneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, true, true);
 
-                        initialDataLoaded = false;
                         final String identityId = identity.getId();
                         final String groupId = identity.getGroup();
                         if (!Objects.equals(currentGroupId, groupId)) {
@@ -112,46 +109,26 @@ public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.
                         }
                         currentGroupId = groupId;
                         addDataListener(identityId, groupId);
-                        loadInitialData(identityId, groupId);
                     }
                 })
         );
     }
 
     private void addDataListener(@NonNull final String identityId, @NonNull String groupId) {
+        final Observable<List<CompUnpaidItemViewModel>> initialData = compsRepo.getCompensations(groupId, identityId, false)
+                .flatMap(compensation -> getItemViewModel(compensation, EventType.NONE, identityId))
+                .toList()
+                .doOnNext(compUnpaidItemViewModels -> {
+                    items.addAll(compUnpaidItemViewModels);
+                    viewModel.setEmpty(getItemCount() == 0);
+                    viewModel.setLoading(false);
+                });
         subscriptions.add(compsRepo.observeCompensationChildren(groupId, identityId, false)
-                .filter(compensationRxChildEvent -> initialDataLoaded)
+                .skipUntil(initialData)
                 .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), identityId))
                 .subscribe(new ChildEventSubscriber<>(items, viewModel, e ->
                         view.showMessage(R.string.toast_error_comps_load)))
-        );
-    }
-
-    private void loadInitialData(@NonNull final String identityId, @NonNull String groupId) {
-        subscriptions.add(compsRepo.getCompensations(groupId, identityId, false)
-                .takeWhile(compensation -> Objects.equals(compensation.getGroup(), currentGroupId))
-                .flatMap(compensation -> getItemViewModel(compensation, EventType.NONE, identityId))
-                .toList()
-                .subscribe(new Subscriber<List<CompUnpaidItemViewModel>>() {
-                    @Override
-                    public void onCompleted() {
-                        initialDataLoaded = true;
-                        viewModel.setEmpty(getItemCount() == 0);
-                        viewModel.setLoading(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e, "failed to load initial unpaid compensations with error:");
-                        view.showMessage(R.string.toast_error_comps_load);
-                    }
-
-                    @Override
-                    public void onNext(List<CompUnpaidItemViewModel> compUnpaidItemViewModels) {
-                        items.addAll(compUnpaidItemViewModels);
-                    }
-                })
         );
     }
 

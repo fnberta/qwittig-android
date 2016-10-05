@@ -18,12 +18,13 @@ import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 /**
  * Provides an implementation of the {@link LoginEmailContract}.
  */
-public class LoginEmailViewModel extends BaseObservable implements LoadingViewModel, Parcelable {
+public class LoginEmailViewModel extends BaseObservable
+        implements LoadingViewModel, Parcelable {
 
-    public static final Parcelable.Creator<LoginEmailViewModel> CREATOR = new Parcelable.Creator<LoginEmailViewModel>() {
+    public static final Creator<LoginEmailViewModel> CREATOR = new Creator<LoginEmailViewModel>() {
         @Override
-        public LoginEmailViewModel createFromParcel(Parcel source) {
-            return new LoginEmailViewModel(source);
+        public LoginEmailViewModel createFromParcel(Parcel in) {
+            return new LoginEmailViewModel(in);
         }
 
         @Override
@@ -43,12 +44,27 @@ public class LoginEmailViewModel extends BaseObservable implements LoadingViewMo
     }
 
     private LoginEmailViewModel(Parcel in) {
-        this.loading = in.readByte() != 0;
-        this.signUp = in.readByte() != 0;
-        this.email = in.readString();
-        this.password = in.readString();
-        this.passwordRepeat = in.readString();
-        this.validate = in.readByte() != 0;
+        loading = in.readByte() != 0;
+        signUp = in.readByte() != 0;
+        email = in.readString();
+        password = in.readString();
+        passwordRepeat = in.readString();
+        validate = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (loading ? 1 : 0));
+        dest.writeByte((byte) (signUp ? 1 : 0));
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeString(passwordRepeat);
+        dest.writeByte((byte) (validate ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -96,14 +112,24 @@ public class LoginEmailViewModel extends BaseObservable implements LoadingViewMo
     public void setPassword(String password) {
         this.password = password;
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.emailComplete);
         }
+    }
+
+    @Bindable
+    public boolean isPasswordComplete() {
+        return !TextUtils.isEmpty(password);
+    }
+
+    @Bindable
+    public boolean isPasswordEqual() {
+        return Objects.equals(password, passwordRepeat);
     }
 
     public void setPasswordRepeat(String passwordRepeat) {
         this.passwordRepeat = passwordRepeat;
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.passwordEqual);
         }
     }
 
@@ -120,27 +146,8 @@ public class LoginEmailViewModel extends BaseObservable implements LoadingViewMo
     public boolean isInputValid() {
         setValidate(true);
         return signUp
-               ? isEmailComplete() && isPasswordComplete() && Objects.equals(password, passwordRepeat)
+               ? isEmailComplete() && isPasswordComplete() && isPasswordEqual()
                : isEmailComplete() && isPasswordComplete();
     }
 
-    @Bindable
-    public boolean isPasswordComplete() {
-        return !TextUtils.isEmpty(password);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.signUp ? (byte) 1 : (byte) 0);
-        dest.writeString(this.email);
-        dest.writeString(this.password);
-        dest.writeString(this.passwordRepeat);
-        dest.writeByte(this.validate ? (byte) 1 : (byte) 0);
-    }
 }

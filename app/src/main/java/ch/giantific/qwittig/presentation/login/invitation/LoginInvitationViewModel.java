@@ -11,12 +11,13 @@ import ch.giantific.qwittig.BR;
 /**
  * Created by fabio on 13.05.16.
  */
-public class LoginInvitationViewModel extends BaseObservable implements Parcelable {
+public class LoginInvitationViewModel extends BaseObservable
+        implements Parcelable {
 
-    public static final Parcelable.Creator<LoginInvitationViewModel> CREATOR = new Parcelable.Creator<LoginInvitationViewModel>() {
+    public static final Creator<LoginInvitationViewModel> CREATOR = new Creator<LoginInvitationViewModel>() {
         @Override
-        public LoginInvitationViewModel createFromParcel(Parcel source) {
-            return new LoginInvitationViewModel(source);
+        public LoginInvitationViewModel createFromParcel(Parcel in) {
+            return new LoginInvitationViewModel(in);
         }
 
         @Override
@@ -31,8 +32,19 @@ public class LoginInvitationViewModel extends BaseObservable implements Parcelab
     }
 
     private LoginInvitationViewModel(Parcel in) {
-        this.groupName = in.readString();
-        this.inviterNickname = in.readString();
+        groupName = in.readString();
+        inviterNickname = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(groupName);
+        dest.writeString(inviterNickname);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Bindable
@@ -55,14 +67,4 @@ public class LoginInvitationViewModel extends BaseObservable implements Parcelab
         notifyPropertyChanged(BR.inviterNickname);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.groupName);
-        dest.writeString(this.inviterNickname);
-    }
 }

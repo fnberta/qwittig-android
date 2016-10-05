@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items;
 
+import android.databinding.Observable;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 
@@ -13,7 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Represents a help item with a title and an icon, both referencing android resources.
  */
-public interface BaseHelpFeedbackItemViewModel extends Parcelable {
+public interface BaseHelpFeedbackItemViewModel extends Observable {
 
     @ViewType
     int getViewType();

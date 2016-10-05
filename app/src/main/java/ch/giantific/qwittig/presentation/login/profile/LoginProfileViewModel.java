@@ -12,12 +12,13 @@ import ch.giantific.qwittig.BR;
 /**
  * Created by fabio on 01.05.16.
  */
-public class LoginProfileViewModel extends BaseObservable implements Parcelable {
+public class LoginProfileViewModel extends BaseObservable
+        implements Parcelable {
 
-    public static final Parcelable.Creator<LoginProfileViewModel> CREATOR = new Parcelable.Creator<LoginProfileViewModel>() {
+    public static final Creator<LoginProfileViewModel> CREATOR = new Creator<LoginProfileViewModel>() {
         @Override
-        public LoginProfileViewModel createFromParcel(Parcel source) {
-            return new LoginProfileViewModel(source);
+        public LoginProfileViewModel createFromParcel(Parcel in) {
+            return new LoginProfileViewModel(in);
         }
 
         @Override
@@ -33,9 +34,21 @@ public class LoginProfileViewModel extends BaseObservable implements Parcelable 
     }
 
     private LoginProfileViewModel(Parcel in) {
-        this.avatar = in.readString();
-        this.nickname = in.readString();
-        this.validate = in.readByte() != 0;
+        avatar = in.readString();
+        nickname = in.readString();
+        validate = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(avatar);
+        dest.writeString(nickname);
+        dest.writeByte((byte) (validate ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Bindable
@@ -67,7 +80,7 @@ public class LoginProfileViewModel extends BaseObservable implements Parcelable 
         this.nickname = nickname;
         notifyPropertyChanged(BR.nickname);
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.nicknameComplete);
         }
     }
 
@@ -81,15 +94,4 @@ public class LoginProfileViewModel extends BaseObservable implements Parcelable 
         return isNicknameComplete();
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.avatar);
-        dest.writeString(this.nickname);
-        dest.writeByte(this.validate ? (byte) 1 : (byte) 0);
-    }
 }

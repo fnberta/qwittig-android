@@ -24,8 +24,8 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
 
     public static final Creator<PurchaseAddEditArticleItemViewModel> CREATOR = new Creator<PurchaseAddEditArticleItemViewModel>() {
         @Override
-        public PurchaseAddEditArticleItemViewModel createFromParcel(Parcel source) {
-            return new PurchaseAddEditArticleItemViewModel(source);
+        public PurchaseAddEditArticleItemViewModel createFromParcel(Parcel in) {
+            return new PurchaseAddEditArticleItemViewModel(in);
         }
 
         @Override
@@ -43,6 +43,7 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
         this("", "", 0, identities);
     }
 
+
     public PurchaseAddEditArticleItemViewModel(@NonNull String name,
                                                @NonNull String price,
                                                double priceParsed,
@@ -54,13 +55,26 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
     }
 
     private PurchaseAddEditArticleItemViewModel(Parcel in) {
-        this.validate = in.readByte() != 0;
-        this.name = in.readString();
-        this.price = in.readString();
-        this.priceParsed = in.readDouble();
-        this.identities = in.createTypedArray(PurchaseAddEditArticleIdentityItemViewModel.CREATOR);
+        validate = in.readByte() != 0;
+        name = in.readString();
+        price = in.readString();
+        priceParsed = in.readDouble();
+        identities = in.createTypedArray(PurchaseAddEditArticleIdentityItemViewModel.CREATOR);
     }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (validate ? 1 : 0));
+        dest.writeString(name);
+        dest.writeString(price);
+        dest.writeDouble(priceParsed);
+        dest.writeTypedArray(identities, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
     @Bindable
     public boolean isValidate() {
@@ -81,7 +95,7 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
         this.name = name;
         notifyPropertyChanged(BR.name);
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.nameComplete);
         }
     }
 
@@ -100,7 +114,7 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
         this.priceParsed = priceParsed;
         notifyPropertyChanged(BR.price);
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.priceComplete);
         }
     }
 
@@ -148,17 +162,4 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
         return ViewType.ARTICLE;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.validate ? (byte) 1 : (byte) 0);
-        dest.writeString(this.name);
-        dest.writeString(this.price);
-        dest.writeDouble(this.priceParsed);
-        dest.writeTypedArray(this.identities, flags);
-    }
 }

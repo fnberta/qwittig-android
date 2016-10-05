@@ -24,5 +24,7 @@ public interface FinanceHeaderContract {
     interface ViewListener extends BaseViewListener {
 
         void setColorTheme(@NonNull BigFraction balance);
+
+        void startEnterTransition();
     }
 }

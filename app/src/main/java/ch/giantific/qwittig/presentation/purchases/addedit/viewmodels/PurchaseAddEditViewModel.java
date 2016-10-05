@@ -29,8 +29,8 @@ public class PurchaseAddEditViewModel extends BaseObservable
 
     public static final Creator<PurchaseAddEditViewModel> CREATOR = new Creator<PurchaseAddEditViewModel>() {
         @Override
-        public PurchaseAddEditViewModel createFromParcel(Parcel source) {
-            return new PurchaseAddEditViewModel(source);
+        public PurchaseAddEditViewModel createFromParcel(Parcel in) {
+            return new PurchaseAddEditViewModel(in);
         }
 
         @Override
@@ -64,20 +64,39 @@ public class PurchaseAddEditViewModel extends BaseObservable
     }
 
     private PurchaseAddEditViewModel(Parcel in) {
-        this.supportedCurrencies = in.createStringArrayList();
-        this.loading = in.readByte() != 0;
-        this.receipt = in.readString();
-        this.currency = in.readString();
-        this.note = in.readString();
-        long tmpDate = in.readLong();
-        this.date = tmpDate == -1 ? null : new Date(tmpDate);
-        this.dateFormatted = in.readString();
-        this.store = in.readString();
-        this.exchangeRate = in.readDouble();
-        this.exchangeRateFormatted = in.readString();
-        this.total = in.readDouble();
-        this.totalFormatted = in.readString();
-        this.myShare = in.readString();
+        supportedCurrencies = in.createStringArrayList();
+        loading = in.readByte() != 0;
+        receipt = in.readString();
+        currency = in.readString();
+        note = in.readString();
+        dateFormatted = in.readString();
+        store = in.readString();
+        exchangeRate = in.readDouble();
+        exchangeRateFormatted = in.readString();
+        total = in.readDouble();
+        totalFormatted = in.readString();
+        myShare = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringList(supportedCurrencies);
+        dest.writeByte((byte) (loading ? 1 : 0));
+        dest.writeString(receipt);
+        dest.writeString(currency);
+        dest.writeString(note);
+        dest.writeString(dateFormatted);
+        dest.writeString(store);
+        dest.writeDouble(exchangeRate);
+        dest.writeString(exchangeRateFormatted);
+        dest.writeDouble(total);
+        dest.writeString(totalFormatted);
+        dest.writeString(myShare);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public List<String> getSupportedCurrencies() {
@@ -234,25 +253,4 @@ public class PurchaseAddEditViewModel extends BaseObservable
         return exchangeRate != 1;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringList(this.supportedCurrencies);
-        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
-        dest.writeString(this.receipt);
-        dest.writeString(this.currency);
-        dest.writeString(this.note);
-        dest.writeLong(this.date != null ? this.date.getTime() : -1);
-        dest.writeString(this.dateFormatted);
-        dest.writeString(this.store);
-        dest.writeDouble(this.exchangeRate);
-        dest.writeString(this.exchangeRateFormatted);
-        dest.writeDouble(this.total);
-        dest.writeString(this.totalFormatted);
-        dest.writeString(this.myShare);
-    }
 }

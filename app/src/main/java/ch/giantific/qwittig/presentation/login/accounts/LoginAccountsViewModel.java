@@ -12,12 +12,13 @@ import android.os.Parcelable;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 
-public class LoginAccountsViewModel extends BaseObservable implements LoadingViewModel, Parcelable {
+public class LoginAccountsViewModel extends BaseObservable
+        implements LoadingViewModel, Parcelable {
 
-    public static final Parcelable.Creator<LoginAccountsViewModel> CREATOR = new Parcelable.Creator<LoginAccountsViewModel>() {
+    public static final Creator<LoginAccountsViewModel> CREATOR = new Creator<LoginAccountsViewModel>() {
         @Override
-        public LoginAccountsViewModel createFromParcel(Parcel source) {
-            return new LoginAccountsViewModel(source);
+        public LoginAccountsViewModel createFromParcel(Parcel in) {
+            return new LoginAccountsViewModel(in);
         }
 
         @Override
@@ -32,7 +33,17 @@ public class LoginAccountsViewModel extends BaseObservable implements LoadingVie
     }
 
     private LoginAccountsViewModel(Parcel in) {
-        this.loading = in.readByte() != 0;
+        loading = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (loading ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -47,13 +58,4 @@ public class LoginAccountsViewModel extends BaseObservable implements LoadingVie
         notifyPropertyChanged(BR.loading);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.loading ? (byte) 1 : (byte) 0);
-    }
 }

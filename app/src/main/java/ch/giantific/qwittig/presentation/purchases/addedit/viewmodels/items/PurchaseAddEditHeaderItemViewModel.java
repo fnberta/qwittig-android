@@ -20,8 +20,8 @@ public class PurchaseAddEditHeaderItemViewModel extends BaseObservable
 
     public static final Creator<PurchaseAddEditHeaderItemViewModel> CREATOR = new Creator<PurchaseAddEditHeaderItemViewModel>() {
         @Override
-        public PurchaseAddEditHeaderItemViewModel createFromParcel(Parcel source) {
-            return new PurchaseAddEditHeaderItemViewModel(source);
+        public PurchaseAddEditHeaderItemViewModel createFromParcel(Parcel in) {
+            return new PurchaseAddEditHeaderItemViewModel(in);
         }
 
         @Override
@@ -37,7 +37,17 @@ public class PurchaseAddEditHeaderItemViewModel extends BaseObservable
     }
 
     private PurchaseAddEditHeaderItemViewModel(Parcel in) {
-        this.header = in.readInt();
+        header = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(header);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Override
@@ -56,13 +66,4 @@ public class PurchaseAddEditHeaderItemViewModel extends BaseObservable
         return ViewType.HEADER;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.header);
-    }
 }

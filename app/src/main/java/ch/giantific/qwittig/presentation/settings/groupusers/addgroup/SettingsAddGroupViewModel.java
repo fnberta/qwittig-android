@@ -15,12 +15,13 @@ import ch.giantific.qwittig.BR;
 /**
  * Provides an implementation of the {@link SettingsAddGroupContract}.
  */
-public class SettingsAddGroupViewModel extends BaseObservable implements Parcelable {
+public class SettingsAddGroupViewModel extends BaseObservable
+        implements Parcelable {
 
-    public static final Parcelable.Creator<SettingsAddGroupViewModel> CREATOR = new Parcelable.Creator<SettingsAddGroupViewModel>() {
+    public static final Creator<SettingsAddGroupViewModel> CREATOR = new Creator<SettingsAddGroupViewModel>() {
         @Override
-        public SettingsAddGroupViewModel createFromParcel(Parcel source) {
-            return new SettingsAddGroupViewModel(source);
+        public SettingsAddGroupViewModel createFromParcel(Parcel in) {
+            return new SettingsAddGroupViewModel(in);
         }
 
         @Override
@@ -36,9 +37,21 @@ public class SettingsAddGroupViewModel extends BaseObservable implements Parcela
     }
 
     private SettingsAddGroupViewModel(Parcel in) {
-        this.validate = in.readByte() != 0;
-        this.name = in.readString();
-        this.currency = in.readString();
+        validate = in.readByte() != 0;
+        name = in.readString();
+        currency = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (validate ? 1 : 0));
+        dest.writeString(name);
+        dest.writeString(currency);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     @Bindable
@@ -58,7 +71,7 @@ public class SettingsAddGroupViewModel extends BaseObservable implements Parcela
     public void setName(String name) {
         this.name = name;
         if (validate) {
-            notifyPropertyChanged(BR.validate);
+            notifyPropertyChanged(BR.nameComplete);
         }
     }
 
@@ -80,15 +93,4 @@ public class SettingsAddGroupViewModel extends BaseObservable implements Parcela
         return isNameComplete();
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.validate ? (byte) 1 : (byte) 0);
-        dest.writeString(this.name);
-        dest.writeString(this.currency);
-    }
 }

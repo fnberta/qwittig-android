@@ -11,7 +11,7 @@ import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
 import ch.giantific.qwittig.presentation.finance.paid.viewmodels.CompsPaidViewModel;
-import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewViewModel;
+import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewModel;
 
 /**
  * Defines an observable view model for a screen showing a list of paid compensations.
@@ -19,7 +19,7 @@ import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidI
 public interface CompsPaidContract {
 
     interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<CompPaidItemViewViewModel> {
+            ListPresenter<CompPaidItemViewModel> {
 
         CompsPaidViewModel getViewModel();
 

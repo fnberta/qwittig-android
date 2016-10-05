@@ -4,7 +4,7 @@
 
 package ch.giantific.qwittig.presentation.about.viewmodels.items;
 
-import android.os.Parcelable;
+import android.databinding.Observable;
 import android.support.annotation.IntDef;
 
 import java.lang.annotation.Retention;
@@ -13,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Represents a help item with a title and an icon, both referencing android resources.
  */
-public interface BaseAboutItemViewModel extends Parcelable {
+public interface BaseAboutItemViewModel extends Observable {
 
     @ViewType
     int getViewType();
