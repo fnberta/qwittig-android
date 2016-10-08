@@ -25,8 +25,6 @@ public interface SettingsAddGroupContract {
 
         List<Currency> getSupportedCurrencies();
 
-        void onNameChanged(CharSequence s, int start, int before, int count);
-
         void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 
         void onCreateClick(View view);

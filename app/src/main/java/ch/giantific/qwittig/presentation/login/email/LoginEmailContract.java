@@ -26,12 +26,6 @@ public interface LoginEmailContract {
 
         void setJoinIdentityId(@NonNull String joinIdentityId);
 
-        void onEmailChanged(CharSequence s, int start, int before, int count);
-
-        void onPasswordChanged(CharSequence s, int start, int before, int count);
-
-        void onPasswordRepeatChanged(CharSequence s, int start, int before, int count);
-
         void onLoginClick(View view);
 
         void onSignUpClick(View view);

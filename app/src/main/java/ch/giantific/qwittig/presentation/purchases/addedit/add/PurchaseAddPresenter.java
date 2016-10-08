@@ -253,9 +253,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         }
 
         moneyFormatter = MoneyUtils.getMoneyFormatter(newCurrency, false, true);
-        // update my share currency field
         viewModel.setCurrency(newCurrency, false);
-        // get new exchange rate
         this.view.loadFetchExchangeRatesWorker(currentIdentity.getGroupCurrency(), newCurrency);
 
         // TODO: once we support currencies with other than 2 decimal values, update items, total and myShare
@@ -270,12 +268,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         items.add(position, articleItem);
         listInteraction.notifyItemInserted(position);
         listInteraction.scrollToPosition(position + 1);
-    }
-
-    @Override
-    public void onArticleNameChanged(PurchaseAddEditArticleItemViewModel itemViewModel,
-                                     CharSequence name) {
-        itemViewModel.setName(name.toString());
     }
 
     @Override
@@ -620,7 +612,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
             final PurchaseAddEditArticleItemViewModel articleItem =
                     (PurchaseAddEditArticleItemViewModel) itemViewModel;
-            final String itemName = articleItem.getName();
+            final String itemName = articleItem.name.get();
             final String name = itemName != null ? itemName : "";
             final String price = articleItem.getPrice();
 

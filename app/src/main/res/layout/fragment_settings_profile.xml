@@ -70,8 +70,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_nickname"
                         android:inputType="textPersonName"
-                        android:onTextChanged="@{presenter::onNicknameChanged}"
-                        android:text="@{viewModel.nickname}"
+                        android:text="@={viewModel.nickname}"
                         />
 
                 </android.support.design.widget.TextInputLayout>
@@ -111,8 +110,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_email"
                         android:inputType="textEmailAddress"
-                        android:onTextChanged="@{presenter::onEmailChanged}"
-                        android:text="@{viewModel.email}"
+                        android:text="@={viewModel.email}"
                         />
 
                 </android.support.design.widget.TextInputLayout>
@@ -177,7 +175,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password_repeat"
                     android:inputType="textPassword"
-                    android:onTextChanged="@{presenter::onPasswordRepeatChanged}"
+                    android:text="@={viewModel.passwordRepeat}"
                     />
 
             </android.support.design.widget.TextInputLayout>

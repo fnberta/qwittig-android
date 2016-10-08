@@ -23,7 +23,6 @@ import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.Base
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleItemViewModel;
 import ch.giantific.qwittig.utils.rxwrapper.android.transitions.TransitionEvent;
-import rx.Completable;
 import rx.Observable;
 import rx.Single;
 
@@ -52,8 +51,6 @@ public interface PurchaseAddEditContract {
         void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 
         void onAddRowClick(@NonNull BasePurchaseAddEditItemViewModel itemViewModel);
-
-        void onArticleNameChanged(PurchaseAddEditArticleItemViewModel itemViewModel, CharSequence name);
 
         void onArticlePriceChanged(PurchaseAddEditArticleItemViewModel itemViewModel, CharSequence price);
 

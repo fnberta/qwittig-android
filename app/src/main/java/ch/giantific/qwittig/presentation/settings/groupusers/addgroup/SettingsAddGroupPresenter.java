@@ -91,11 +91,6 @@ public class SettingsAddGroupPresenter extends BasePresenterImpl<SettingsAddGrou
     }
 
     @Override
-    public void onNameChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setName(s.toString());
-    }
-
-    @Override
     public void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final Currency currency = (Currency) parent.getItemAtPosition(position);
         viewModel.setCurrency(currency.getCode());
@@ -107,7 +102,7 @@ public class SettingsAddGroupPresenter extends BasePresenterImpl<SettingsAddGrou
             return;
         }
 
-        final String name = viewModel.getName();
+        final String name = viewModel.name.get();
         boolean newGroup = true;
         for (String groupName : groupNames) {
             if (name.equalsIgnoreCase(groupName)) {

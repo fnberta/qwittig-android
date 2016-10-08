@@ -82,8 +82,8 @@ public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupC
                     public void onNext(Identity identity) {
                         LoginFirstGroupPresenter.this.identity = identity;
 
-                        if (TextUtils.isEmpty(viewModel.getGroupName())) {
-                            viewModel.setGroupName(identity.getGroupName());
+                        if (TextUtils.isEmpty(viewModel.groupName.get())) {
+                            viewModel.groupName.set(identity.getGroupName());
                         }
 
                         if (TextUtils.isEmpty(viewModel.getGroupCurrency())) {
@@ -109,13 +109,8 @@ public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupC
     }
 
     @Override
-    public void onGroupNameChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setGroupName(s.toString());
-    }
-
-    @Override
     public void onDoneClick(View view) {
-        final String groupName = viewModel.getGroupName();
+        final String groupName = viewModel.groupName.get();
         final String groupCurrency = viewModel.getGroupCurrency();
         if (!Objects.equals(groupName, identity.getGroupName()) ||
                 !Objects.equals(groupCurrency, identity.getGroupCurrency())) {

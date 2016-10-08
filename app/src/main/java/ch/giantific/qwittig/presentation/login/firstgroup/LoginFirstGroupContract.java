@@ -27,8 +27,6 @@ public interface LoginFirstGroupContract {
 
         void onGroupCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 
-        void onGroupNameChanged(CharSequence s, int start, int before, int count);
-
         void onDoneClick(View view);
     }
 

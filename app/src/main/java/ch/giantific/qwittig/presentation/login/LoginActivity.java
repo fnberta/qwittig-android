@@ -74,16 +74,20 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     private static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
     private static final String PREF_FIRST_RUN = "PREF_FIRST_RUN";
-
     @Inject
     Navigator navigator;
     @Inject
     GoogleApiClientDelegate googleApiDelegate;
-    private LoginAccountsContract.Presenter accountsPresenter;
-    private LoginEmailContract.Presenter emailPresenter;
-    private LoginInvitationContract.Presenter invitationPresenter;
-    private LoginProfileContract.Presenter profilePresenter;
-    private LoginFirstGroupContract.Presenter firstGroupPresenter;
+    @Inject
+    LoginAccountsContract.Presenter accountsPresenter;
+    @Inject
+    LoginEmailContract.Presenter emailPresenter;
+    @Inject
+    LoginInvitationContract.Presenter invitationPresenter;
+    @Inject
+    LoginProfileContract.Presenter profilePresenter;
+    @Inject
+    LoginFirstGroupContract.Presenter firstGroupPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +134,6 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     }
 
     private void addAccountsFragment() {
-        accountsPresenter = component.getLoginAccountsPresenter();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, new LoginAccountsFragment(), FRAGMENT_LOGIN)
                 .commit();
@@ -138,7 +141,6 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     private void showInvitationFragment(@NonNull String groupName,
                                         @NonNull String inviterNickname) {
-        invitationPresenter = component.getLoginInvitationPresenter();
         final Fragment fragment = LoginInvitationFragment.newInstance(groupName, inviterNickname);
         if (Utils.isRunningLollipopAndHigher()) {
             fragment.setEnterTransition(new Slide(Gravity.BOTTOM));
@@ -190,8 +192,6 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     @Override
     public void showEmailFragment(@NonNull String identityId) {
-        emailPresenter = component.getLoginEmailPresenter();
-
         final FragmentManager fm = getSupportFragmentManager();
         final LoginEmailFragment fragment = LoginEmailFragment.newInstance(identityId);
         if (Utils.isRunningLollipopAndHigher()) {
@@ -208,8 +208,6 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     @Override
     public void showProfileFragment(boolean withInvitation) {
-        profilePresenter = component.getLoginProfilePresenter();
-
         final FragmentManager fm = getSupportFragmentManager();
         final LoginProfileFragment fragment = LoginProfileFragment.newInstance(withInvitation);
         if (Utils.isRunningLollipopAndHigher()) {
@@ -228,8 +226,6 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     @Override
     public void showFirstGroupFragment() {
-        firstGroupPresenter = component.getLoginFirstGroupPresenter();
-
         final FragmentManager fm = getSupportFragmentManager();
         final LoginFirstGroupFragment fragment = new LoginFirstGroupFragment();
         if (Utils.isRunningLollipopAndHigher()) {

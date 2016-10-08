@@ -69,7 +69,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_group_name"
                         android:inputType="text|textCapSentences"
-                        android:onTextChanged="@{presenter::onNameChanged}"
+                        android:text="@={viewModel.name}"
                         />
                 </android.support.design.widget.TextInputLayout>
 

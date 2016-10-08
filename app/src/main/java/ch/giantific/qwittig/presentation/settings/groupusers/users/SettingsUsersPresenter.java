@@ -225,16 +225,11 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
     }
 
     @Override
-    public void onNicknameChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setNickname(s.toString());
-    }
-
-    @Override
     public void onAddUserClick(View view) {
         if (viewModel.isInputValid()) {
-            groupRepo.addPendingIdentity(currentIdentity, viewModel.getNickname());
+            groupRepo.addPendingIdentity(currentIdentity, viewModel.nickname.get());
             viewModel.setValidate(false);
-            viewModel.setNickname("");
+            viewModel.nickname.set("");
         }
     }
 }

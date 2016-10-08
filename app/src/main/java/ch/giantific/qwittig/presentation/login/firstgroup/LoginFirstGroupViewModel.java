@@ -2,6 +2,8 @@ package ch.giantific.qwittig.presentation.login.firstgroup;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.Observable;
+import android.databinding.ObservableField;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -27,31 +29,46 @@ public class LoginFirstGroupViewModel extends BaseObservable
             return new LoginFirstGroupViewModel[size];
         }
     };
+    public final ObservableField<String> groupName = new ObservableField<>();
     private boolean loading;
     private boolean validate;
-    private String groupName;
     private String groupCurrency;
     private int selectedGroupCurrency;
 
     public LoginFirstGroupViewModel(boolean loading) {
         this.loading = loading;
+
+        addChangedListeners();
     }
 
     private LoginFirstGroupViewModel(Parcel in) {
         loading = in.readByte() != 0;
         validate = in.readByte() != 0;
-        groupName = in.readString();
+        groupName.set(in.readString());
         groupCurrency = in.readString();
         selectedGroupCurrency = in.readInt();
+
+        addChangedListeners();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte((byte) (loading ? 1 : 0));
         dest.writeByte((byte) (validate ? 1 : 0));
-        dest.writeString(groupName);
+        dest.writeString(groupName.get());
         dest.writeString(groupCurrency);
         dest.writeInt(selectedGroupCurrency);
+    }
+
+    private void addChangedListeners() {
+        groupName.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.groupNameComplete);
+                }
+            }
+        });
     }
 
     @Override
@@ -82,21 +99,8 @@ public class LoginFirstGroupViewModel extends BaseObservable
     }
 
     @Bindable
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(@NonNull String groupName) {
-        this.groupName = groupName;
-        notifyPropertyChanged(BR.groupName);
-        if (validate) {
-            notifyPropertyChanged(BR.groupNameComplete);
-        }
-    }
-
-    @Bindable
     public boolean isGroupNameComplete() {
-        return !TextUtils.isEmpty(groupName);
+        return !TextUtils.isEmpty(groupName.get());
     }
 
     public String getGroupCurrency() {

@@ -56,8 +56,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_group_name"
                     android:inputType="textCapSentences"
-                    android:onTextChanged="@{presenter::onGroupNameChanged}"
-                    android:text="@{viewModel.groupName}"
+                    android:text="@={viewModel.groupName}"
                     />
 
             </android.support.design.widget.TextInputLayout>

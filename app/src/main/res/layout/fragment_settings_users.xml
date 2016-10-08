@@ -85,8 +85,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_nickname"
                     android:inputType="textPersonName"
-                    android:onTextChanged="@{presenter::onNicknameChanged}"
-                    android:text="@{viewModel.nickname}"
+                    android:text="@={viewModel.nickname}"
                     tools:text="Vera"
                     />
 

@@ -2,6 +2,8 @@ package ch.giantific.qwittig.presentation.login.profile;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.Observable;
+import android.databinding.ObservableField;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -26,29 +28,43 @@ public class LoginProfileViewModel extends BaseObservable
             return new LoginProfileViewModel[size];
         }
     };
+    public final ObservableField<String> nickname = new ObservableField<>();
     private String avatar;
-    private String nickname;
     private boolean validate;
 
     public LoginProfileViewModel() {
+        addChangedListeners();
     }
 
     private LoginProfileViewModel(Parcel in) {
         avatar = in.readString();
-        nickname = in.readString();
+        nickname.set(in.readString());
         validate = in.readByte() != 0;
+
+        addChangedListeners();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(avatar);
-        dest.writeString(nickname);
+        dest.writeString(nickname.get());
         dest.writeByte((byte) (validate ? 1 : 0));
     }
 
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    private void addChangedListeners() {
+        nickname.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.nicknameComplete);
+                }
+            }
+        });
     }
 
     @Bindable
@@ -72,21 +88,8 @@ public class LoginProfileViewModel extends BaseObservable
     }
 
     @Bindable
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(@NonNull String nickname) {
-        this.nickname = nickname;
-        notifyPropertyChanged(BR.nickname);
-        if (validate) {
-            notifyPropertyChanged(BR.nicknameComplete);
-        }
-    }
-
-    @Bindable
     public boolean isNicknameComplete() {
-        return !TextUtils.isEmpty(nickname);
+        return !TextUtils.isEmpty(nickname.get());
     }
 
     public boolean isInputValid() {

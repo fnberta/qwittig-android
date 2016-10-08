@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/small_space"
                 android:layout_marginTop="@dimen/small_space"
-                android:error="@{!viewModel.validate ? null : viewModel.emailComplete ? null : @string/error_email}"
+                android:error="@{!viewModel.validate ? null : viewModel.emailValid ? null : @string/error_email}"
                 android:transitionGroup="true"
                 >
 
@@ -60,7 +60,7 @@
                     android:hint="@string/hint_email"
                     android:imeOptions="actionNext"
                     android:inputType="textEmailAddress"
-                    android:onTextChanged="@{presenter::onEmailChanged}"
+                    android:text="@={viewModel.email}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/small_space"
-                android:error="@{!viewModel.validate ? null : viewModel.passwordComplete ? null : @string/error_password}"
+                android:error="@{!viewModel.validate ? null : viewModel.passwordValid ? null : @string/error_password}"
                 android:transitionGroup="true"
                 >
 
@@ -80,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password"
                     android:inputType="textPassword"
-                    android:onTextChanged="@{presenter::onPasswordChanged}"
+                    android:text="@={viewModel.password}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password_repeat"
                     android:inputType="textPassword"
-                    android:onTextChanged="@{presenter::onPasswordRepeatChanged}"
+                    android:text="@={viewModel.passwordRepeat}"
                     />
 
             </android.support.design.widget.TextInputLayout>

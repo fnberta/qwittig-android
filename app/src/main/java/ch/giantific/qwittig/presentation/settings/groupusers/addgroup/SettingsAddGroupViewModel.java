@@ -6,6 +6,8 @@ package ch.giantific.qwittig.presentation.settings.groupusers.addgroup;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.Observable;
+import android.databinding.ObservableField;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -29,29 +31,43 @@ public class SettingsAddGroupViewModel extends BaseObservable
             return new SettingsAddGroupViewModel[size];
         }
     };
+    public final ObservableField<String> name = new ObservableField<>();
     private boolean validate;
-    private String name;
     private String currency;
 
     public SettingsAddGroupViewModel() {
+        addChangedListeners();
     }
 
     private SettingsAddGroupViewModel(Parcel in) {
         validate = in.readByte() != 0;
-        name = in.readString();
+        name.set(in.readString());
         currency = in.readString();
+
+        addChangedListeners();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte((byte) (validate ? 1 : 0));
-        dest.writeString(name);
+        dest.writeString(name.get());
         dest.writeString(currency);
     }
 
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    private void addChangedListeners() {
+        name.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.nameComplete);
+                }
+            }
+        });
     }
 
     @Bindable
@@ -64,20 +80,9 @@ public class SettingsAddGroupViewModel extends BaseObservable
         notifyPropertyChanged(BR.validate);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-        if (validate) {
-            notifyPropertyChanged(BR.nameComplete);
-        }
-    }
-
     @Bindable
     public boolean isNameComplete() {
-        return !TextUtils.isEmpty(name);
+        return !TextUtils.isEmpty(name.get());
     }
 
     public String getCurrency() {

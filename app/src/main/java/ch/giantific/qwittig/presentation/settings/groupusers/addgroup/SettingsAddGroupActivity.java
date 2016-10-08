@@ -20,6 +20,8 @@ import android.view.MenuItem;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
@@ -49,8 +51,10 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
     public static final String ADD_USERS_FRAGMENT = "ADD_USERS_FRAGMENT";
     public static final String ADD_GROUP_FRAGMENT = "ADD_GROUP_FRAGMENT";
 
-    private SettingsAddGroupContract.Presenter groupPresenter;
-    private SettingsUsersContract.Presenter usersPresenter;
+    @Inject
+    SettingsAddGroupContract.Presenter groupPresenter;
+    @Inject
+    SettingsUsersContract.Presenter usersPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +77,6 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
                 .settingsUsersPresenterModule(new SettingsUsersPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
-        groupPresenter = component.getAddGroupPresenter();
     }
 
     @Override
@@ -108,9 +111,6 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
 
     @Override
     public void showAddUsersFragment() {
-        usersPresenter = component.getUsersPresenter();
-        setUpIconAsDone();
-
         final FragmentManager fm = getSupportFragmentManager();
         final SettingsAddGroupFragment groupFragment =
                 (SettingsAddGroupFragment) fm.findFragmentByTag(ADD_GROUP_FRAGMENT);
@@ -125,6 +125,8 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
         fm.beginTransaction()
                 .replace(R.id.container, usersFragment, SettingsAddGroupActivity.ADD_USERS_FRAGMENT)
                 .commit();
+
+        setUpIconAsDone();
     }
 
     private void setUpIconAsDone() {

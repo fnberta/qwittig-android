@@ -183,7 +183,7 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
                 return true;
             }
             final PurchaseAddEditArticleItemViewModel articleItem = (PurchaseAddEditArticleItemViewModel) addEditItem;
-            if (!Objects.equals(articleOld.getName(), articleItem.getName())) {
+            if (!Objects.equals(articleOld.getName(), articleItem.name.get())) {
                 return true;
             }
 

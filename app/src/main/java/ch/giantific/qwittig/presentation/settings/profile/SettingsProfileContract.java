@@ -53,13 +53,7 @@ public interface SettingsProfileContract {
 
         void onUnlinkThirdPartyLoginMenuClick();
 
-        void onEmailChanged(CharSequence s, int start, int before, int count);
-
-        void onNicknameChanged(CharSequence s, int start, int before, int count);
-
         void onPasswordChanged(CharSequence s, int start, int before, int count);
-
-        void onPasswordRepeatChanged(CharSequence s, int start, int before, int count);
 
         void onSaveProfileClick(View view);
 

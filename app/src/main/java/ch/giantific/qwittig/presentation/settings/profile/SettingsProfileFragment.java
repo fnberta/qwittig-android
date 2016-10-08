@@ -91,7 +91,6 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         super.onActivityCreated(savedInstanceState);
 
         presenter.attachView(this);
-        binding.setPresenter(presenter);
         binding.setViewModel(presenter.getViewModel());
     }
 

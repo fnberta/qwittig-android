@@ -31,8 +31,6 @@ public interface SettingsUsersContract {
 
         void onNewAvatarTaken(@NonNull String avatarPath);
 
-        void onNicknameChanged(CharSequence s, int start, int before, int count);
-
         void onAddUserClick(View view);
     }
 

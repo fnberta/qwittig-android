@@ -6,6 +6,8 @@ package ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.Observable;
+import android.databinding.ObservableField;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -33,10 +35,10 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
             return new PurchaseAddEditArticleItemViewModel[size];
         }
     };
-    private boolean validate;
-    private String name;
+    public final ObservableField<String> name = new ObservableField<>();
     private String price;
     private double priceParsed;
+    private boolean validate;
     private PurchaseAddEditArticleIdentityItemViewModel[] identities;
 
     public PurchaseAddEditArticleItemViewModel(@NonNull PurchaseAddEditArticleIdentityItemViewModel[] identities) {
@@ -48,24 +50,28 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
                                                @NonNull String price,
                                                double priceParsed,
                                                @NonNull PurchaseAddEditArticleIdentityItemViewModel[] identities) {
-        this.name = name;
+        this.name.set(name);
         this.price = price;
         this.priceParsed = priceParsed;
         this.identities = identities;
+
+        addChangedListeners();
     }
 
     private PurchaseAddEditArticleItemViewModel(Parcel in) {
         validate = in.readByte() != 0;
-        name = in.readString();
+        name.set(in.readString());
         price = in.readString();
         priceParsed = in.readDouble();
         identities = in.createTypedArray(PurchaseAddEditArticleIdentityItemViewModel.CREATOR);
+
+        addChangedListeners();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte((byte) (validate ? 1 : 0));
-        dest.writeString(name);
+        dest.writeString(name.get());
         dest.writeString(price);
         dest.writeDouble(priceParsed);
         dest.writeTypedArray(identities, flags);
@@ -74,6 +80,17 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    private void addChangedListeners() {
+        name.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.nameComplete);
+                }
+            }
+        });
     }
 
     @Bindable
@@ -87,21 +104,8 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
     }
 
     @Bindable
-    public String getName() {
-        return name;
-    }
-
-    public void setName(@NonNull String name) {
-        this.name = name;
-        notifyPropertyChanged(BR.name);
-        if (validate) {
-            notifyPropertyChanged(BR.nameComplete);
-        }
-    }
-
-    @Bindable
     public boolean isNameComplete() {
-        return !TextUtils.isEmpty(name);
+        return !TextUtils.isEmpty(name.get());
     }
 
     @Bindable

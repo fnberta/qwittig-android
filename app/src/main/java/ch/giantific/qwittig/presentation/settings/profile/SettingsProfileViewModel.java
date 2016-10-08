@@ -6,6 +6,8 @@ package ch.giantific.qwittig.presentation.settings.profile;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.Observable;
+import android.databinding.ObservableField;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -33,42 +35,73 @@ public class SettingsProfileViewModel extends BaseObservable
             return new SettingsProfileViewModel[size];
         }
     };
+    public final ObservableField<String> nickname = new ObservableField<>();
+    public final ObservableField<String> email = new ObservableField<>();
+    public final ObservableField<String> passwordRepeat = new ObservableField<>();
     private boolean validate;
     private String avatar;
-    private String nickname;
-    private String email;
     private String password;
-    private String passwordRepeat;
     private boolean facebookUser;
     private boolean googleUser;
     private boolean unlinkSocialLogin;
 
     public SettingsProfileViewModel() {
+        addChangedListeners();
     }
 
     private SettingsProfileViewModel(Parcel in) {
+        nickname.set(in.readString());
+        email.set(in.readString());
+        password = in.readString();
+        passwordRepeat.set(in.readString());
         validate = in.readByte() != 0;
         avatar = in.readString();
-        nickname = in.readString();
-        email = in.readString();
-        password = in.readString();
-        passwordRepeat = in.readString();
         facebookUser = in.readByte() != 0;
         googleUser = in.readByte() != 0;
         unlinkSocialLogin = in.readByte() != 0;
+
+        addChangedListeners();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(nickname.get());
+        dest.writeString(email.get());
+        dest.writeString(password);
+        dest.writeString(passwordRepeat.get());
         dest.writeByte((byte) (validate ? 1 : 0));
         dest.writeString(avatar);
-        dest.writeString(nickname);
-        dest.writeString(email);
-        dest.writeString(password);
-        dest.writeString(passwordRepeat);
         dest.writeByte((byte) (facebookUser ? 1 : 0));
         dest.writeByte((byte) (googleUser ? 1 : 0));
         dest.writeByte((byte) (unlinkSocialLogin ? 1 : 0));
+    }
+
+    private void addChangedListeners() {
+        nickname.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.nicknameComplete);
+                }
+            }
+        });
+        email.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.emailValid);
+                }
+            }
+        });
+        passwordRepeat.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.passwordValid);
+                    notifyPropertyChanged(BR.passwordEqual);
+                }
+            }
+        });
     }
 
     @Override
@@ -102,59 +135,23 @@ public class SettingsProfileViewModel extends BaseObservable
     }
 
     @Bindable
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(@NonNull String nickname) {
-        this.nickname = nickname;
-        notifyPropertyChanged(BR.nickname);
-        if (validate) {
-            notifyPropertyChanged(BR.nicknameComplete);
-        }
-    }
-
-    @Bindable
     public boolean isNicknameComplete() {
-        return !TextUtils.isEmpty(nickname);
-    }
-
-    @Bindable
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(@NonNull String email) {
-        this.email = email;
-        notifyPropertyChanged(BR.email);
-        if (validate) {
-            notifyPropertyChanged(BR.emailValid);
-        }
+        return !TextUtils.isEmpty(nickname.get());
     }
 
     @Bindable
     public boolean isEmailValid() {
-        return Utils.isEmailValid(email);
+        return Utils.isEmailValid(email.get());
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(@NonNull String password) {
         this.password = password;
         if (validate) {
             notifyPropertyChanged(BR.passwordValid);
-        }
-    }
-
-    public String getPasswordRepeat() {
-        return passwordRepeat;
-    }
-
-    public void setPasswordRepeat(String passwordRepeat) {
-        this.passwordRepeat = passwordRepeat;
-        if (validate) {
             notifyPropertyChanged(BR.passwordEqual);
         }
     }
@@ -166,7 +163,7 @@ public class SettingsProfileViewModel extends BaseObservable
 
     @Bindable
     public boolean isPasswordEqual() {
-        return Objects.equals(password, passwordRepeat);
+        return Objects.equals(password, passwordRepeat.get());
     }
 
     public boolean isFacebookUser() {

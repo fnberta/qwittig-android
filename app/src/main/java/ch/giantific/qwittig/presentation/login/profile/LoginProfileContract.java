@@ -25,8 +25,6 @@ public interface LoginProfileContract {
 
         void onAvatarClick(View view);
 
-        void onNicknameChanged(CharSequence s, int start, int before, int count);
-
         void onDoneClick(View view);
     }
 

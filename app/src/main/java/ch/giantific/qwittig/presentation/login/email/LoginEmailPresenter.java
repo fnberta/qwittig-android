@@ -117,25 +117,10 @@ public class LoginEmailPresenter extends BasePresenterImpl<LoginEmailContract.Vi
     }
 
     @Override
-    public void onEmailChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setEmail(s.toString());
-    }
-
-    @Override
-    public void onPasswordChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setPassword(s.toString());
-    }
-
-    @Override
-    public void onPasswordRepeatChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setPasswordRepeat(s.toString());
-    }
-
-    @Override
     public void onLoginClick(View view) {
-        if (viewModel.isInputValid()) {
+        if (viewModel.isInputValid(false)) {
             viewModel.setLoading(true);
-            this.view.loadEmailLoginWorker(viewModel.getEmail(), viewModel.getPassword());
+            this.view.loadEmailLoginWorker(viewModel.email.get(), viewModel.password.get());
         }
     }
 
@@ -146,16 +131,16 @@ public class LoginEmailPresenter extends BasePresenterImpl<LoginEmailContract.Vi
             return;
         }
 
-        if (viewModel.isInputValid()) {
+        if (viewModel.isInputValid(true)) {
             viewModel.setLoading(true);
             this.view.hideKeyboard();
-            this.view.loadEmailSignUpWorker(viewModel.getEmail(), viewModel.getPassword());
+            this.view.loadEmailSignUpWorker(viewModel.email.get(), viewModel.password.get());
         }
     }
 
     @Override
     public void onResetPasswordClick(View view) {
-        this.view.showResetPasswordDialog(viewModel.getEmail());
+        this.view.showResetPasswordDialog(viewModel.email.get());
     }
 
     @Override

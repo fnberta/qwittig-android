@@ -67,8 +67,8 @@ public class LoginProfilePresenter extends BasePresenterImpl<LoginProfileContrac
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
-                        if (TextUtils.isEmpty(viewModel.getNickname())) {
-                            viewModel.setNickname(identity.getNickname());
+                        if (TextUtils.isEmpty(viewModel.nickname.get())) {
+                            viewModel.nickname.set(identity.getNickname());
                         }
 
                         if (TextUtils.isEmpty(viewModel.getAvatar())) {
@@ -90,17 +90,12 @@ public class LoginProfilePresenter extends BasePresenterImpl<LoginProfileContrac
     }
 
     @Override
-    public void onNicknameChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setNickname(s.toString());
-    }
-
-    @Override
     public void onDoneClick(View v) {
         if (!viewModel.isInputValid()) {
             return;
         }
 
-        subscriptions.add(userRepo.updateProfile(viewModel.getNickname(), viewModel.getAvatar(), true)
+        subscriptions.add(userRepo.updateProfile(viewModel.nickname.get(), viewModel.getAvatar(), true)
                 .subscribe(new SingleSubscriber<User>() {
                     @Override
                     public void onSuccess(User user) {

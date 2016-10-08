@@ -93,8 +93,8 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
         view.reloadOptionsMenu();
 
         emailOrig = currentUser.getEmail();
-        if (TextUtils.isEmpty(viewModel.getEmail()) && !TextUtils.isEmpty(emailOrig)) {
-            viewModel.setEmail(emailOrig);
+        if (TextUtils.isEmpty(viewModel.email.get()) && !TextUtils.isEmpty(emailOrig)) {
+            viewModel.email.set(emailOrig);
         }
 
         subscriptions.add(userRepo.getUser(currentUser.getUid())
@@ -102,8 +102,8 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
                 .doOnSuccess(identity -> {
                     final String nickname = identity.getNickname();
                     nicknameOrig = nickname;
-                    if (TextUtils.isEmpty(viewModel.getNickname())) {
-                        viewModel.setNickname(nickname);
+                    if (TextUtils.isEmpty(viewModel.nickname.get())) {
+                        viewModel.nickname.set(nickname);
                     }
 
                     final String avatar = identity.getAvatar();
@@ -152,16 +152,6 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     }
 
     @Override
-    public void onEmailChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setEmail(s.toString());
-    }
-
-    @Override
-    public void onNicknameChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setNickname(s.toString());
-    }
-
-    @Override
     public void onPasswordChanged(CharSequence s, int start, int before, int count) {
         final String password = s.toString();
         viewModel.setPassword(password);
@@ -176,17 +166,12 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     }
 
     @Override
-    public void onPasswordRepeatChanged(CharSequence s, int start, int before, int count) {
-        viewModel.setPasswordRepeat(s.toString());
-    }
-
-    @Override
     public void onSaveProfileClick(View view) {
         if (!viewModel.isInputValid()) {
             return;
         }
 
-        final String nickname = viewModel.getNickname();
+        final String nickname = viewModel.nickname.get();
         if (!Objects.equals(nickname, nicknameOrig) && groupNicknames.contains(nickname)) {
             this.view.showMessage(R.string.toast_profile_nickname_taken);
             return;
@@ -199,10 +184,9 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
 
         final boolean googleUser = viewModel.isGoogleUser();
         final boolean facebookUser = viewModel.isFacebookUser();
-        final String email =
-                googleUser || facebookUser || Objects.equals(viewModel.getEmail(), emailOrig)
-                ? null
-                : viewModel.getEmail();
+        final String email = googleUser || facebookUser || Objects.equals(viewModel.email.get(), emailOrig)
+                             ? null
+                             : viewModel.email.get();
         final String password = googleUser || facebookUser ? null : viewModel.getPassword();
         if (!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
             this.view.showReAuthenticateDialog(emailOrig);
@@ -224,7 +208,7 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
         view.showProgressDialog(R.string.progress_profile_unlink);
-        view.loadUnlinkGoogleWorker(viewModel.getEmail(), viewModel.getPassword(), idToken);
+        view.loadUnlinkGoogleWorker(viewModel.email.get(), viewModel.getPassword(), idToken);
     }
 
     @Override
@@ -235,7 +219,7 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     @Override
     public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
         subscriptions.add(single
-                .flatMap(aVoid -> userRepo.updateProfile(viewModel.getNickname(),
+                .flatMap(aVoid -> userRepo.updateProfile(viewModel.nickname.get(),
                         viewModel.getAvatar(), isAvatarChanged()))
                 .subscribe(profileSubscriber(workerTag))
         );
@@ -244,7 +228,7 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     @Override
     public void onFacebookSignedIn(@NonNull String token) {
         view.showProgressDialog(R.string.progress_profile_unlink);
-        view.loadUnlinkFacebookWorker(viewModel.getEmail(), viewModel.getPassword(), token);
+        view.loadUnlinkFacebookWorker(viewModel.email.get(), viewModel.getPassword(), token);
     }
 
     @Override
@@ -255,7 +239,7 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     @Override
     public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
         subscriptions.add(single
-                .flatMap(aVoid -> userRepo.updateProfile(viewModel.getNickname(),
+                .flatMap(aVoid -> userRepo.updateProfile(viewModel.nickname.get(),
                         viewModel.getAvatar(), isAvatarChanged()))
                 .subscribe(profileSubscriber(workerTag))
         );
@@ -264,14 +248,14 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
         view.showProgressDialog(R.string.progress_profile_change_email_pw);
-        view.loadChangeEmailPasswordWorker(email, password, viewModel.getEmail(),
+        view.loadChangeEmailPasswordWorker(email, password, viewModel.email.get(),
                 viewModel.getPassword());
     }
 
     @Override
     public void setEmailUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
         subscriptions.add(single
-                .flatMap(aVoid -> userRepo.updateProfile(viewModel.getNickname(),
+                .flatMap(aVoid -> userRepo.updateProfile(viewModel.nickname.get(),
                         viewModel.getAvatar(), isAvatarChanged()))
                 .subscribe(profileSubscriber(workerTag))
         );
@@ -300,7 +284,7 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     }
 
     private void saveProfile() {
-        subscriptions.add(userRepo.updateProfile(viewModel.getNickname(), viewModel.getAvatar(), isAvatarChanged())
+        subscriptions.add(userRepo.updateProfile(viewModel.nickname.get(), viewModel.getAvatar(), isAvatarChanged())
                 .subscribe(new SingleSubscriber<User>() {
                     @Override
                     public void onSuccess(User user) {
@@ -326,8 +310,8 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     }
 
     private boolean changesWereMade() {
-        return !Objects.equals(viewModel.getEmail(), emailOrig)
-                || !Objects.equals(viewModel.getNickname(), nicknameOrig)
+        return !Objects.equals(viewModel.email.get(), emailOrig)
+                || !Objects.equals(viewModel.nickname.get(), nicknameOrig)
                 || isAvatarChanged()
                 || !TextUtils.isEmpty(viewModel.getPassword());
     }

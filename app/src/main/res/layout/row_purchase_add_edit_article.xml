@@ -68,8 +68,7 @@
                     android:hint="@string/hint_article_name"
                     android:imeOptions="actionNext"
                     android:inputType="text|textCapSentences"
-                    android:onTextChanged="@{(name, start, before, count) -> presenter.onArticleNameChanged(viewModel, name)}"
-                    android:text="@{viewModel.name}"
+                    android:text="@={viewModel.name}"
                     />
 
             </android.support.design.widget.TextInputLayout>
