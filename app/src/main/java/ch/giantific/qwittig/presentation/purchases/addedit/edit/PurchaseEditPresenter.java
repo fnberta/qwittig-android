@@ -169,8 +169,8 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
         }
 
         final List<Article> oldArticles = editPurchase.getArticles();
-        for (int i = 0, size = items.size(), skipCount = 0; i < size; i++) {
-            final BasePurchaseAddEditItemViewModel addEditItem = items.get(i);
+        for (int i = 0, size = getItemCount(), skipCount = 0; i < size; i++) {
+            final BasePurchaseAddEditItemViewModel addEditItem = getItemAtPosition(i);
             if (addEditItem.getViewType() != ViewType.ARTICLE) {
                 skipCount++;
                 continue;

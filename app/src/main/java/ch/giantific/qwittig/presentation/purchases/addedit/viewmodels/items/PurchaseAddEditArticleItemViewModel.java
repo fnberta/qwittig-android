@@ -143,9 +143,9 @@ public class PurchaseAddEditArticleItemViewModel extends BaseObservable
 
     public void toggleIdentity(@NonNull PurchaseAddEditArticleIdentityItemViewModel identityItem) {
         final boolean isSelected = identityItem.isSelected();
-        for (PurchaseAddEditArticleIdentityItemViewModel user : identities) {
-            if (Objects.equals(user.getIdentityId(), identityItem.getIdentityId())) {
-                user.setSelected(isSelected);
+        for (PurchaseAddEditArticleIdentityItemViewModel identity : identities) {
+            if (Objects.equals(identity.getIdentityId(), identityItem.getIdentityId())) {
+                identity.setSelected(isSelected);
             }
         }
     }

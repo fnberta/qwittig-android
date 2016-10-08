@@ -147,15 +147,15 @@ public class BindingAdapters {
     }
 
     @BindingAdapter({"articleIdentities"})
-    public static void loadItemUsers(ImageView view, PurchaseAddEditArticleIdentityItemViewModel[] users) {
+    public static void loadArticleIdentities(ImageView view, PurchaseAddEditArticleIdentityItemViewModel[] identities) {
         final Context context = view.getContext();
         final int padding = context.getResources().getDimensionPixelSize(R.dimen.small_space);
         final Drawable fallback = ContextCompat.getDrawable(view.getContext(), R.drawable.ic_group_black_24dp);
         int selected = 0;
         PurchaseAddEditArticleIdentityItemViewModel articleIdentity = null;
-        for (PurchaseAddEditArticleIdentityItemViewModel user : users) {
-            if (user.isSelected()) {
-                articleIdentity = user;
+        for (PurchaseAddEditArticleIdentityItemViewModel identity : identities) {
+            if (identity.isSelected()) {
+                articleIdentity = identity;
                 selected++;
                 if (selected > 1) {
                     view.setPadding(0, padding, padding, padding);

@@ -17,7 +17,6 @@ import java.util.Objects;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.CompensationRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -28,7 +27,9 @@ import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.CompsUnpaidViewModel;
 import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel.ViewType;
 import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
 import rx.SingleSubscriber;
 import timber.log.Timber;
@@ -163,9 +164,9 @@ public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.
 
     @Override
     public void onAmountConfirmed(double confirmedAmount) {
-        for (int i = 0, itemsSize = items.size(); i < itemsSize; i++) {
-            final CompUnpaidItemViewModel itemViewModel = items.get(i);
-            if (itemViewModel.getViewType() != CompUnpaidItemViewModel.ViewType.CREDIT
+        for (int i = 0, size = getItemCount(); i < size; i++) {
+            final CompUnpaidItemViewModel itemViewModel = getItemAtPosition(i);
+            if (itemViewModel.getViewType() != ViewType.CREDIT
                     || !Objects.equals(itemViewModel.getId(), compConfirmingId)) {
                 continue;
             }

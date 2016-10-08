@@ -161,8 +161,8 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
 
     private void scrollToFirstSelectedItem() {
         if (selectionModeEnabled) {
-            for (int i = 0, size = items.size(); i < size; i++) {
-                final DraftItemViewModel itemViewModel = items.get(i);
+            for (int i = 0, size = getItemCount(); i < size; i++) {
+                final DraftItemViewModel itemViewModel = getItemAtPosition(i);
                 if (itemViewModel.isSelected()) {
                     listInteraction.scrollToPosition(i);
                     break;
@@ -239,8 +239,8 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
 
     @Override
     public void clearSelection() {
-        for (int i = items.size() - 1; i >= 0; i--) {
-            final DraftItemViewModel itemViewModel = items.get(i);
+        for (int i = getItemCount() - 1; i >= 0; i--) {
+            final DraftItemViewModel itemViewModel = getItemAtPosition(i);
             if (itemViewModel.isSelected()) {
                 itemViewModel.setSelected(false);
                 draftsSelected.remove(itemViewModel.getId());

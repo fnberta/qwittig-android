@@ -191,7 +191,7 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
 
     @Override
     public void onNewAvatarTaken(@NonNull String avatarPath) {
-        for (int i = 0, itemsSize = items.size(); i < itemsSize; i++) {
+        for (int i = 0, size = getItemCount(); i < size; i++) {
             final SettingsUsersItemViewModel itemViewModel = getItemAtPosition(i);
             if (Objects.equals(itemViewModel.getId(), avatarIdentityId)) {
                 userRepo.updatePendingIdentityAvatar(avatarIdentityId, avatarPath);

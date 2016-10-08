@@ -40,7 +40,8 @@ import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.Purc
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
+public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter
+        implements PurchaseAddEditListInteraction {
 
     private final PurchaseAddEditContract.Presenter presenter;
 
@@ -88,7 +89,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
             case ViewType.TOTAL: {
                 final RowPurchaseAddEditTotalBinding binding =
                         RowPurchaseAddEditTotalBinding.inflate(inflater, parent, false);
-                return new TotalRow(context, binding, presenter);
+                return new TotalRow(context, binding, presenter.getViewModel().getSupportedCurrencies());
             }
             default:
                 return super.onCreateViewHolder(parent, viewType);
@@ -179,6 +180,14 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
         return presenter.getItemAtPosition(position).getViewType();
     }
 
+    @Override
+    public void notifyItemIdentityChanged(int identityRowPos,
+                                          @NonNull PurchaseAddEditArticleIdentityItemViewModel itemViewModel) {
+        final ArticleIdentitiesRow row =
+                (ArticleIdentitiesRow) recyclerView.findViewHolderForAdapterPosition(identityRowPos);
+        row.notifyItemChanged(itemViewModel);
+    }
+
     private static class ArticleIdentitiesRow extends BindingRow<RowPurchaseAddEditArticleIdentitiesBinding> {
 
         private final PurchaseAddEditArticleIdentitiesRecyclerAdapter recyclerAdapter;
@@ -196,21 +205,25 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
             binding.rvPurchaseAddItemUsers.setAdapter(recyclerAdapter);
         }
 
-        public void setIdentities(@NonNull PurchaseAddEditArticleIdentityItemViewModel[] identities) {
+        void setIdentities(@NonNull PurchaseAddEditArticleIdentityItemViewModel[] identities) {
             this.identities.clear();
             this.identities.addAll(Arrays.asList(identities));
             recyclerAdapter.notifyDataSetChanged();
+        }
+
+        void notifyItemChanged(@NonNull PurchaseAddEditArticleIdentityItemViewModel itemViewModel) {
+            recyclerAdapter.notifyItemChanged(identities.indexOf(itemViewModel));
         }
     }
 
     private static class TotalRow extends BindingRow<RowPurchaseAddEditTotalBinding> {
 
         TotalRow(@NonNull Context context, @NonNull RowPurchaseAddEditTotalBinding binding,
-                 @NonNull PurchaseAddEditContract.Presenter presenter) {
+                 @NonNull List<String> supportedCurrencies) {
             super(binding);
 
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
-                    R.layout.spinner_item_title, presenter.getViewModel().getSupportedCurrencies());
+                    R.layout.spinner_item_title, supportedCurrencies);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             binding.spCurrency.setAdapter(adapter);
         }

@@ -35,10 +35,10 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.PurchaseResult;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditListInteraction;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel.ViewType;
@@ -72,7 +72,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     protected final DateFormat dateFormatter;
     private final GroupRepository groupRepo;
     protected List<Identity> identities;
-    protected ListInteraction listInteraction;
+    protected PurchaseAddEditListInteraction listInteraction;
     protected NumberFormat moneyFormatter;
     protected Identity currentIdentity;
     private boolean fetchingExchangeRates;
@@ -131,7 +131,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     }
 
     @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
+    public void setListInteraction(@NonNull PurchaseAddEditListInteraction listInteraction) {
         this.listInteraction = listInteraction;
     }
 
@@ -332,7 +332,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     @Override
     public void onToggleIdentitiesClick(@NonNull PurchaseAddEditArticleItemViewModel itemViewModel) {
         final int insertPos = items.indexOf(itemViewModel) + 1;
-        if (items.size() < insertPos) {
+        if (getItemCount() < insertPos) {
             expandArticleRow(insertPos, itemViewModel);
         } else if (getItemAtPosition(insertPos).getViewType() == ViewType.IDENTITIES) {
             collapseArticleRow(insertPos);
@@ -370,45 +370,67 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     }
 
     @Override
-    public void onArticleRowIdentityClick() {
-        for (int i = 0, mItemsSize = items.size(); i < mItemsSize; i++) {
-            final BasePurchaseAddEditItemViewModel itemViewModel = items.get(i);
-            if (itemViewModel.getViewType() != ViewType.IDENTITIES) {
-                continue;
-            }
+    public void onArticleRowIdentityClick(@NonNull PurchaseAddEditArticleIdentityItemViewModel identityViewModel) {
+        // toggle identity selection state
+        identityViewModel.setSelected(!identityViewModel.isSelected());
 
-            final PurchaseAddEditArticleItemViewModel articleItem =
-                    (PurchaseAddEditArticleItemViewModel) getItemAtPosition(i - 1);
-            articleItem.notifyPropertyChanged(BR.identities);
+        for (int i = 0, size = getItemCount(); i < size; i++) {
+            final BasePurchaseAddEditItemViewModel itemViewModel = getItemAtPosition(i);
+            if (itemViewModel.getViewType() == ViewType.IDENTITIES) {
+                // notify selection state changed
+                listInteraction.notifyItemIdentityChanged(i, identityViewModel);
+
+                // load and set appropriate toggle image
+                final PurchaseAddEditArticleItemViewModel articleItem =
+                        (PurchaseAddEditArticleItemViewModel) getItemAtPosition(i - 1);
+                articleItem.notifyPropertyChanged(BR.identities);
+
+                break;
+            }
         }
 
+        // update total and my share
         updateTotalAndMyShare();
     }
 
     @Override
-    public void onArticleRowIdentityLongClick(@NonNull PurchaseAddEditArticleIdentityItemViewModel userClicked) {
-        for (BasePurchaseAddEditItemViewModel itemViewModel : items) {
-            if (itemViewModel.getViewType() != ViewType.ARTICLE) {
-                continue;
-            }
+    public boolean onArticleRowIdentityLongClick(@NonNull PurchaseAddEditArticleIdentityItemViewModel identityViewModel) {
+        // toggle identity selection state
+        identityViewModel.setSelected(!identityViewModel.isSelected());
 
-            final PurchaseAddEditArticleItemViewModel articleItem =
-                    (PurchaseAddEditArticleItemViewModel) itemViewModel;
-            articleItem.toggleIdentity(userClicked);
-            articleItem.notifyPropertyChanged(BR.identities);
+        for (int i = 0, size = getItemCount(); i < size; i++) {
+            final BasePurchaseAddEditItemViewModel itemViewModel = getItemAtPosition(i);
+            final int viewType = itemViewModel.getViewType();
+            switch (viewType) {
+                case ViewType.IDENTITIES:
+                    // notify selection state changed
+                    listInteraction.notifyItemIdentityChanged(i, identityViewModel);
+                    break;
+                case ViewType.ARTICLE:
+                    // load and set appropriate toggle image for all articles
+                    final PurchaseAddEditArticleItemViewModel articleItem =
+                            (PurchaseAddEditArticleItemViewModel) itemViewModel;
+                    articleItem.toggleIdentity(identityViewModel);
+                    articleItem.notifyPropertyChanged(BR.identities);
+                    break;
+            }
         }
 
+        // update total and my share
         updateTotalAndMyShare();
+
+        return true;
     }
 
     @Override
     public void onArticleDismiss(int position) {
         items.remove(position);
-        if (getItemAtPosition(position).getViewType() != ViewType.IDENTITIES) {
-            listInteraction.notifyItemRemoved(position);
-        } else {
+        // if identity row was open, remove it as well
+        if (getItemAtPosition(position).getViewType() == ViewType.IDENTITIES) {
             items.remove(position);
             listInteraction.notifyItemRangeRemoved(position, 2);
+        } else {
+            listInteraction.notifyItemRemoved(position);
         }
 
         updateTotalAndMyShare();
@@ -587,18 +609,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         onPurchaseSaved(asDraft);
     }
 
-    protected void savePurchase(@NonNull Purchase purchase, boolean asDraft) {
-        if (asDraft) {
-            purchaseRepo.saveDraft(purchase, null);
-        } else {
-            purchaseRepo.savePurchase(purchase, null, currentIdentity.getUser(), false);
-        }
-    }
-
-    protected void onPurchaseSaved(boolean asDraft) {
-        navigator.finish(asDraft ? PurchaseResult.PURCHASE_DRAFT : PurchaseResult.PURCHASE_SAVED);
-    }
-
     @NonNull
     private Purchase getPurchase(final boolean isDraft) {
         final List<String> purchaseIdentities = new ArrayList<>();
@@ -633,6 +643,18 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         }
 
         return createPurchase(purchaseIdentities, purchaseArticles, fractionDigits, isDraft);
+    }
+
+    protected void savePurchase(@NonNull Purchase purchase, boolean asDraft) {
+        if (asDraft) {
+            purchaseRepo.saveDraft(purchase, null);
+        } else {
+            purchaseRepo.savePurchase(purchase, null, currentIdentity.getUser(), false);
+        }
+    }
+
+    protected void onPurchaseSaved(boolean asDraft) {
+        navigator.finish(asDraft ? PurchaseResult.PURCHASE_DRAFT : PurchaseResult.PURCHASE_SAVED);
     }
 
     private double convertRoundItemPrice(@NonNull String priceText, int fractionDigits) {

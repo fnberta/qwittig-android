@@ -12,7 +12,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
@@ -42,7 +41,7 @@ public interface PurchaseAddEditContract {
 
         PurchaseAddEditViewModel getViewModel();
 
-        void setListInteraction(@NonNull ListInteraction listInteraction);
+        void setListInteraction(@NonNull PurchaseAddEditListInteraction listInteraction);
 
         void onDateClick(View view);
 
@@ -59,9 +58,9 @@ public interface PurchaseAddEditContract {
 
         void onToggleIdentitiesClick(@NonNull PurchaseAddEditArticleItemViewModel itemViewModel);
 
-        void onArticleRowIdentityClick();
+        void onArticleRowIdentityClick(@NonNull PurchaseAddEditArticleIdentityItemViewModel itemViewModel);
 
-        void onArticleRowIdentityLongClick(@NonNull PurchaseAddEditArticleIdentityItemViewModel userClicked);
+        boolean onArticleRowIdentityLongClick(@NonNull PurchaseAddEditArticleIdentityItemViewModel itemViewModel);
 
         void onArticleDismiss(int position);
 

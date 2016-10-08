@@ -15,6 +15,11 @@
             name="viewModel"
             type="ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel"
             />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.Presenter"
+            />
     </data>
 
     <LinearLayout
@@ -24,6 +29,8 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:gravity="center"
         android:orientation="vertical"
+        android:onClick="@{() -> presenter.onArticleRowIdentityClick(viewModel)}"
+        android:onLongClick="@{() -> presenter.onArticleRowIdentityLongClick(viewModel)}"
         >
 
         <ImageView
