@@ -92,7 +92,7 @@ public class AssignmentRepository {
                            @NonNull String timeFrame) {
         final Map<String, Object> childUpdates = new HashMap<>();
 
-        // add history event
+        // addItemAtPosition history event
         final String assignmentId = assignmentHistory.getAssignment();
         final String key = databaseRef.child(AssignmentHistory.BASE_PATH).child(assignmentId).push().getKey();
         childUpdates.put(String.format("%s/%s/%s", AssignmentHistory.BASE_PATH, assignmentId, key), assignmentHistory.toMap());

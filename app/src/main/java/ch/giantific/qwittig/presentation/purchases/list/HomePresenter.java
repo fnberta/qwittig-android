@@ -4,15 +4,15 @@
 
 package ch.giantific.qwittig.presentation.purchases.list;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
 import ch.giantific.qwittig.R;
@@ -33,40 +33,23 @@ import timber.log.Timber;
 public class HomePresenter extends BasePresenterImpl<HomeContract.ViewListener>
         implements HomeContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = HomeViewModel.class.getCanonicalName();
     private final HomeViewModel viewModel;
     private final GroupRepository groupRepo;
     private final PurchaseRepository purchaseRepo;
     private Identity currentIdentity;
     private String currentUserId;
 
-    public HomePresenter(@Nullable Bundle savedState,
-                         @NonNull Navigator navigator,
+    @Inject
+    public HomePresenter(@NonNull Navigator navigator,
+                         @NonNull HomeViewModel viewModel,
                          @NonNull UserRepository userRepo,
                          @NonNull GroupRepository groupRepo,
                          @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.groupRepo = groupRepo;
         this.purchaseRepo = purchaseRepo;
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new HomeViewModel();
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public HomeViewModel getViewModel() {
-        return viewModel;
     }
 
     @Override

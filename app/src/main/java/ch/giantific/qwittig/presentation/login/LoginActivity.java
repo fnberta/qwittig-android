@@ -33,26 +33,27 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
 import ch.giantific.qwittig.presentation.login.accounts.LoginAccountsContract;
 import ch.giantific.qwittig.presentation.login.accounts.LoginAccountsFragment;
+import ch.giantific.qwittig.presentation.login.accounts.LoginAccountsViewModel;
 import ch.giantific.qwittig.presentation.login.di.DaggerLoginComponent;
-import ch.giantific.qwittig.presentation.login.di.LoginAccountsPresenterModule;
 import ch.giantific.qwittig.presentation.login.di.LoginComponent;
-import ch.giantific.qwittig.presentation.login.di.LoginEmailPresenterModule;
-import ch.giantific.qwittig.presentation.login.di.LoginFirstGroupPresenterModule;
-import ch.giantific.qwittig.presentation.login.di.LoginInvitationPresenterModule;
-import ch.giantific.qwittig.presentation.login.di.LoginProfilePresenterModule;
 import ch.giantific.qwittig.presentation.login.email.EmailPromptDialogFragment;
 import ch.giantific.qwittig.presentation.login.email.LoginEmailContract;
 import ch.giantific.qwittig.presentation.login.email.LoginEmailFragment;
+import ch.giantific.qwittig.presentation.login.email.LoginEmailViewModel;
 import ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupContract;
 import ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupFragment;
+import ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupViewModel;
 import ch.giantific.qwittig.presentation.login.invitation.LoginInvitationContract;
 import ch.giantific.qwittig.presentation.login.invitation.LoginInvitationFragment;
+import ch.giantific.qwittig.presentation.login.invitation.LoginInvitationViewModel;
 import ch.giantific.qwittig.presentation.login.profile.LoginProfileContract;
 import ch.giantific.qwittig.presentation.login.profile.LoginProfileFragment;
+import ch.giantific.qwittig.presentation.login.profile.LoginProfileViewModel;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Single;
@@ -81,13 +82,23 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     @Inject
     LoginAccountsContract.Presenter accountsPresenter;
     @Inject
+    LoginAccountsViewModel accountsViewModel;
+    @Inject
     LoginEmailContract.Presenter emailPresenter;
+    @Inject
+    LoginEmailViewModel emailViewModel;
     @Inject
     LoginInvitationContract.Presenter invitationPresenter;
     @Inject
+    LoginInvitationViewModel invitationViewModel;
+    @Inject
     LoginProfileContract.Presenter profilePresenter;
     @Inject
+    LoginProfileViewModel profileViewModel;
+    @Inject
     LoginFirstGroupContract.Presenter firstGroupPresenter;
+    @Inject
+    LoginFirstGroupViewModel firstGroupViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,12 +119,8 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         component = DaggerLoginComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, this))
-                .loginAccountsPresenterModule(new LoginAccountsPresenterModule(savedInstanceState))
-                .loginEmailPresenterModule(new LoginEmailPresenterModule(savedInstanceState))
-                .loginInvitationPresenterModule(new LoginInvitationPresenterModule(savedInstanceState))
-                .loginProfilePresenterModule(new LoginProfilePresenterModule(savedInstanceState))
-                .loginFirstGroupPresenterModule(new LoginFirstGroupPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
@@ -122,6 +129,17 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{accountsPresenter, emailPresenter,
                 invitationPresenter, profilePresenter, firstGroupPresenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(LoginAccountsViewModel.TAG, accountsViewModel);
+        outState.putParcelable(LoginEmailViewModel.TAG, emailViewModel);
+        outState.putParcelable(LoginInvitationViewModel.TAG, invitationViewModel);
+        outState.putParcelable(LoginProfileViewModel.TAG, profileViewModel);
+        outState.putParcelable(LoginFirstGroupViewModel.TAG, firstGroupViewModel);
     }
 
     private void checkFirstRun() {
@@ -171,7 +189,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         final String identityId = deepLink.getQueryParameter(GroupRepository.INVITATION_IDENTITY);
         final String groupName = deepLink.getQueryParameter(GroupRepository.INVITATION_GROUP);
         final String inviterNickname = deepLink.getQueryParameter(GroupRepository.INVITATION_INVITER);
-        accountsPresenter.setInvitationIdentityId(identityId);
+        accountsViewModel.setJoinIdentityId(identityId);
         showInvitationFragment(groupName, inviterNickname);
     }
 
@@ -245,7 +263,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     @Override
     public void popBackStack(boolean accepted) {
         if (!accepted) {
-            accountsPresenter.setInvitationIdentityId("");
+            accountsViewModel.setJoinIdentityId("");
         }
         getSupportFragmentManager().popBackStack();
     }

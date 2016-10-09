@@ -16,8 +16,6 @@ public interface LoginInvitationContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
 
-        LoginInvitationViewModel getViewModel();
-
         void onAcceptClick(View view);
 
         void onDeclineClick(View view);

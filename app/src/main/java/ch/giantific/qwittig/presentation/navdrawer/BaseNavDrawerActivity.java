@@ -18,17 +18,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.NavDrawerHeaderBinding;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.navdrawer.di.DaggerNavDrawerComponent;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerPresenterModule;
 import ch.giantific.qwittig.presentation.settings.general.SettingsContract;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileContract;
 
@@ -48,6 +51,8 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     protected Navigator navigator;
     @Inject
     protected NavDrawerContract.Presenter navPresenter;
+    @Inject
+    NavDrawerViewModel navViewModel;
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private Menu navigationViewMenu;
@@ -66,12 +71,10 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
         final NavDrawerComponent navComp = DaggerNavDrawerComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .navDrawerPresenterModule(new NavDrawerPresenterModule(savedInstanceState))
                 .build();
         injectDependencies(navComp, savedInstanceState);
-        headerIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, navPresenter);
+        headerIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, new ArrayList<>());
         navPresenter.attachView(this);
-        navPresenter.setSpinnerInteraction(headerIdentitiesAdapter);
     }
 
     protected abstract void injectDependencies(@NonNull NavDrawerComponent navComp,
@@ -97,7 +100,7 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
         final View navigationViewHeader = navigationView.getHeaderView(0);
         final NavDrawerHeaderBinding headerBinding = NavDrawerHeaderBinding.bind(navigationViewHeader);
         headerBinding.setPresenter(navPresenter);
-        headerBinding.setViewModel(navPresenter.getViewModel());
+        headerBinding.setViewModel(navViewModel);
         headerBinding.spDrawerGroup.setAdapter(headerIdentitiesAdapter);
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -229,5 +232,16 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     protected final void checkNavDrawerItem(int itemId) {
         final MenuItem item = navigationViewMenu.findItem(itemId);
         item.setChecked(true);
+    }
+
+    @Override
+    public void clearHeaderIdentities() {
+        headerIdentitiesAdapter.clear();
+    }
+
+    @Override
+    public void addHeaderIdentities(@NonNull List<Identity> identities) {
+        headerIdentitiesAdapter.addAll(identities);
+        headerIdentitiesAdapter.notifyDataSetChanged();
     }
 }

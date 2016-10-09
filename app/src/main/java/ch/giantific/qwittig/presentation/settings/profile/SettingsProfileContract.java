@@ -37,8 +37,6 @@ public interface SettingsProfileContract {
             EmailReAuthenticateDialogFragment.DialogInteractionListener,
             GoogleApiClientDelegate.GoogleLoginCallback {
 
-        SettingsProfileViewModel getViewModel();
-
         boolean showDeleteAvatar();
 
         boolean showUnlinkFacebook();

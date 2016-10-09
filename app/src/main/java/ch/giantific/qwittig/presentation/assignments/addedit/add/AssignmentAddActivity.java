@@ -12,10 +12,10 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.presentation.assignments.addedit.BaseAssignmentAddEditActivity;
 import ch.giantific.qwittig.presentation.assignments.addedit.BaseAssignmentAddEditFragment;
 import ch.giantific.qwittig.presentation.assignments.addedit.di.AssignmentAddComponent;
-import ch.giantific.qwittig.presentation.assignments.addedit.di.AssignmentAddPresenterModule;
 import ch.giantific.qwittig.presentation.assignments.addedit.di.DaggerAssignmentAddComponent;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 
 /**
  * Hosts {@link AssignmentAddFragment} that allows the user to create a new task.
@@ -31,7 +31,7 @@ public class AssignmentAddActivity extends BaseAssignmentAddEditActivity<Assignm
         component = DaggerAssignmentAddComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .assignmentAddPresenterModule(new AssignmentAddPresenterModule(savedInstanceState))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .build();
         component.inject(this);
     }

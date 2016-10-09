@@ -21,8 +21,6 @@ public interface LoginFirstGroupContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
 
-        LoginFirstGroupViewModel getViewModel();
-
         List<Currency> getSupportedCurrencies();
 
         void onGroupCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);

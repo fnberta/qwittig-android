@@ -1,9 +1,7 @@
 package ch.giantific.qwittig.presentation.common.presenters;
 
-import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.firebase.auth.FirebaseUser;
 
@@ -23,8 +21,7 @@ public abstract class BasePresenterImpl<T extends BaseViewListener> implements B
     protected T view;
     protected CompositeSubscription subscriptions = new CompositeSubscription();
 
-    public BasePresenterImpl(@Nullable Bundle savedState,
-                             @NonNull Navigator navigator,
+    public BasePresenterImpl(@NonNull Navigator navigator,
                              @NonNull UserRepository userRepo) {
         this.navigator = navigator;
         this.userRepo = userRepo;
@@ -33,12 +30,6 @@ public abstract class BasePresenterImpl<T extends BaseViewListener> implements B
     @Override
     public void attachView(@NonNull T view) {
         this.view = view;
-    }
-
-    @Override
-    @CallSuper
-    public void saveState(@NonNull Bundle outState) {
-        // empty default implementation
     }
 
     @Override

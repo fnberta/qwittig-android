@@ -6,9 +6,9 @@ import android.support.v7.util.SortedList;
 
 import java.util.Objects;
 
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.presentation.common.viewmodels.EmptyViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.ChildItemViewModel;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 
 /**
  * Created by fabio on 28.09.16.

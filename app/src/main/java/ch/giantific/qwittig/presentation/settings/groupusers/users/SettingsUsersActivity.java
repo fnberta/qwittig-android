@@ -24,15 +24,15 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupPresenterModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersPresenterModule;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
 import ch.giantific.qwittig.utils.AvatarUtils;
 
 /**
- * Hosts {@link SettingsUsersFragment} that allows the user to add users to his/her current
+ * Hosts {@link SettingsUsersFragment} that allows the user to addItemAtPosition users to his/her current
  * group.
  * <p/>
  * Subclass of {@link BaseActivity}.
@@ -42,6 +42,8 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
 
     @Inject
     SettingsUsersContract.Presenter presenter;
+    @Inject
+    SettingsUsersViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,8 +69,7 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
         component = DaggerSettingsGroupUsersComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .settingsAddGroupPresenterModule(new SettingsAddGroupPresenterModule(savedInstanceState))
-                .settingsUsersPresenterModule(new SettingsUsersPresenterModule(savedInstanceState))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
@@ -76,6 +77,13 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
     @Override
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(SettingsUsersViewModel.TAG, viewModel);
     }
 
     @Override

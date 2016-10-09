@@ -14,24 +14,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.assignments.details.viewmodels.AssignmentDetailsViewModel;
-import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.BaseAssignmentDetailsItemViewModel;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.AssignmentDetailsHeaderItemViewModel;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.AssignmentDetailsHistoryItemViewModel;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
 
 /**
  * Defines an observable view model for the task details screen.
  */
 public interface AssignmentDetailsContract {
 
-    interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<BaseAssignmentDetailsItemViewModel> {
-
-        AssignmentDetailsViewModel getViewModel();
-
-        void setListInteraction(@NonNull ListInteraction listInteraction);
+    interface Presenter extends BasePresenter<ViewListener> {
 
         void onDeleteAssignmentMenuClick();
 
@@ -55,6 +48,14 @@ public interface AssignmentDetailsContract {
          * @return a {@link SpannableStringBuilder} with the appropriate string
          */
         SpannableStringBuilder buildIdentitiesString(@NonNull List<Identity> identities);
+
+        void addItem(@NonNull AssignmentDetailsHeaderItemViewModel itemViewModel);
+
+        void addItems(@NonNull List<AssignmentDetailsHistoryItemViewModel> itemViewModels);
+
+        void clearItems();
+
+        void notifyItemsChanged();
     }
 
     @IntDef({AssignmentDetailsResult.DELETED, AssignmentDetailsResult.GROUP_CHANGED})

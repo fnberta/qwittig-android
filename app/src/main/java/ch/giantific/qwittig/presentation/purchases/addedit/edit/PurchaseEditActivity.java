@@ -13,6 +13,7 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
@@ -52,7 +53,8 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
         component = DaggerPurchaseEditComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .purchaseEditPresenterModule(new PurchaseEditPresenterModule(savedInstanceState, editPurchaseId))
+                .purchaseEditPresenterModule(new PurchaseEditPresenterModule(editPurchaseId))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .build();
         component.inject(this);
 

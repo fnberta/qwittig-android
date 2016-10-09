@@ -11,22 +11,34 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsUsersBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseSortedListFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
 
 /**
  * Displays the user invite screen, where the user can invite new users to the group and sees
  * everybody that is currently invited but has not yet accepted/declined the invitation.
  */
-public class SettingsUsersFragment extends BaseFragment<SettingsGroupUsersComponent, SettingsUsersContract.Presenter, BaseFragment.ActivityListener<SettingsGroupUsersComponent>>
+public class SettingsUsersFragment extends BaseSortedListFragment<SettingsGroupUsersComponent,
+        SettingsUsersContract.Presenter,
+        BaseFragment.ActivityListener<SettingsGroupUsersComponent>,
+        SettingsUsersItemViewModel>
         implements SettingsUsersContract.ViewListener {
 
+    @Inject
+    SettingsUsersViewModel viewModel;
     private FragmentSettingsUsersBinding binding;
     private ProgressDialog progressDialog;
     private Intent shareLink;
@@ -46,11 +58,10 @@ public class SettingsUsersFragment extends BaseFragment<SettingsGroupUsersCompon
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final SettingsUsersRecyclerAdapter adapter = setupRecyclerView();
+        setupRecyclerView();
         presenter.attachView(this);
-        presenter.setListInteraction(adapter);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
 
         shareLink = new Intent(Intent.ACTION_SEND);
         shareLink.setType("text/plain");
@@ -61,13 +72,16 @@ public class SettingsUsersFragment extends BaseFragment<SettingsGroupUsersCompon
         component.inject(this);
     }
 
-    private SettingsUsersRecyclerAdapter setupRecyclerView() {
+    @Override
+    protected BaseSortedListRecyclerAdapter<SettingsUsersItemViewModel, SettingsUsersContract.Presenter, ? extends RecyclerView.ViewHolder> getRecyclerAdapter() {
+        return new SettingsUsersRecyclerAdapter(presenter);
+    }
+
+    @Override
+    protected void setupRecyclerView() {
         binding.rvSettingsUsers.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvSettingsUsers.setHasFixedSize(true);
-        final SettingsUsersRecyclerAdapter adapter = new SettingsUsersRecyclerAdapter(presenter);
-        binding.rvSettingsUsers.setAdapter(adapter);
-
-        return adapter;
+        binding.rvSettingsUsers.setAdapter(recyclerAdapter);
     }
 
     @Override

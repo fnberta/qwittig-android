@@ -11,7 +11,6 @@ import android.widget.AdapterView;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.SpinnerInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 
@@ -21,12 +20,6 @@ import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 public interface NavDrawerContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
-
-        NavDrawerViewModel getViewModel();
-
-        void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction);
-
-        List<Identity> getIdentities();
 
         boolean isUserLoggedIn();
 
@@ -38,6 +31,8 @@ public interface NavDrawerContract {
     }
 
     interface ViewListener extends BaseViewListener {
-        // empty
+        void clearHeaderIdentities();
+
+        void addHeaderIdentities(@NonNull List<Identity> identities);
     }
 }

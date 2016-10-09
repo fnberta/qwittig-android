@@ -16,16 +16,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentAssignmentAddEditBinding;
+import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.AssignmentAddEditViewModel;
+import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.common.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.listadapters.StringResSpinnerAdapter;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListDragInteraction;
 
 /**
- * Provides an interface for the user to add a new task. Allows the selection of the time
+ * Provides an interface for the user to addItemAtPosition a new task. Allows the selection of the time
  * frame, the deadline and the users involved. The title of the task is set in the {@link Toolbar}
  * of the hosting {@link Activity}.
  * <p/>
@@ -34,8 +37,11 @@ import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListDr
 public abstract class BaseAssignmentAddEditFragment<T> extends BaseFragment<T, AssignmentAddEditContract.Presenter, BaseFragment.ActivityListener<T>>
         implements AssignmentAddEditContract.ViewListener {
 
+    @Inject
+    AssignmentAddEditViewModel viewModel;
     private FragmentAssignmentAddEditBinding binding;
-    private ListDragInteraction itemTouchHelper;
+    private ItemTouchHelper itemTouchHelper;
+    private AssignmentAddEditIdentitiesRecyclerAdapter recyclerAdapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -52,7 +58,7 @@ public abstract class BaseAssignmentAddEditFragment<T> extends BaseFragment<T, A
     }
 
     private void setupIdentitiesSwipeHelper() {
-        itemTouchHelper = new ListDragHelper(new ItemTouchHelper.SimpleCallback(
+        itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.START | ItemTouchHelper.END) {
             @Override
@@ -62,13 +68,13 @@ public abstract class BaseAssignmentAddEditFragment<T> extends BaseFragment<T, A
                     return false;
                 }
 
-                presenter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
+                presenter.onIdentityMove(source.getAdapterPosition(), target.getAdapterPosition());
                 return true;
             }
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                presenter.onItemDismiss(viewHolder.getAdapterPosition());
+                presenter.onIdentityDismiss(viewHolder.getAdapterPosition());
             }
 
             @Override
@@ -83,29 +89,25 @@ public abstract class BaseAssignmentAddEditFragment<T> extends BaseFragment<T, A
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final AssignmentAddEditIdentitiesRecyclerAdapter adapter = setupRecyclerView();
+        setupRecyclerView();
         presenter.attachView(this);
-        presenter.setListInteraction(adapter);
-        presenter.setListDragInteraction(itemTouchHelper);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
         setupTimeFrameSpinner();
     }
 
-    private AssignmentAddEditIdentitiesRecyclerAdapter setupRecyclerView() {
+    private void setupRecyclerView() {
         binding.rvAssignmentIdentities.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvAssignmentIdentities.setHasFixedSize(true);
-        final AssignmentAddEditIdentitiesRecyclerAdapter adapter =
-                new AssignmentAddEditIdentitiesRecyclerAdapter(presenter);
-        binding.rvAssignmentIdentities.setAdapter(adapter);
-
-        return adapter;
+        recyclerAdapter = new AssignmentAddEditIdentitiesRecyclerAdapter(presenter,
+                viewModel.getIdentities());
+        binding.rvAssignmentIdentities.setAdapter(recyclerAdapter);
     }
 
     private void setupTimeFrameSpinner() {
         final StringResSpinnerAdapter timeFrameAdapter =
                 new StringResSpinnerAdapter(getActivity(), R.layout.spinner_item,
-                        presenter.getViewModel().getTimeFrames());
+                        viewModel.getTimeFrames());
         binding.spAssignmentTimeFrame.setAdapter(timeFrameAdapter);
     }
 
@@ -124,10 +126,33 @@ public abstract class BaseAssignmentAddEditFragment<T> extends BaseFragment<T, A
         DatePickerDialogFragment.display(getFragmentManager());
     }
 
-    private static class ListDragHelper extends ItemTouchHelper implements ListDragInteraction {
+    @Override
+    public boolean isIdentitiesEmpty() {
+        return recyclerAdapter.getItemCount() == 0;
+    }
 
-        public ListDragHelper(Callback callback) {
-            super(callback);
-        }
+    @Override
+    public void addIdentity(@NonNull AssignmentAddEditIdentityItemViewModel item) {
+        recyclerAdapter.addItem(item);
+    }
+
+    @Override
+    public void startDragIdentity(@NonNull RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public void swapIdentity(int fromPosition, int toPosition) {
+        recyclerAdapter.swapItem(fromPosition, toPosition);
+    }
+
+    @Override
+    public void removeIdentityAtPosition(int position) {
+        recyclerAdapter.removeItemAtPosition(position);
+    }
+
+    @Override
+    public void notifyIdentityChanged(@NonNull AssignmentAddEditIdentityItemViewModel item) {
+        recyclerAdapter.notifyItemChanged(recyclerAdapter.getPositionForItem(item));
     }
 }

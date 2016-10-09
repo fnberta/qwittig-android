@@ -22,10 +22,6 @@ public interface LoginAccountsContract {
             LoginWorkerListener,
             GoogleApiClientDelegate.GoogleLoginCallback {
 
-        LoginAccountsViewModel getViewModel();
-
-        void setInvitationIdentityId(@NonNull String identityId);
-
         void onFacebookSignedIn(@NonNull String idToken);
 
         void onFacebookLoginFailed();

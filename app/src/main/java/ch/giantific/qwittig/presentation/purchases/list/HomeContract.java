@@ -18,8 +18,6 @@ public interface HomeContract {
     interface Presenter extends BasePresenter<ViewListener>,
             JoinGroupDialogFragment.DialogInteractionListener {
 
-        HomeViewModel getViewModel();
-
         void handleInvitation(@NonNull String identityId, @NonNull String groupName,
                               @NonNull String inviterNickname);
 

@@ -5,9 +5,7 @@
 package ch.giantific.qwittig.presentation.assignments.addedit.add;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
@@ -18,10 +16,11 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.AssignmentRepository;
@@ -35,8 +34,6 @@ import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditCo
 import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.AssignmentAddEditViewModel;
 import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListDragInteraction;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.utils.DateUtils;
 import rx.Single;
@@ -44,63 +41,33 @@ import rx.SingleSubscriber;
 import timber.log.Timber;
 
 /**
- * Provides an implementation of the {@link AssignmentAddEditContract} interface for the add task screen.
+ * Provides an implementation of the {@link AssignmentAddEditContract} interface for the addItemAtPosition task screen.
  */
 public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditContract.ViewListener>
         implements AssignmentAddEditContract.Presenter {
 
-    protected static final String STATE_VIEW_MODEL = AssignmentAddEditViewModel.class.getCanonicalName();
-    private static final String STATE_ITEMS = "STATE_ITEMS";
     protected final AssignmentAddEditViewModel viewModel;
-    protected final ArrayList<AssignmentAddEditIdentityItemViewModel> items;
     protected final AssignmentRepository assignmentRepo;
     protected final DateFormat dateFormatter;
     private final GroupRepository groupRepo;
-    protected ListInteraction listInteraction;
     private String currentGroupId;
-    private ListDragInteraction listDragInteraction;
 
-    public AssignmentAddPresenter(@Nullable Bundle savedState,
-                                  @NonNull Navigator navigator,
+    @Inject
+    public AssignmentAddPresenter(@NonNull Navigator navigator,
+                                  @NonNull AssignmentAddEditViewModel viewModel,
                                   @NonNull UserRepository userRepo,
                                   @NonNull GroupRepository groupRepo, @NonNull AssignmentRepository assignmentRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.assignmentRepo = assignmentRepo;
         this.groupRepo = groupRepo;
+
         dateFormatter = DateUtils.getDateFormatter(false);
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-            items = savedState.getParcelableArrayList(STATE_ITEMS);
-        } else {
+        if (TextUtils.isEmpty(viewModel.getDeadlineFormatted())) {
             final Date date = new Date();
-            viewModel = new AssignmentAddEditViewModel(date, dateFormatter.format(date));
-            items = new ArrayList<>();
+            viewModel.setDeadline(date, dateFormatter.format(date));
         }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-        outState.putParcelableArrayList(STATE_ITEMS, items);
-    }
-
-    @Override
-    public AssignmentAddEditViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        this.listInteraction = listInteraction;
-    }
-
-    @Override
-    public void setListDragInteraction(@NonNull ListDragInteraction listDragInteraction) {
-        this.listDragInteraction = listDragInteraction;
     }
 
     @Override
@@ -115,7 +82,7 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> identities) {
-                        if (items.isEmpty()) {
+                        if (view.isIdentitiesEmpty()) {
                             addInitialIdentityRows(identities);
                         }
                     }
@@ -140,19 +107,8 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
 
     private void addInitialIdentityRows(@NonNull List<Identity> identities) {
         for (int i = 0, size = identities.size(); i < size; i++) {
-            items.add(new AssignmentAddEditIdentityItemViewModel(identities.get(i), true));
-            listInteraction.notifyItemInserted(i);
+            view.addIdentity(new AssignmentAddEditIdentityItemViewModel(identities.get(i), true));
         }
-    }
-
-    @Override
-    public AssignmentAddEditIdentityItemViewModel getItemAtPosition(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
     }
 
     @Override
@@ -215,7 +171,7 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
     @NonNull
     protected final List<String> getSelectedIdentityIds() {
         final List<String> identityIds = new ArrayList<>();
-        for (AssignmentAddEditIdentityItemViewModel itemViewModel : items) {
+        for (AssignmentAddEditIdentityItemViewModel itemViewModel : viewModel.getIdentities()) {
             if (itemViewModel.isSelected()) {
                 identityIds.add(itemViewModel.getIdentityId());
             }
@@ -238,23 +194,22 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
 
     @Override
     public void onIdentitiesRowItemClick(@NonNull AssignmentAddEditIdentityItemViewModel itemViewModel) {
-        final int pos = items.indexOf(itemViewModel);
         if (itemViewModel.isSelected()) {
             if (!identityIsLastOneChecked()) {
                 itemViewModel.setSelected(false);
-                listInteraction.notifyItemChanged(pos);
+                view.notifyIdentityChanged(itemViewModel);
             } else {
                 view.showMessage(R.string.toast_min_one_user);
             }
         } else {
             itemViewModel.setSelected(true);
-            listInteraction.notifyItemChanged(pos);
+            view.notifyIdentityChanged(itemViewModel);
         }
     }
 
     private boolean identityIsLastOneChecked() {
         int involvedCount = 0;
-        for (AssignmentAddEditIdentityItemViewModel itemViewModel : items) {
+        for (AssignmentAddEditIdentityItemViewModel itemViewModel : viewModel.getIdentities()) {
             if (itemViewModel.isSelected()) {
                 involvedCount++;
             }
@@ -269,7 +224,7 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
 
     @Override
     public void onStartDrag(@NonNull RecyclerView.ViewHolder viewHolder) {
-        listDragInteraction.startDrag(viewHolder);
+        view.startDragIdentity(viewHolder);
     }
 
     @Override
@@ -278,15 +233,13 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
     }
 
     @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(items, fromPosition, toPosition);
-        listInteraction.notifyItemMoved(fromPosition, toPosition);
+    public void onIdentityMove(int fromPosition, int toPosition) {
+        view.swapIdentity(fromPosition, toPosition);
     }
 
     @Override
-    public void onItemDismiss(int position) {
-        items.remove(position);
-        listInteraction.notifyItemRemoved(position);
+    public void onIdentityDismiss(int position) {
+        view.removeIdentityAtPosition(position);
     }
 
     @Override

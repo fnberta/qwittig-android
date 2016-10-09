@@ -4,17 +4,15 @@
 
 package ch.giantific.qwittig.presentation.purchases.list.drafts;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.SortedList;
 
 import com.google.firebase.auth.FirebaseUser;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
@@ -22,10 +20,8 @@ import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
-import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
+import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber2;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.DraftsViewModel;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.DraftItemViewModel;
@@ -39,71 +35,34 @@ import rx.Observable;
 public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListener>
         implements DraftsContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = DraftsViewModel.class.getCanonicalName();
-    private static final String STATE_DRAFTS_SELECTED = "STATE_DRAFTS_SELECTED";
-    private static final String STATE_SELECTION_MODE = "STATE_SELECTION_MODE";
     private final DraftsViewModel viewModel;
-    private final SortedList<DraftItemViewModel> items;
-    private final SortedListCallback<DraftItemViewModel> listCallback;
-    private final ChildEventSubscriber<DraftItemViewModel, DraftsViewModel> subscriber;
     private final PurchaseRepository purchaseRepo;
-    private final ArrayList<String> draftsSelected;
-    private ListInteraction listInteraction;
-    private boolean selectionModeEnabled;
-    private boolean deleteSelectedItems;
     private NumberFormat moneyFormatter;
     private String currentGroupId;
+    private boolean deleteSelectedItems;
 
-    public DraftsPresenter(@Nullable Bundle savedState,
-                           @NonNull Navigator navigator,
+    @Inject
+    public DraftsPresenter(@NonNull Navigator navigator,
+                           @NonNull DraftsViewModel viewModel,
                            @NonNull UserRepository userRepo,
                            @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.purchaseRepo = purchaseRepo;
-
-        listCallback = new SortedListCallback<DraftItemViewModel>() {
-            @Override
-            public int compare(DraftItemViewModel o1, DraftItemViewModel o2) {
-                return o1.compareTo(o2);
-            }
-        };
-        items = new SortedList<>(DraftItemViewModel.class, listCallback);
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-            draftsSelected = savedState.getStringArrayList(STATE_DRAFTS_SELECTED);
-            selectionModeEnabled = savedState.getBoolean(STATE_SELECTION_MODE, false);
-        } else {
-            viewModel = new DraftsViewModel(true);
-            draftsSelected = new ArrayList<>();
-        }
-
-        //noinspection ConstantConditions
-        subscriber = new ChildEventSubscriber<>(items, viewModel, e ->
-                view.showMessage(R.string.toast_error_drafts_load));
     }
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-        outState.putStringArrayList(STATE_DRAFTS_SELECTED, draftsSelected);
-        outState.putBoolean(STATE_SELECTION_MODE, selectionModeEnabled);
+    public int compareItemViewModels(@NonNull DraftItemViewModel item1,
+                                     @NonNull DraftItemViewModel item2) {
+        return item1.compareTo(item2);
     }
 
     @Override
-    public DraftsViewModel getViewModel() {
-        return viewModel;
-    }
+    public void attachView(@NonNull DraftsContract.ViewListener view) {
+        super.attachView(view);
 
-    @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        this.listInteraction = listInteraction;
-        listCallback.setListInteraction(listInteraction);
-
-        if (selectionModeEnabled) {
+        if (viewModel.isSelectionModeEnabled()) {
             view.startSelectionMode();
         }
     }
@@ -123,7 +82,7 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
                         final String identityId = identity.getId();
                         final String groupId = identity.getGroup();
                         if (!Objects.equals(currentGroupId, groupId)) {
-                            items.clear();
+                            view.clearItems();
                         }
                         currentGroupId = groupId;
                         addDataListener(identityId, groupId);
@@ -134,11 +93,11 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
 
     private void addDataListener(@NonNull String identityId, @NonNull String groupId) {
         final Observable<List<DraftItemViewModel>> initialData = purchaseRepo.getPurchases(groupId, identityId, true)
-                .map(draft -> getItemViewModel(draft, EventType.NONE, draftsSelected.contains(draft.getId())))
+                .map(draft -> getItemViewModel(draft, EventType.NONE, viewModel.isDraftSelected(draft)))
                 .toList()
                 .doOnNext(draftItemViewModels -> {
-                    items.addAll(draftItemViewModels);
-                    viewModel.setEmpty(getItemCount() == 0);
+                    view.addItems(draftItemViewModels);
+                    viewModel.setEmpty(view.isItemsEmpty());
                     viewModel.setLoading(false);
                     scrollToFirstSelectedItem();
                 });
@@ -148,9 +107,10 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
                 .map(event -> {
                     final Purchase draft = event.getValue();
                     return getItemViewModel(event.getValue(), event.getEventType(),
-                            draftsSelected.contains(draft.getId()));
+                            viewModel.isDraftSelected(draft));
                 })
-                .subscribe(subscriber)
+                .subscribe(new ChildEventSubscriber2<>(view, viewModel, e ->
+                        view.showMessage(R.string.toast_error_drafts_load)))
         );
     }
 
@@ -160,25 +120,15 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
     }
 
     private void scrollToFirstSelectedItem() {
-        if (selectionModeEnabled) {
-            for (int i = 0, size = getItemCount(); i < size; i++) {
-                final DraftItemViewModel itemViewModel = getItemAtPosition(i);
+        if (viewModel.isSelectionModeEnabled()) {
+            for (int i = 0, size = view.getItemCount(); i < size; i++) {
+                final DraftItemViewModel itemViewModel = view.getItemAtPosition(i);
                 if (itemViewModel.isSelected()) {
-                    listInteraction.scrollToPosition(i);
+                    view.scrollToItemPosition(i);
                     break;
                 }
             }
         }
-    }
-
-    @Override
-    public DraftItemViewModel getItemAtPosition(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
     }
 
     @Override
@@ -191,32 +141,32 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
     public void onSelectionModeEnded() {
         clearSelection();
         deleteSelectedItems = false;
-        selectionModeEnabled = false;
+        viewModel.setSelectionModeEnabled(false);
     }
 
     @Override
     public void onDraftDeleted(@NonNull String draftId) {
         view.showMessage(R.string.toast_draft_deleted);
-        items.removeItemAt(subscriber.getPositionForId(draftId));
+        view.removeItemAtPosition(view.getItemPositionForId(draftId));
     }
 
     @Override
     public void onDraftRowClick(@NonNull DraftItemViewModel itemViewModel) {
-        if (!selectionModeEnabled) {
+        if (!viewModel.isSelectionModeEnabled()) {
             navigator.startPurchaseEdit(itemViewModel.getId(), true);
         } else {
-            toggleSelection(items.indexOf(itemViewModel));
-            view.setSelectionModeTitle(R.string.cab_title_selected, draftsSelected.size());
+            toggleSelection(view.getItemPositionForItem(itemViewModel));
+            view.setSelectionModeTitle(R.string.cab_title_selected, view.getItemCount());
         }
     }
 
     @Override
     public boolean onDraftRowLongClick(@NonNull DraftItemViewModel itemViewModel) {
-        if (!selectionModeEnabled) {
-            toggleSelection(items.indexOf(itemViewModel));
+        if (!viewModel.isSelectionModeEnabled()) {
+            toggleSelection(view.getItemPositionForItem(itemViewModel));
             view.startSelectionMode();
-            view.setSelectionModeTitle(R.string.cab_title_selected, draftsSelected.size());
-            selectionModeEnabled = true;
+            view.setSelectionModeTitle(R.string.cab_title_selected, view.getItemCount());
+            viewModel.setSelectionModeEnabled(true);
         }
 
         return true;
@@ -224,37 +174,33 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
 
     @Override
     public void toggleSelection(int position) {
-        final DraftItemViewModel itemViewModel = getItemAtPosition(position);
+        final DraftItemViewModel itemViewModel = view.getItemAtPosition(position);
         final String id = itemViewModel.getId();
         if (itemViewModel.isSelected()) {
             itemViewModel.setSelected(false);
-            draftsSelected.remove(id);
+            viewModel.addDraftSelected(id);
         } else {
             itemViewModel.setSelected(true);
-            draftsSelected.add(id);
+            viewModel.removeDraftSelected(id);
         }
 
-        listInteraction.notifyItemChanged(position);
+        view.notifyItemChanged(position);
     }
 
     @Override
     public void clearSelection() {
-        for (int i = getItemCount() - 1; i >= 0; i--) {
-            final DraftItemViewModel itemViewModel = getItemAtPosition(i);
+        for (int i = view.getItemCount() - 1; i >= 0; i--) {
+            final DraftItemViewModel itemViewModel = view.getItemAtPosition(i);
             if (itemViewModel.isSelected()) {
                 itemViewModel.setSelected(false);
-                draftsSelected.remove(itemViewModel.getId());
+                viewModel.removeDraftSelected(itemViewModel.getId());
 
                 if (deleteSelectedItems) {
-                    deleteDraft(itemViewModel);
+                    purchaseRepo.deleteDraft(itemViewModel.getId(), itemViewModel.getBuyer());
                 } else {
-                    listInteraction.notifyItemChanged(i);
+                    view.notifyItemChanged(i);
                 }
             }
         }
-    }
-
-    private void deleteDraft(@NonNull DraftItemViewModel itemViewModel) {
-        purchaseRepo.deleteDraft(itemViewModel.getId(), itemViewModel.getBuyer());
     }
 }

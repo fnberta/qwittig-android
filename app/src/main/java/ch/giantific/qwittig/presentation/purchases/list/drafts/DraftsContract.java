@@ -7,12 +7,11 @@ package ch.giantific.qwittig.presentation.purchases.list.drafts;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
 import ch.giantific.qwittig.presentation.common.presenters.SelectionModePresenter;
-import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.DraftsViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
+import ch.giantific.qwittig.presentation.common.views.SortedListView;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.DraftItemViewModel;
 
 /**
@@ -21,12 +20,8 @@ import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.
 public interface DraftsContract {
 
     interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<DraftItemViewModel>,
+            SortedListPresenter<DraftItemViewModel>,
             SelectionModePresenter {
-
-        DraftsViewModel getViewModel();
-
-        void setListInteraction(@NonNull ListInteraction listInteraction);
 
         void onDeleteSelectedDraftsClick();
 
@@ -39,11 +34,19 @@ public interface DraftsContract {
         boolean onDraftRowLongClick(@NonNull DraftItemViewModel itemViewModel);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseViewListener,
+            SortedListView<DraftItemViewModel> {
+
         void startSelectionMode();
 
         void stopSelectionMode();
 
         void setSelectionModeTitle(@StringRes int title, int draftsSelected);
+
+        int getItemCount();
+
+        void notifyItemChanged(int position);
+
+        void scrollToItemPosition(int position);
     }
 }

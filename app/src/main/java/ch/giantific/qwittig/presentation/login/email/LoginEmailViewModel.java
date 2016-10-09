@@ -34,16 +34,16 @@ public class LoginEmailViewModel extends BaseObservable
             return new LoginEmailViewModel[size];
         }
     };
+    public static final String TAG = LoginEmailViewModel.class.getCanonicalName();
     public final ObservableField<String> email = new ObservableField<>();
     public final ObservableField<String> password = new ObservableField<>();
     public final ObservableField<String> passwordRepeat = new ObservableField<>();
     private boolean loading;
     private boolean signUp;
     private boolean validate;
+    private String joinIdentityId;
 
-    public LoginEmailViewModel(boolean loading) {
-        this.loading = loading;
-
+    public LoginEmailViewModel() {
         addChangedListeners();
     }
 
@@ -54,6 +54,7 @@ public class LoginEmailViewModel extends BaseObservable
         loading = in.readByte() != 0;
         signUp = in.readByte() != 0;
         validate = in.readByte() != 0;
+        joinIdentityId = in.readString();
 
         addChangedListeners();
     }
@@ -66,6 +67,7 @@ public class LoginEmailViewModel extends BaseObservable
         dest.writeByte((byte) (loading ? 1 : 0));
         dest.writeByte((byte) (signUp ? 1 : 0));
         dest.writeByte((byte) (validate ? 1 : 0));
+        dest.writeString(joinIdentityId);
     }
 
     @Override
@@ -149,4 +151,11 @@ public class LoginEmailViewModel extends BaseObservable
                : isEmailValid() && isPasswordValid();
     }
 
+    public String getJoinIdentityId() {
+        return joinIdentityId;
+    }
+
+    public void setJoinIdentityId(String joinIdentityId) {
+        this.joinIdentityId = joinIdentityId;
+    }
 }

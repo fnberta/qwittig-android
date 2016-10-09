@@ -11,7 +11,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContra
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditComponent;
 
 /**
- * Displays the interface where the user can add a new purchase by setting store, date, users
+ * Displays the interface where the user can addItemAtPosition a new purchase by setting store, date, users
  * involved and the different items.
  * <p/>
  * Subclass of {@link BasePurchaseAddEditFragment}.

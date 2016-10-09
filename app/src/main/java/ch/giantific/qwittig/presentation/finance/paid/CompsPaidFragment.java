@@ -12,20 +12,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.BaseSortedListFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
 import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
-import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidRecyclerAdapter;
+import ch.giantific.qwittig.presentation.finance.paid.viewmodels.CompsPaidViewModel;
+import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewModel;
 
 /**
  * Displays recent paid compensations in a {@link RecyclerView} list.
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class CompsPaidFragment extends BaseFragment<FinanceSubcomponent, CompsPaidContract.Presenter, BaseFragment.ActivityListener<FinanceSubcomponent>>
+public class CompsPaidFragment extends BaseSortedListFragment<FinanceSubcomponent,
+        CompsPaidContract.Presenter,
+        BaseFragment.ActivityListener<FinanceSubcomponent>,
+        CompPaidItemViewModel>
         implements CompsPaidContract.ViewListener {
 
+    @Inject
+    CompsPaidViewModel viewModel;
     private FragmentFinanceCompensationsPaidBinding binding;
 
     public CompsPaidFragment() {
@@ -43,10 +52,9 @@ public class CompsPaidFragment extends BaseFragment<FinanceSubcomponent, CompsPa
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final CompsPaidRecyclerAdapter adapter = setupRecyclerView();
+        setupRecyclerView();
         presenter.attachView(this);
-        presenter.setListInteraction(adapter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -54,13 +62,16 @@ public class CompsPaidFragment extends BaseFragment<FinanceSubcomponent, CompsPa
         component.inject(this);
     }
 
-    private CompsPaidRecyclerAdapter setupRecyclerView() {
+    @Override
+    protected BaseSortedListRecyclerAdapter<CompPaidItemViewModel, CompsPaidContract.Presenter, ? extends RecyclerView.ViewHolder> getRecyclerAdapter() {
+        return new CompsPaidRecyclerAdapter(presenter);
+    }
+
+    @Override
+    protected void setupRecyclerView() {
         binding.rvPb.rvBase.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvPb.rvBase.setHasFixedSize(true);
-        final CompsPaidRecyclerAdapter adapter = new CompsPaidRecyclerAdapter(presenter);
-        binding.rvPb.rvBase.setAdapter(adapter);
-
-        return adapter;
+        binding.rvPb.rvBase.setAdapter(recyclerAdapter);
     }
 
     @Override

@@ -4,9 +4,7 @@
 
 package ch.giantific.qwittig.presentation.assignments.addedit.edit;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.firebase.auth.FirebaseUser;
 
@@ -24,6 +22,7 @@ import ch.giantific.qwittig.domain.models.Assignment.TimeFrame;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditContract;
 import ch.giantific.qwittig.presentation.assignments.addedit.add.AssignmentAddPresenter;
+import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.AssignmentAddEditViewModel;
 import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import rx.SingleSubscriber;
@@ -34,32 +33,18 @@ import timber.log.Timber;
  */
 public class AssignmentEditPresenter extends AssignmentAddPresenter {
 
-    private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
-
     private final String assignmentId;
     private Assignment assignment;
-    private boolean oldValuesSet;
 
-    public AssignmentEditPresenter(@Nullable Bundle savedState,
-                                   @NonNull Navigator navigator,
+    public AssignmentEditPresenter(@NonNull Navigator navigator,
+                                   @NonNull AssignmentAddEditViewModel viewModel,
                                    @NonNull UserRepository userRepo,
                                    @NonNull GroupRepository groupRepo,
                                    @NonNull AssignmentRepository assignmentRepo,
                                    @NonNull String assignmentId) {
-        super(savedState, navigator, userRepo, groupRepo, assignmentRepo);
+        super(navigator, viewModel, userRepo, groupRepo, assignmentRepo);
 
         this.assignmentId = assignmentId;
-
-        if (savedState != null) {
-            oldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putBoolean(STATE_ITEMS_SET, oldValuesSet);
     }
 
     @Override
@@ -70,9 +55,9 @@ public class AssignmentEditPresenter extends AssignmentAddPresenter {
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> identities) {
-                        if (!oldValuesSet) {
-                            restoreOldValues(identities);
-                            oldValuesSet = true;
+                        if (!viewModel.isEditDataSet()) {
+                            restoreEditData(identities);
+                            viewModel.setEditDataSet(true);
                         }
                     }
 
@@ -84,7 +69,7 @@ public class AssignmentEditPresenter extends AssignmentAddPresenter {
         );
     }
 
-    private void restoreOldValues(@NonNull List<Identity> identities) {
+    private void restoreEditData(@NonNull List<Identity> identities) {
         viewModel.setTitle(assignment.getTitle());
         final String timeFrame = assignment.getTimeFrame();
         handleTimeFrame(timeFrame);
@@ -100,7 +85,7 @@ public class AssignmentEditPresenter extends AssignmentAddPresenter {
                 if (Objects.equals(identityId, identity.getId())) {
                     final AssignmentAddEditIdentityItemViewModel itemViewModel =
                             new AssignmentAddEditIdentityItemViewModel(identity, true);
-                    items.add(itemViewModel);
+                    view.addIdentity(itemViewModel);
                     iterator.remove();
                     break;
                 }
@@ -111,11 +96,9 @@ public class AssignmentEditPresenter extends AssignmentAddPresenter {
             for (Identity identity : identities) {
                 final AssignmentAddEditIdentityItemViewModel itemViewModel =
                         new AssignmentAddEditIdentityItemViewModel(identity, false);
-                items.add(itemViewModel);
+                view.addIdentity(itemViewModel);
             }
         }
-
-        listInteraction.notifyDataSetChanged();
     }
 
     private void handleTimeFrame(@NonNull @TimeFrame String timeFrame) {

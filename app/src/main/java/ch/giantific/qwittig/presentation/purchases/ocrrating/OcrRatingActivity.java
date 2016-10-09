@@ -18,6 +18,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.purchases.ocrrating.di.DaggerOcrRatingComponent;
 import ch.giantific.qwittig.presentation.purchases.ocrrating.di.OcrRatingComponent;
@@ -31,6 +32,8 @@ public class OcrRatingActivity extends BaseActivity<OcrRatingComponent>
 
     @Inject
     OcrRatingContract.Presenter presenter;
+    @Inject
+    OcrRatingViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +58,8 @@ public class OcrRatingActivity extends BaseActivity<OcrRatingComponent>
         component = DaggerOcrRatingComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .ocrRatingPresenterModule(new OcrRatingPresenterModule(savedInstanceState, ocrDataId))
+                .ocrRatingPresenterModule(new OcrRatingPresenterModule(ocrDataId))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .build();
         component.inject(this);
         presenter.attachView(this);
@@ -64,6 +68,13 @@ public class OcrRatingActivity extends BaseActivity<OcrRatingComponent>
     @Override
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(OcrRatingViewModel.TAG, viewModel);
     }
 
     @Override

@@ -22,10 +22,6 @@ public interface LoginEmailContract {
             EmailUserWorkerListener,
             EmailPromptDialogFragment.DialogInteractionListener {
 
-        LoginEmailViewModel getViewModel();
-
-        void setJoinIdentityId(@NonNull String joinIdentityId);
-
         void onLoginClick(View view);
 
         void onSignUpClick(View view);

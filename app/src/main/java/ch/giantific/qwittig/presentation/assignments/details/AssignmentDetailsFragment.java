@@ -23,10 +23,15 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentAssignmentDetailsBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.AssignmentDetailsViewModel;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.AssignmentDetailsHeaderItemViewModel;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.AssignmentDetailsHistoryItemViewModel;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 
 /**
@@ -36,10 +41,15 @@ import ch.giantific.qwittig.presentation.common.BaseFragment;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class AssignmentDetailsFragment extends BaseFragment<AssignmentDetailsSubcomponent, AssignmentDetailsContract.Presenter, BaseFragment.ActivityListener<AssignmentDetailsSubcomponent>>
+public class AssignmentDetailsFragment extends BaseFragment<AssignmentDetailsSubcomponent,
+        AssignmentDetailsContract.Presenter,
+        BaseFragment.ActivityListener<AssignmentDetailsSubcomponent>>
         implements AssignmentDetailsContract.ViewListener {
 
+    @Inject
+    AssignmentDetailsViewModel viewModel;
     private FragmentAssignmentDetailsBinding binding;
+    private AssignmentHistoryRecyclerAdapter recyclerAdapter;
 
     public AssignmentDetailsFragment() {
     }
@@ -62,10 +72,9 @@ public class AssignmentDetailsFragment extends BaseFragment<AssignmentDetailsSub
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final AssignmentHistoryRecyclerAdapter adapter = setupRecyclerView();
+        setupRecyclerView();
         presenter.attachView(this);
-        presenter.setListInteraction(adapter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -73,13 +82,11 @@ public class AssignmentDetailsFragment extends BaseFragment<AssignmentDetailsSub
         component.inject(this);
     }
 
-    private AssignmentHistoryRecyclerAdapter setupRecyclerView() {
+    private void setupRecyclerView() {
         binding.rvAssignmentDetailsHistory.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvAssignmentDetailsHistory.setHasFixedSize(true);
-        final AssignmentHistoryRecyclerAdapter adapter = new AssignmentHistoryRecyclerAdapter(presenter);
-        binding.rvAssignmentDetailsHistory.setAdapter(adapter);
-
-        return adapter;
+        recyclerAdapter = new AssignmentHistoryRecyclerAdapter();
+        binding.rvAssignmentDetailsHistory.setAdapter(recyclerAdapter);
     }
 
     @Override
@@ -133,5 +140,25 @@ public class AssignmentDetailsFragment extends BaseFragment<AssignmentDetailsSub
         }
 
         return stringBuilder;
+    }
+
+    @Override
+    public void addItem(@NonNull AssignmentDetailsHeaderItemViewModel itemViewModel) {
+        recyclerAdapter.addItem(itemViewModel);
+    }
+
+    @Override
+    public void addItems(@NonNull List<AssignmentDetailsHistoryItemViewModel> itemViewModels) {
+        recyclerAdapter.addItems(itemViewModels);
+    }
+
+    @Override
+    public void clearItems() {
+        recyclerAdapter.clearItems();
+    }
+
+    @Override
+    public void notifyItemsChanged() {
+        recyclerAdapter.notifyDataSetChanged();
     }
 }

@@ -13,7 +13,7 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.HeaderItemViewModel;
 
 /**
- * Provides a header row in the add or edit purchase screen.
+ * Provides a header row in the addItemAtPosition or edit purchase screen.
  */
 public class PurchaseAddEditHeaderItemViewModel extends BaseObservable
         implements HeaderItemViewModel, BasePurchaseAddEditItemViewModel {

@@ -29,15 +29,14 @@ public class LoginFirstGroupViewModel extends BaseObservable
             return new LoginFirstGroupViewModel[size];
         }
     };
+    public static final String TAG = LoginFirstGroupViewModel.class.getCanonicalName();
     public final ObservableField<String> groupName = new ObservableField<>();
     private boolean loading;
     private boolean validate;
     private String groupCurrency;
     private int selectedGroupCurrency;
 
-    public LoginFirstGroupViewModel(boolean loading) {
-        this.loading = loading;
-
+    public LoginFirstGroupViewModel() {
         addChangedListeners();
     }
 

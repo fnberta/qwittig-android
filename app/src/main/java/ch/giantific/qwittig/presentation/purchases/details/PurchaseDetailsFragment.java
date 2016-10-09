@@ -11,9 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentPurchaseDetailsBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel;
 
 
 /**
@@ -22,12 +25,26 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSub
  *
  * @see PurchaseDetailsActivity
  */
-public class PurchaseDetailsFragment extends BaseFragment<PurchaseDetailsSubcomponent, PurchaseDetailsContract.Presenter, BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
+public class PurchaseDetailsFragment extends BaseFragment<PurchaseDetailsSubcomponent,
+        PurchaseDetailsContract.Presenter,
+        BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
 
+    @Inject
+    PurchaseDetailsViewModel viewModel;
     private FragmentPurchaseDetailsBinding binding;
+    private PurchaseDetailsRecyclerAdapter articlesRecyclerAdapter;
+    private PurchaseDetailsIdentitiesRecyclerAdapter identitiesRecyclerAdapter;
 
     public PurchaseDetailsFragment() {
         // required empty constructor
+    }
+
+    public PurchaseDetailsRecyclerAdapter getArticlesRecyclerAdapter() {
+        return articlesRecyclerAdapter;
+    }
+
+    public PurchaseDetailsIdentitiesRecyclerAdapter getIdentitiesRecyclerAdapter() {
+        return identitiesRecyclerAdapter;
     }
 
     @Override
@@ -41,10 +58,9 @@ public class PurchaseDetailsFragment extends BaseFragment<PurchaseDetailsSubcomp
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final PurchaseDetailsRecyclerAdapter adapter = setupRecyclerView();
-        setupIdentitiesList();
-        presenter.setListInteraction(adapter);
-        binding.setViewModel(presenter.getViewModel());
+        setupArticleRecyclerView();
+        setupIdentitiesRecyclerView();
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -52,23 +68,19 @@ public class PurchaseDetailsFragment extends BaseFragment<PurchaseDetailsSubcomp
         component.inject(this);
     }
 
-    private PurchaseDetailsRecyclerAdapter setupRecyclerView() {
+    private void setupArticleRecyclerView() {
         binding.rvPurchaseDetails.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvPurchaseDetails.setHasFixedSize(true);
-        final PurchaseDetailsRecyclerAdapter adapter = new PurchaseDetailsRecyclerAdapter(presenter);
-        binding.rvPurchaseDetails.setAdapter(adapter);
-
-        return adapter;
+        articlesRecyclerAdapter = new PurchaseDetailsRecyclerAdapter();
+        binding.rvPurchaseDetails.setAdapter(articlesRecyclerAdapter);
     }
 
-    private void setupIdentitiesList() {
+    private void setupIdentitiesRecyclerView() {
         binding.rvPurchaseDetailsIdentities.setHasFixedSize(true);
         binding.rvPurchaseDetailsIdentities.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.HORIZONTAL, false));
-        final PurchaseDetailsIdentitiesRecyclerAdapter adapter =
-                new PurchaseDetailsIdentitiesRecyclerAdapter(presenter);
-        binding.rvPurchaseDetailsIdentities.setAdapter(adapter);
-        presenter.setIdentitiesListInteraction(adapter);
+        identitiesRecyclerAdapter = new PurchaseDetailsIdentitiesRecyclerAdapter();
+        binding.rvPurchaseDetailsIdentities.setAdapter(identitiesRecyclerAdapter);
     }
 
     @Override

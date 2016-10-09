@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.transition.Fade;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +22,7 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
@@ -30,7 +30,6 @@ import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListen
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.general.di.DaggerSettingsComponent;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
-import ch.giantific.qwittig.presentation.settings.general.di.SettingsPresenterModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupFragment;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileContract;
 import rx.Single;
@@ -50,6 +49,8 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
 
     @Inject
     SettingsContract.Presenter presenter;
+    @Inject
+    SettingsViewModel viewModel;
     @Inject
     GoogleApiClientDelegate googleApiDelegate;
 
@@ -78,8 +79,8 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
         component = DaggerSettingsComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, null))
-                .settingsPresenterModule(new SettingsPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
@@ -87,6 +88,13 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
     @Override
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(SettingsViewModel.TAG, viewModel);
     }
 
     @Override

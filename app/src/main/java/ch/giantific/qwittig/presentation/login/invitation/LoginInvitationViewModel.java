@@ -25,6 +25,7 @@ public class LoginInvitationViewModel extends BaseObservable
             return new LoginInvitationViewModel[size];
         }
     };
+    public static final String TAG = LoginInvitationViewModel.class.getCanonicalName();
     private String groupName;
     private String inviterNickname;
 

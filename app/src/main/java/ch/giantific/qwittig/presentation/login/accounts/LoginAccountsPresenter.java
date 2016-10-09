@@ -5,13 +5,13 @@
 package ch.giantific.qwittig.presentation.login.accounts;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseUser;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
@@ -28,42 +28,25 @@ import rx.SingleSubscriber;
 public class LoginAccountsPresenter extends BasePresenterImpl<LoginAccountsContract.ViewListener>
         implements LoginAccountsContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = LoginAccountsViewModel.class.getCanonicalName();
-    private static final String STATE_IDENTITY_ID = "STATE_IDENTITY_ID";
     private final LoginAccountsViewModel viewModel;
     private final AfterLoginUseCase afterLoginUseCase;
-    private String joinIdentityId;
 
-    public LoginAccountsPresenter(@Nullable Bundle savedState,
-                                  @NonNull Navigator navigator,
+    @Inject
+    public LoginAccountsPresenter(@NonNull Navigator navigator,
+                                  @NonNull LoginAccountsViewModel viewModel,
                                   @NonNull UserRepository userRepo,
                                   @NonNull AfterLoginUseCase afterLoginUseCase) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.afterLoginUseCase = afterLoginUseCase;
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-            joinIdentityId = savedState.getString(STATE_IDENTITY_ID, "");
-        } else {
-            viewModel = new LoginAccountsViewModel(false);
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-        if (!TextUtils.isEmpty(joinIdentityId)) {
-            outState.putString(STATE_IDENTITY_ID, joinIdentityId);
-        }
     }
 
     @Override
     public void setUserLoginStream(@NonNull Single<FirebaseUser> loginResult,
                                    @NonNull final String workerTag,
                                    @LoginWorker.LoginType int type) {
+        final String joinIdentityId = viewModel.getJoinIdentityId();
         afterLoginUseCase.setLoginResult(loginResult);
         afterLoginUseCase.setJoinIdentityId(joinIdentityId);
         subscriptions.add(afterLoginUseCase.execute()
@@ -88,16 +71,6 @@ public class LoginAccountsPresenter extends BasePresenterImpl<LoginAccountsContr
                     }
                 })
         );
-    }
-
-    @Override
-    public LoginAccountsViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setInvitationIdentityId(@NonNull String identityId) {
-        this.joinIdentityId = identityId;
     }
 
     @Override
@@ -133,6 +106,6 @@ public class LoginAccountsPresenter extends BasePresenterImpl<LoginAccountsContr
 
     @Override
     public void onUseEmailClick(View view) {
-        this.view.showEmailLogin(joinIdentityId);
+        this.view.showEmailLogin(viewModel.getJoinIdentityId());
     }
 }

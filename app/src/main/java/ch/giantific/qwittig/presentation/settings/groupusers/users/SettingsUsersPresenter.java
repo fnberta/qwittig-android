@@ -4,11 +4,7 @@
 
 package ch.giantific.qwittig.presentation.settings.groupusers.users;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.SortedList;
-import android.text.TextUtils;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseUser;
@@ -18,15 +14,15 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.util.List;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
-import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
+import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber2;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
@@ -41,57 +37,24 @@ import timber.log.Timber;
 public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContract.ViewListener>
         implements SettingsUsersContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = SettingsUsersViewModel.class.getCanonicalName();
-    private static final String STATE_AVATAR_IDENTITY_ID = "STATE_AVATAR_IDENTITY_ID";
     private final SettingsUsersViewModel viewModel;
-    private final SortedList<SettingsUsersItemViewModel> items;
-    private final SortedListCallback<SettingsUsersItemViewModel> listCallback;
     private final GroupRepository groupRepo;
     private Identity currentIdentity;
-    private String avatarIdentityId;
 
-    public SettingsUsersPresenter(@Nullable Bundle savedState,
-                                  @NonNull Navigator navigator,
+    @Inject
+    public SettingsUsersPresenter(@NonNull Navigator navigator,
+                                  @NonNull SettingsUsersViewModel viewModel,
                                   @NonNull UserRepository userRepo,
                                   @NonNull GroupRepository groupRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.groupRepo = groupRepo;
-
-        listCallback = new SortedListCallback<SettingsUsersItemViewModel>() {
-            @Override
-            public int compare(SettingsUsersItemViewModel o1, SettingsUsersItemViewModel o2) {
-                return o1.compareTo(o2);
-            }
-        };
-        items = new SortedList<>(SettingsUsersItemViewModel.class, listCallback);
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-            avatarIdentityId = savedState.getString(STATE_AVATAR_IDENTITY_ID);
-        } else {
-            viewModel = new SettingsUsersViewModel();
-        }
     }
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-        if (!TextUtils.isEmpty(avatarIdentityId)) {
-            outState.putString(STATE_AVATAR_IDENTITY_ID, avatarIdentityId);
-        }
-    }
-
-    @Override
-    public SettingsUsersViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        listCallback.setListInteraction(listInteraction);
+    public int compareItemViewModels(@NonNull SettingsUsersItemViewModel item1, @NonNull SettingsUsersItemViewModel item2) {
+        return item1.compareTo(item2);
     }
 
     @Override
@@ -105,7 +68,7 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
                     public void onNext(Identity identity) {
                         currentIdentity = identity;
                         viewModel.setGroupName(identity.getGroupName());
-                        items.clear();
+                        view.clearItems();
 
                         final String groupId = identity.getGroup();
                         addDataListener(groupId);
@@ -119,14 +82,14 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
                 .flatMap((identity) -> getItemViewModel(EventType.NONE, identity))
                 .toList()
                 .doOnNext(settingsUsersItemViewModels -> {
-                    items.addAll(settingsUsersItemViewModels);
-                    viewModel.setEmpty(getItemCount() == 0);
+                    view.addItems(settingsUsersItemViewModels);
+                    viewModel.setEmpty(view.isItemsEmpty());
                     view.startEnterTransition();
                 });
         subscriptions.add(groupRepo.observeGroupIdentityChildren(groupId)
                 .skipUntil(initialData)
                 .flatMap(event -> getItemViewModel(event.getEventType(), event.getValue()))
-                .subscribe(new ChildEventSubscriber<>(items, viewModel, e ->
+                .subscribe(new ChildEventSubscriber2<>(view, viewModel, e ->
                         view.showMessage(R.string.toast_error_users_load)))
         );
     }
@@ -138,18 +101,8 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
     }
 
     @Override
-    public SettingsUsersItemViewModel getItemAtPosition(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
-    }
-
-    @Override
     public void onInviteClick(int position) {
-        final SettingsUsersItemViewModel userItem = getItemAtPosition(position);
+        final SettingsUsersItemViewModel userItem = view.getItemAtPosition(position);
         final String invitationLink = groupRepo.getInvitationLink(userItem.getId(),
                 userItem.getGroupName(), currentIdentity.getNickname());
         final String googleApiKey = view.getGoogleApiKey();
@@ -172,37 +125,31 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
 
     @Override
     public void onEditNicknameClick(int position) {
-        final SettingsUsersItemViewModel userItem = getItemAtPosition(position);
+        final SettingsUsersItemViewModel userItem = view.getItemAtPosition(position);
         view.showChangeNicknameDialog(userItem.getNickname(), position);
     }
 
     @Override
     public void onValidNicknameEntered(@NonNull String nickname, int position) {
-        final SettingsUsersItemViewModel itemViewModel = getItemAtPosition(position);
+        final SettingsUsersItemViewModel itemViewModel = view.getItemAtPosition(position);
         userRepo.updatePendingIdentityNickname(itemViewModel.getId(), nickname);
     }
 
     @Override
     public void onEditAvatarClick(int position) {
-        final SettingsUsersItemViewModel userItem = getItemAtPosition(position);
-        avatarIdentityId = userItem.getId();
+        final SettingsUsersItemViewModel userItem = view.getItemAtPosition(position);
+        viewModel.setAvatarIdentityId(userItem.getId());
         navigator.startImagePicker();
     }
 
     @Override
     public void onNewAvatarTaken(@NonNull String avatarPath) {
-        for (int i = 0, size = getItemCount(); i < size; i++) {
-            final SettingsUsersItemViewModel itemViewModel = getItemAtPosition(i);
-            if (Objects.equals(itemViewModel.getId(), avatarIdentityId)) {
-                userRepo.updatePendingIdentityAvatar(avatarIdentityId, avatarPath);
-                break;
-            }
-        }
+        userRepo.updatePendingIdentityAvatar(viewModel.getAvatarIdentityId(), avatarPath);
     }
 
     @Override
     public void onRemoveClick(final int position) {
-        final SettingsUsersItemViewModel itemViewModel = getItemAtPosition(position);
+        final SettingsUsersItemViewModel itemViewModel = view.getItemAtPosition(position);
         if (!Objects.equals(itemViewModel.getBalance(), BigFraction.ZERO)) {
             view.showMessage(R.string.toast_del_identity_balance_not_zero);
             return;
@@ -217,7 +164,7 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
 
                     @Override
                     public void onError(Throwable error) {
-                        Timber.e(error, "failed to remove pending identity with error:");
+                        Timber.e(error, "failed to removeItem pending identity with error:");
                         view.showMessage(R.string.toast_error_settings_users_remove);
                     }
                 })

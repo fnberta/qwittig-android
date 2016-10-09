@@ -8,7 +8,6 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.presentation.assignments.list.AssignmentsContract;
@@ -33,14 +32,14 @@ public class AssignmentsViewModel extends BaseObservable
             return new AssignmentsViewModel[size];
         }
     };
+    public static final String TAG = AssignmentsViewModel.class.getCanonicalName();
     private boolean loading;
     private boolean empty;
     private AssignmentDeadline deadline;
 
-    public AssignmentsViewModel(boolean loading, @NonNull AssignmentDeadline deadline) {
+    public AssignmentsViewModel() {
         this.empty = true;
-        this.loading = loading;
-        this.deadline = deadline;
+        this.loading = true;
     }
 
     private AssignmentsViewModel(Parcel in) {

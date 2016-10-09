@@ -1,8 +1,6 @@
 package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,6 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
@@ -38,7 +38,6 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.PurchaseResult;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditListInteraction;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel.ViewType;
@@ -60,31 +59,27 @@ import timber.log.Timber;
 public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContract.ViewListener>
         implements PurchaseAddEditContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = PurchaseAddEditViewModel.class.getCanonicalName();
-    private static final String STATE_ROW_ITEMS = "STATE_ROW_ITEMS";
-    private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
     private static final int FIXED_ROWS_COUNT = 6;
     protected final PurchaseAddEditViewModel viewModel;
     protected final PurchaseRepository purchaseRepo;
     protected final RemoteConfigHelper configHelper;
-    protected final ArrayList<BasePurchaseAddEditItemViewModel> items;
     protected final NumberFormat exchangeRateFormatter;
     protected final DateFormat dateFormatter;
     private final GroupRepository groupRepo;
     protected List<Identity> identities;
-    protected PurchaseAddEditListInteraction listInteraction;
     protected NumberFormat moneyFormatter;
     protected Identity currentIdentity;
-    private boolean fetchingExchangeRates;
 
-    public PurchaseAddPresenter(@Nullable Bundle savedState,
-                                @NonNull Navigator navigator,
+    @Inject
+    public PurchaseAddPresenter(@NonNull Navigator navigator,
+                                @NonNull PurchaseAddEditViewModel viewModel,
                                 @NonNull UserRepository userRepo,
                                 @NonNull GroupRepository groupRepo,
                                 @NonNull PurchaseRepository purchaseRepo,
                                 @NonNull RemoteConfigHelper configHelper) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.groupRepo = groupRepo;
         this.purchaseRepo = purchaseRepo;
         this.configHelper = configHelper;
@@ -92,47 +87,27 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         dateFormatter = DateUtils.getDateFormatter(false);
         exchangeRateFormatter = MoneyUtils.getExchangeRateFormatter();
 
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-            items = savedState.getParcelableArrayList(STATE_ROW_ITEMS);
-            fetchingExchangeRates = savedState.getBoolean(STATE_FETCHING_RATES);
-            //noinspection ConstantConditions
-            moneyFormatter = MoneyUtils.getMoneyFormatter(viewModel.getCurrency(), false, true);
+        if (viewModel.getItems().size() == 0) {
+            // first start, set some default values for view model
+            initDefaultValues();
         } else {
-            final List<String> currencies = Arrays.asList(configHelper.getSupportedCurrencyCodes());
-            final Date date = new Date();
-            viewModel = new PurchaseAddEditViewModel(currencies, false, date, dateFormatter.format(date));
-            items = new ArrayList<>();
-            initFixedRows();
+            // not first start, currency is set, initialise formatter
+            moneyFormatter = MoneyUtils.getMoneyFormatter(viewModel.getCurrency(), false, true);
         }
     }
 
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
+    private void initDefaultValues() {
+        final List<String> currencies = Arrays.asList(configHelper.getSupportedCurrencyCodes());
+        viewModel.setSupportedCurrencies(currencies);
+        final Date date = new Date();
+        viewModel.setDate(date, dateFormatter.format(date));
 
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-        outState.putParcelableArrayList(STATE_ROW_ITEMS, items);
-        outState.putBoolean(STATE_FETCHING_RATES, fetchingExchangeRates);
-    }
-
-    private void initFixedRows() {
-        items.add(new PurchaseAddEditHeaderItemViewModel(R.string.header_purchase));
-        items.add(PurchaseAddEditGenericItemViewModel.createNewDateInstance());
-        items.add(PurchaseAddEditGenericItemViewModel.createNewStoreInstance());
-        items.add(new PurchaseAddEditHeaderItemViewModel(R.string.header_articles));
-        items.add(PurchaseAddEditGenericItemViewModel.createNewAddRowInstance());
-        items.add(PurchaseAddEditGenericItemViewModel.createNewTotalInstance());
-    }
-
-    @Override
-    public PurchaseAddEditViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setListInteraction(@NonNull PurchaseAddEditListInteraction listInteraction) {
-        this.listInteraction = listInteraction;
+        viewModel.addItem(new PurchaseAddEditHeaderItemViewModel(R.string.header_purchase));
+        viewModel.addItem(PurchaseAddEditGenericItemViewModel.createNewDateInstance());
+        viewModel.addItem(PurchaseAddEditGenericItemViewModel.createNewStoreInstance());
+        viewModel.addItem(new PurchaseAddEditHeaderItemViewModel(R.string.header_articles));
+        viewModel.addItem(PurchaseAddEditGenericItemViewModel.createNewAddRowInstance());
+        viewModel.addItem(PurchaseAddEditGenericItemViewModel.createNewTotalInstance());
     }
 
     @Override
@@ -148,7 +123,9 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                     @Override
                     public void onSuccess(List<Identity> value) {
                         // fill with one article row on first start
-                        addArticleOnFirstRun();
+                        if (viewModel.getItems().size() == FIXED_ROWS_COUNT) {
+                            addArticleOnFirstRun();
+                        }
                     }
 
                     @Override
@@ -172,7 +149,9 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                     currentIdentity = identity;
                     // if first run, set initial currency to group currency, create money formatter
                     // and set initial total and my share
-                    setCurrencyOnFirstRun(identity.getGroupCurrency());
+                    if (TextUtils.isEmpty(viewModel.getCurrency())) {
+                        setCurrencyOnFirstRun(identity.getGroupCurrency());
+                    }
                 })
                 .flatMapObservable(identity -> groupRepo.getGroupIdentities(identity.getGroup(), true))
                 .toSortedList()
@@ -181,24 +160,19 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     }
 
     private void setCurrencyOnFirstRun(@NonNull String groupCurrency) {
-        if (TextUtils.isEmpty(viewModel.getCurrency())) {
-            viewModel.setCurrency(groupCurrency, true);
-            moneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, false, true);
+        viewModel.setCurrency(groupCurrency, true);
+        moneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, false, true);
 
-            final String formatted = moneyFormatter.format(0);
-            viewModel.setTotal(0, formatted);
-            viewModel.setMyShare(formatted);
-        }
+        final String formatted = moneyFormatter.format(0);
+        viewModel.setTotal(0, formatted);
+        viewModel.setMyShare(formatted);
     }
 
     private void addArticleOnFirstRun() {
-        if (getItemCount() == FIXED_ROWS_COUNT) {
-            final PurchaseAddEditArticleItemViewModel articleItem =
-                    new PurchaseAddEditArticleItemViewModel(getArticleIdentities());
-            // add right above 'add article' row
-            items.add(4, articleItem);
-            listInteraction.notifyItemInserted(4);
-        }
+        final PurchaseAddEditArticleItemViewModel articleItem =
+                new PurchaseAddEditArticleItemViewModel(getArticleIdentities());
+        // addItemAtPosition right above 'addItemAtPosition article' row
+        view.addItemAtPosition(4, articleItem);
     }
 
     final PurchaseAddEditArticleIdentityItemViewModel[] getArticleIdentities() {
@@ -222,16 +196,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         }
 
         return articleIdentities;
-    }
-
-    @Override
-    public BasePurchaseAddEditItemViewModel getItemAtPosition(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
     }
 
     @Override
@@ -261,13 +225,11 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @Override
     public void onAddRowClick(@NonNull BasePurchaseAddEditItemViewModel itemViewModel) {
-        final int position = items.indexOf(itemViewModel);
-
+        final int position = viewModel.getItems().indexOf(itemViewModel);
         final PurchaseAddEditArticleItemViewModel articleItem =
                 new PurchaseAddEditArticleItemViewModel(getArticleIdentities());
-        items.add(position, articleItem);
-        listInteraction.notifyItemInserted(position);
-        listInteraction.scrollToPosition(position + 1);
+        view.addItemAtPosition(position, articleItem);
+        view.scrollToPosition(position + 1);
     }
 
     @Override
@@ -284,7 +246,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     private void updateTotalAndMyShare() {
         double total = 0;
         double myShare = 0;
-        for (BasePurchaseAddEditItemViewModel itemViewModel : items) {
+        for (BasePurchaseAddEditItemViewModel itemViewModel : viewModel.getItems()) {
             if (itemViewModel.getViewType() != ViewType.ARTICLE) {
                 continue;
             }
@@ -331,38 +293,33 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @Override
     public void onToggleIdentitiesClick(@NonNull PurchaseAddEditArticleItemViewModel itemViewModel) {
+        final ArrayList<BasePurchaseAddEditItemViewModel> items = viewModel.getItems();
         final int insertPos = items.indexOf(itemViewModel) + 1;
-        if (getItemCount() < insertPos) {
+        if (items.size() < insertPos) {
             expandArticleRow(insertPos, itemViewModel);
-        } else if (getItemAtPosition(insertPos).getViewType() == ViewType.IDENTITIES) {
-            collapseArticleRow(insertPos);
+            collapseOtherArticleRows(insertPos);
+        } else if (items.get(insertPos).getViewType() == ViewType.IDENTITIES) {
+            view.removeItemAtPosition(insertPos, true);
         } else {
             expandArticleRow(insertPos, itemViewModel);
+            collapseOtherArticleRows(insertPos);
         }
     }
 
     private void expandArticleRow(int pos, @NonNull BasePurchaseAddEditItemViewModel parentItem) {
         final PurchaseAddEditArticleItemViewModel articleItem =
                 (PurchaseAddEditArticleItemViewModel) parentItem;
-        items.add(pos, new PurchaseAddEditArticleIdentitiesItemViewModel(articleItem.getIdentities()));
-        listInteraction.notifyItemInserted(pos);
-
-        collapseOtherItemRows(pos);
+        view.addItemAtPosition(pos, new PurchaseAddEditArticleIdentitiesItemViewModel(articleItem.getIdentities()));
     }
 
-    private void collapseArticleRow(int pos) {
-        items.remove(pos);
-        listInteraction.notifyItemRemoved(pos);
-    }
-
-    private void collapseOtherItemRows(int insertPos) {
+    private void collapseOtherArticleRows(int insertPos) {
         int pos = 0;
         for (Iterator<BasePurchaseAddEditItemViewModel> iterator =
-             items.iterator(); iterator.hasNext(); ) {
+             viewModel.getItems().iterator(); iterator.hasNext(); ) {
             final int type = iterator.next().getViewType();
             if (type == ViewType.IDENTITIES && pos != insertPos) {
                 iterator.remove();
-                listInteraction.notifyItemRemoved(pos);
+                view.notifyItemRemoved(pos);
             }
 
             pos++;
@@ -374,15 +331,16 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         // toggle identity selection state
         identityViewModel.setSelected(!identityViewModel.isSelected());
 
-        for (int i = 0, size = getItemCount(); i < size; i++) {
-            final BasePurchaseAddEditItemViewModel itemViewModel = getItemAtPosition(i);
+        final ArrayList<BasePurchaseAddEditItemViewModel> items = viewModel.getItems();
+        for (int i = 0, size = items.size(); i < size; i++) {
+            final BasePurchaseAddEditItemViewModel itemViewModel = items.get(i);
             if (itemViewModel.getViewType() == ViewType.IDENTITIES) {
                 // notify selection state changed
-                listInteraction.notifyItemIdentityChanged(i, identityViewModel);
+                view.notifyItemIdentityChanged(i, identityViewModel);
 
                 // load and set appropriate toggle image
                 final PurchaseAddEditArticleItemViewModel articleItem =
-                        (PurchaseAddEditArticleItemViewModel) getItemAtPosition(i - 1);
+                        (PurchaseAddEditArticleItemViewModel) items.get(i - 1);
                 articleItem.notifyPropertyChanged(BR.identities);
 
                 break;
@@ -398,13 +356,14 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         // toggle identity selection state
         identityViewModel.setSelected(!identityViewModel.isSelected());
 
-        for (int i = 0, size = getItemCount(); i < size; i++) {
-            final BasePurchaseAddEditItemViewModel itemViewModel = getItemAtPosition(i);
+        final ArrayList<BasePurchaseAddEditItemViewModel> items = viewModel.getItems();
+        for (int i = 0, size = items.size(); i < size; i++) {
+            final BasePurchaseAddEditItemViewModel itemViewModel = items.get(i);
             final int viewType = itemViewModel.getViewType();
             switch (viewType) {
                 case ViewType.IDENTITIES:
                     // notify selection state changed
-                    listInteraction.notifyItemIdentityChanged(i, identityViewModel);
+                    view.notifyItemIdentityChanged(i, identityViewModel);
                     break;
                 case ViewType.ARTICLE:
                     // load and set appropriate toggle image for all articles
@@ -424,13 +383,13 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @Override
     public void onArticleDismiss(int position) {
-        items.remove(position);
-        // if identity row was open, remove it as well
-        if (getItemAtPosition(position).getViewType() == ViewType.IDENTITIES) {
-            items.remove(position);
-            listInteraction.notifyItemRangeRemoved(position, 2);
+        view.removeItemAtPosition(position, false);
+        // if identity row was open, removeItem it as well
+        if (viewModel.getItems().get(position).getViewType() == ViewType.IDENTITIES) {
+            view.removeItemAtPosition(position, false);
+            view.notifyItemRangeRemoved(position, 2);
         } else {
-            listInteraction.notifyItemRemoved(position);
+            view.notifyItemRemoved(position);
         }
 
         updateTotalAndMyShare();
@@ -507,8 +466,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                     @Override
                     public void onSuccess(Float exchangeRate) {
                         view.removeWorker(workerTag);
-                        fetchingExchangeRates = false;
-
+                        viewModel.setFetchingExchangeRates(false);
                         viewModel.setExchangeRate(exchangeRate,
                                 exchangeRateFormatter.format(exchangeRate));
                     }
@@ -516,8 +474,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                     @Override
                     public void onError(Throwable error) {
                         view.removeWorker(workerTag);
-                        fetchingExchangeRates = false;
-
+                        viewModel.setFetchingExchangeRates(false);
                         view.showMessageWithAction(R.string.toast_error_exchange_rate,
                                 new MessageAction(R.string.action_retry) {
                                     @Override
@@ -540,7 +497,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @Override
     public void onSavePurchaseClick(View view) {
-        if (fetchingExchangeRates) {
+        if (viewModel.isFetchingExchangeRates()) {
             this.view.showMessage(R.string.toast_exchange_rate_fetching);
             return;
         }
@@ -571,7 +528,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @Override
     public void onSaveAsDraftMenuClick() {
-        if (fetchingExchangeRates) {
+        if (viewModel.isFetchingExchangeRates()) {
             view.showMessage(R.string.toast_exchange_rate_fetching);
             return;
         }
@@ -582,7 +539,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     private boolean validateItems() {
         boolean hasItem = false;
         boolean allValid = true;
-        for (BasePurchaseAddEditItemViewModel itemViewModel : items) {
+        for (BasePurchaseAddEditItemViewModel itemViewModel : viewModel.getItems()) {
             if (itemViewModel.getViewType() != ViewType.ARTICLE) {
                 continue;
             }
@@ -615,7 +572,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         final List<Article> purchaseArticles = new ArrayList<>();
         final int fractionDigits = MoneyUtils.getFractionDigits(viewModel.getCurrency());
 
-        for (BasePurchaseAddEditItemViewModel itemViewModel : items) {
+        for (BasePurchaseAddEditItemViewModel itemViewModel : viewModel.getItems()) {
             if (itemViewModel.getViewType() != ViewType.ARTICLE) {
                 continue;
             }

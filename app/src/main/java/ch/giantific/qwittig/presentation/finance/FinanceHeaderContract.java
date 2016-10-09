@@ -17,8 +17,7 @@ import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 public interface FinanceHeaderContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
-
-        FinanceHeaderViewModel getViewModel();
+        // empty
     }
 
     interface ViewListener extends BaseViewListener {

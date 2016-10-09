@@ -9,8 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ch.giantific.qwittig.databinding.RowPurchaseDetailsIdentityBinding;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsIdentityItemViewModel;
 
@@ -20,14 +22,14 @@ import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.Purc
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchaseDetailsIdentityBinding>> {
+public class PurchaseDetailsIdentitiesRecyclerAdapter extends RecyclerView.Adapter<BindingRow<RowPurchaseDetailsIdentityBinding>> {
 
-    private final PurchaseDetailsContract.Presenter presenter;
+    private final List<PurchaseDetailsIdentityItemViewModel> items;
 
-    public PurchaseDetailsIdentitiesRecyclerAdapter(@NonNull PurchaseDetailsContract.Presenter presenter) {
+    public PurchaseDetailsIdentitiesRecyclerAdapter() {
         super();
 
-        this.presenter = presenter;
+        items = new ArrayList<>();
     }
 
     @Override
@@ -41,7 +43,7 @@ public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapte
     @Override
     public void onBindViewHolder(BindingRow<RowPurchaseDetailsIdentityBinding> holder, int position) {
         final RowPurchaseDetailsIdentityBinding binding = holder.getBinding();
-        final PurchaseDetailsIdentityItemViewModel viewModel = presenter.getIdentityAtPosition(position);
+        final PurchaseDetailsIdentityItemViewModel viewModel = items.get(position);
 
         binding.setViewModel(viewModel);
         binding.executePendingBindings();
@@ -49,6 +51,14 @@ public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapte
 
     @Override
     public int getItemCount() {
-        return presenter.getIdentityCount();
+        return items.size();
+    }
+
+    public void addItems(@NonNull List<PurchaseDetailsIdentityItemViewModel> items) {
+        this.items.addAll(items);
+    }
+
+    public void clearItems() {
+        items.clear();
     }
 }

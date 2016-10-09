@@ -10,15 +10,15 @@ import ch.giantific.qwittig.presentation.about.viewmodels.items.AboutItemViewMod
 import ch.giantific.qwittig.presentation.about.viewmodels.items.BaseAboutItemViewModel;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
 
 /**
  * Defines an observable view model for a screen showing information about Qwittig.
  */
 public interface AboutContract {
 
-    interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<BaseAboutItemViewModel> {
+    interface Presenter extends BasePresenter<ViewListener> {
+
+        BaseAboutItemViewModel[] getAboutItems();
 
         void onAboutItemClick(@NonNull AboutItemViewModel itemViewModel);
     }

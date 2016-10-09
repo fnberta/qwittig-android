@@ -35,7 +35,7 @@ public class TabsAdapter extends FragmentPagerAdapter {
     /**
      * Adds an initial fragment to the adapter.
      *
-     * @param fragment the fragment to add
+     * @param fragment the fragment to addItemAtPosition
      * @param title    the title of the fragment to be displayed in the tab
      */
     public void addInitialFragment(@NonNull Fragment fragment, @NonNull String title) {

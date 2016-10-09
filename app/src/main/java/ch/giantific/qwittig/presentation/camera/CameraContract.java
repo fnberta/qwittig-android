@@ -19,7 +19,6 @@ import rx.Single;
 public interface CameraContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
-        CameraViewModel getViewModel();
 
         void onCameraLoadFailed();
 

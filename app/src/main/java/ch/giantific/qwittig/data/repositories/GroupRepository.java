@@ -136,7 +136,7 @@ public class GroupRepository {
                 identityNickname, identityAvatar, balance);
         childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), identity.toMap());
 
-        // add to user
+        // addItemAtPosition to user
         childUpdates.put(String.format("%s/%s/%s/%s", User.BASE_PATH, userId, User.PATH_IDENTITIES, identityId), true);
         childUpdates.put(String.format("%s/%s/%s", User.BASE_PATH, userId, User.PATH_CURRENT_IDENTITY), identityId);
 

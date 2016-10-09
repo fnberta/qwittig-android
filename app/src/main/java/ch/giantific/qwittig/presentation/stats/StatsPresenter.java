@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.data.rest.StatsResult;
@@ -46,7 +48,6 @@ import timber.log.Timber;
 public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener>
         implements StatsContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = StatsViewModel.class.getCanonicalName();
     private StatsViewModel viewModel;
     private StatsTypeItem type;
     private StatsPeriodItem period;
@@ -54,28 +55,13 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
     private Date endDate;
     private NumberFormat currencyFormatter;
 
-    public StatsPresenter(@Nullable Bundle savedState,
-                          @NonNull Navigator navigator,
+    @Inject
+    public StatsPresenter(@NonNull Navigator navigator,
+                          @NonNull StatsViewModel viewModel,
                           @NonNull UserRepository userRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new StatsViewModel(true);
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public StatsViewModel getViewModel() {
-        return viewModel;
+        this.viewModel = viewModel;
     }
 
     @Override

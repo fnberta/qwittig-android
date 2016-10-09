@@ -26,19 +26,22 @@ public class LoginAccountsViewModel extends BaseObservable
             return new LoginAccountsViewModel[size];
         }
     };
+    public static final String TAG = LoginAccountsViewModel.class.getCanonicalName();
     private boolean loading;
+    private String joinIdentityId;
 
-    public LoginAccountsViewModel(boolean loading) {
-        this.loading = loading;
+    public LoginAccountsViewModel() {
     }
 
     private LoginAccountsViewModel(Parcel in) {
         loading = in.readByte() != 0;
+        joinIdentityId = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte((byte) (loading ? 1 : 0));
+        dest.writeString(joinIdentityId);
     }
 
     @Override
@@ -58,4 +61,11 @@ public class LoginAccountsViewModel extends BaseObservable
         notifyPropertyChanged(BR.loading);
     }
 
+    public String getJoinIdentityId() {
+        return joinIdentityId;
+    }
+
+    public void setJoinIdentityId(String joinIdentityId) {
+        this.joinIdentityId = joinIdentityId;
+    }
 }

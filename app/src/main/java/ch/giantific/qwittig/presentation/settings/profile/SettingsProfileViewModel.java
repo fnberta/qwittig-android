@@ -35,6 +35,7 @@ public class SettingsProfileViewModel extends BaseObservable
             return new SettingsProfileViewModel[size];
         }
     };
+    public static final String TAG = SettingsProfileViewModel.class.getCanonicalName();
     public final ObservableField<String> nickname = new ObservableField<>();
     public final ObservableField<String> email = new ObservableField<>();
     public final ObservableField<String> passwordRepeat = new ObservableField<>();

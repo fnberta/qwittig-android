@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 import java.util.Date;
 
 /**
- * Defines the view model for a date row in the add or edit purchase screen.
+ * Defines the view model for a date row in the addItemAtPosition or edit purchase screen.
  */
 public interface PurchaseAddEditDateItemViewModel extends Observable {
 

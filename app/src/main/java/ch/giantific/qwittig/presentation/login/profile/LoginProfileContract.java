@@ -17,8 +17,6 @@ public interface LoginProfileContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
 
-        LoginProfileViewModel getViewModel();
-
         void setWithInvitation(boolean withInvitation);
 
         void onNewAvatarTaken(@NonNull String avatarPath);

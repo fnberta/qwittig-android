@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.purchases.details;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -14,9 +13,10 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
@@ -25,7 +25,6 @@ import ch.giantific.qwittig.domain.models.Article;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsContract.PurchaseDetailsResult;
@@ -42,64 +41,31 @@ import rx.Observable;
 public class PurchaseDetailsPresenter extends BasePresenterImpl<PurchaseDetailsContract.ViewListener>
         implements PurchaseDetailsContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = PurchaseDetailsViewModel.class.getCanonicalName();
     private final PurchaseDetailsViewModel viewModel;
     private final PurchaseRepository purchaseRepo;
-    private final List<PurchaseDetailsArticleItemViewModel> articleItems;
-    private final List<PurchaseDetailsIdentityItemViewModel> identityItems;
     private final String purchaseId;
     private final String purchaseGroupId;
     private final DateFormat dateFormatter;
-    private ListInteraction itemsListInteraction;
-    private ListInteraction identitiesListInteraction;
     private String currentIdentityId;
     private NumberFormat moneyFormatter;
     private NumberFormat foreignMoneyFormatter;
     private boolean identitiesActive = true;
 
-    public PurchaseDetailsPresenter(@Nullable Bundle savedState,
-                                    @NonNull Navigator navigator,
+    @Inject
+    public PurchaseDetailsPresenter(@NonNull Navigator navigator,
+                                    @NonNull PurchaseDetailsViewModel viewModel,
                                     @NonNull UserRepository userRepo,
                                     @NonNull PurchaseRepository purchaseRepo,
                                     @NonNull String purchaseId,
                                     @Nullable String purchaseGroupId) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.purchaseRepo = purchaseRepo;
         this.purchaseId = purchaseId;
         this.purchaseGroupId = purchaseGroupId;
 
-        articleItems = new ArrayList<>();
-        identityItems = new ArrayList<>();
         dateFormatter = DateUtils.getDateFormatter(false);
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new PurchaseDetailsViewModel(true);
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public PurchaseDetailsViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        itemsListInteraction = listInteraction;
-    }
-
-    @Override
-    public void setIdentitiesListInteraction(@NonNull ListInteraction listInteraction) {
-        identitiesListInteraction = listInteraction;
     }
 
     @Override
@@ -143,12 +109,12 @@ public class PurchaseDetailsPresenter extends BasePresenterImpl<PurchaseDetailsC
 
                     @Override
                     public void onNext(List<PurchaseDetailsIdentityItemViewModel> itemViewModels) {
-                        identityItems.clear();
-                        identityItems.addAll(itemViewModels);
-                        identitiesListInteraction.notifyDataSetChanged();
+                        view.clearIdentities();
+                        view.addIdentities(itemViewModels);
+                        view.notifyIdentitiesChanged();
                         checkIdentitiesActive(itemViewModels);
 
-                        viewModel.setEmpty(getItemCount() == 0);
+                        viewModel.setEmpty(view.isArticlesEmpty());
                         viewModel.setLoading(false);
                         view.startEnterTransition();
                     }
@@ -182,13 +148,13 @@ public class PurchaseDetailsPresenter extends BasePresenterImpl<PurchaseDetailsC
     }
 
     private void setArticles(@NonNull List<Article> articles, @NonNull String identityId) {
-        articleItems.clear();
+        view.clearArticles();
         for (Article article : articles) {
             final PurchaseDetailsArticleItemViewModel viewModel =
                     new PurchaseDetailsArticleItemViewModel(article, identityId, moneyFormatter);
-            articleItems.add(viewModel);
+            view.addArticle(viewModel);
         }
-        itemsListInteraction.notifyDataSetChanged();
+        view.notifyArticlesChanged();
     }
 
     private void checkIdentitiesActive(@NonNull List<PurchaseDetailsIdentityItemViewModel> itemViewModels) {
@@ -212,27 +178,6 @@ public class PurchaseDetailsPresenter extends BasePresenterImpl<PurchaseDetailsC
         if (!purchase.isRead(currentIdentity)) {
             purchaseRepo.updateReadBy(purchaseId, currentIdentity);
         }
-    }
-
-    @Override
-    public PurchaseDetailsArticleItemViewModel getItemAtPosition(int position) {
-        return articleItems.get(position);
-    }
-
-
-    @Override
-    public int getItemCount() {
-        return articleItems.size();
-    }
-
-    @Override
-    public PurchaseDetailsIdentityItemViewModel getIdentityAtPosition(int position) {
-        return identityItems.get(position);
-    }
-
-    @Override
-    public int getIdentityCount() {
-        return identityItems.size();
     }
 
     @Override

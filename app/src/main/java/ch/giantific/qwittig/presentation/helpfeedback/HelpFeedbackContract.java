@@ -9,7 +9,6 @@ import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
 import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.BaseHelpFeedbackItemViewModel;
 import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.HelpFeedbackItemViewModel;
 
@@ -18,8 +17,9 @@ import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.HelpFeedb
  */
 public interface HelpFeedbackContract {
 
-    interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<BaseHelpFeedbackItemViewModel> {
+    interface Presenter extends BasePresenter<ViewListener> {
+
+        BaseHelpFeedbackItemViewModel[] getHelpFeedbackItems();
 
         void onHelpFeedbackItemClicked(@NonNull HelpFeedbackItemViewModel itemViewModel);
     }

@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityAssignmentAddEditBinding;
+import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.AssignmentAddEditViewModel;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
@@ -34,6 +35,8 @@ public abstract class BaseAssignmentAddEditActivity<T> extends BaseActivity<T>
 
     @Inject
     AssignmentAddEditContract.Presenter presenter;
+    @Inject
+    AssignmentAddEditViewModel viewModel;
     private ActivityAssignmentAddEditBinding binding;
 
     @Override
@@ -41,7 +44,7 @@ public abstract class BaseAssignmentAddEditActivity<T> extends BaseActivity<T>
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_assignment_add_edit);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
 
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -65,6 +68,13 @@ public abstract class BaseAssignmentAddEditActivity<T> extends BaseActivity<T>
     @Override
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(AssignmentAddEditViewModel.TAG, viewModel);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

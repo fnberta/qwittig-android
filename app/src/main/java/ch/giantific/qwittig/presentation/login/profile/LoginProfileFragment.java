@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentLoginProfileBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.login.di.LoginComponent;
@@ -24,6 +26,8 @@ public class LoginProfileFragment extends BaseFragment<LoginComponent, LoginProf
 
     private static final String KEY_WITH_INVITATION = "WITH_INVITATION";
 
+    @Inject
+    LoginProfileViewModel viewModel;
     private FragmentLoginProfileBinding binding;
 
     public LoginProfileFragment() {
@@ -53,7 +57,7 @@ public class LoginProfileFragment extends BaseFragment<LoginComponent, LoginProf
         presenter.setWithInvitation(withInvitation);
         presenter.attachView(this);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override

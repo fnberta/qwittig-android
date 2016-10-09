@@ -12,17 +12,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseSortedListFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.PurchasesViewModel;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.items.PurchaseItemViewModel;
 
 /**
  * Displays recent purchases in a {@link RecyclerView} list.
  */
-public class PurchasesFragment extends BaseFragment<HomeSubcomponent, PurchasesContract.Presenter, BaseFragment.ActivityListener<HomeSubcomponent>>
+public class PurchasesFragment extends BaseSortedListFragment<HomeSubcomponent,
+        PurchasesContract.Presenter,
+        BaseFragment.ActivityListener<HomeSubcomponent>,
+        PurchaseItemViewModel>
         implements PurchasesContract.ViewListener {
 
+    @Inject
+    PurchasesViewModel viewModel;
     private FragmentHomePurchasesBinding binding;
 
     public PurchasesFragment() {
@@ -40,10 +50,8 @@ public class PurchasesFragment extends BaseFragment<HomeSubcomponent, PurchasesC
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final PurchasesRecyclerAdapter adapter = setupRecyclerView();
         presenter.attachView(this);
-        presenter.setListInteraction(adapter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -51,13 +59,16 @@ public class PurchasesFragment extends BaseFragment<HomeSubcomponent, PurchasesC
         component.inject(this);
     }
 
-    private PurchasesRecyclerAdapter setupRecyclerView() {
+    @Override
+    protected BaseSortedListRecyclerAdapter<PurchaseItemViewModel, PurchasesContract.Presenter, ? extends RecyclerView.ViewHolder> getRecyclerAdapter() {
+        return new PurchasesRecyclerAdapter(presenter);
+    }
+
+    @Override
+    protected void setupRecyclerView() {
         binding.rvPb.rvBase.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvPb.rvBase.setHasFixedSize(true);
-        final PurchasesRecyclerAdapter adapter = new PurchasesRecyclerAdapter(presenter);
-        binding.rvPb.rvBase.setAdapter(adapter);
-
-        return adapter;
+        binding.rvPb.rvBase.setAdapter(recyclerAdapter);
     }
 
     @Override

@@ -34,6 +34,7 @@ public class PurchaseDetailsViewModel extends BaseObservable
             return new PurchaseDetailsViewModel[size];
         }
     };
+    public static final String TAG = PurchaseDetailsViewModel.class.getCanonicalName();
     private boolean loading;
     private boolean empty;
     private String store;
@@ -46,9 +47,9 @@ public class PurchaseDetailsViewModel extends BaseObservable
     private String note;
     private double exchangeRate;
 
-    public PurchaseDetailsViewModel(boolean loading) {
+    public PurchaseDetailsViewModel() {
         this.empty = true;
-        this.loading = loading;
+        this.loading = true;
     }
 
     private PurchaseDetailsViewModel(Parcel in) {

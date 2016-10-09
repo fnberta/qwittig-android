@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentStatsPieBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
@@ -17,6 +19,8 @@ import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 public class StatsPieFragment extends BaseFragment<StatsSubcomponent, StatsContract.Presenter,
         BaseFragment.ActivityListener<StatsSubcomponent>> {
 
+    @Inject
+    StatsViewModel viewModel;
     private FragmentStatsPieBinding binding;
 
     public StatsPieFragment() {
@@ -34,7 +38,7 @@ public class StatsPieFragment extends BaseFragment<StatsSubcomponent, StatsContr
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override

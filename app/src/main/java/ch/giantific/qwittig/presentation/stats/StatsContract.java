@@ -24,8 +24,6 @@ public interface StatsContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
 
-        StatsViewModel getViewModel();
-
         void setType(@NonNull StatsTypeItem type);
 
         void setPeriod(@NonNull StatsPeriodItem statsPeriod);

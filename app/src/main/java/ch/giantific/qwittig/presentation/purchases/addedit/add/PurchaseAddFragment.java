@@ -16,10 +16,12 @@ import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContra
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
 
 /**
- * Displays the interface where the user can add a new purchase by setting store, date, users
+ * Displays the interface where the user can addItemAtPosition a new purchase by setting store, date, users
  * involved and the different items.
  */
-public class PurchaseAddFragment extends BasePurchaseAddEditFragment<PurchaseAddComponent, PurchaseAddEditContract.Presenter, BasePurchaseAddEditFragment.ActivityListener<PurchaseAddComponent>> {
+public class PurchaseAddFragment extends BasePurchaseAddEditFragment<PurchaseAddComponent,
+        PurchaseAddEditContract.Presenter,
+        BasePurchaseAddEditFragment.ActivityListener<PurchaseAddComponent>> {
 
     public PurchaseAddFragment() {
         // required empty constructor

@@ -1,22 +1,20 @@
 package ch.giantific.qwittig.presentation.navdrawer;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
 
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.SpinnerInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import rx.Observable;
@@ -28,32 +26,15 @@ public class NavDrawerPresenter extends BasePresenterImpl<NavDrawerContract.View
         implements NavDrawerContract.Presenter {
 
     private final NavDrawerViewModel viewModel;
-    private final List<Identity> identities;
-    private SpinnerInteraction spinnerInteraction;
     private Identity currentIdentity;
 
-    public NavDrawerPresenter(@Nullable Bundle savedState,
-                              @NonNull Navigator navigator,
+    @Inject
+    public NavDrawerPresenter(@NonNull Navigator navigator,
+                              @NonNull NavDrawerViewModel viewModel,
                               @NonNull UserRepository userRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
-        identities = new ArrayList<>();
-        viewModel = new NavDrawerViewModel();
-    }
-
-    @Override
-    public NavDrawerViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public List<Identity> getIdentities() {
-        return identities;
-    }
-
-    @Override
-    public void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction) {
-        this.spinnerInteraction = spinnerInteraction;
+        this.viewModel = viewModel;
     }
 
     @Override
@@ -80,21 +61,17 @@ public class NavDrawerPresenter extends BasePresenterImpl<NavDrawerContract.View
                     }
 
                     @Override
-                    public void onNext(List<Identity> newIdentities) {
-                        identities.clear();
-                        identities.addAll(newIdentities);
-                        spinnerInteraction.notifyDataSetChanged();
+                    public void onNext(List<Identity> identities) {
+                        view.clearHeaderIdentities();
+                        view.addHeaderIdentities(identities);
 
-                        int selected = 0;
                         for (int i = 0, size = identities.size(); i < size; i++) {
                             final Identity identity = identities.get(i);
                             if (Objects.equals(currentIdentity.getId(), identity.getId())) {
-                                selected = i;
+                                viewModel.setSelectedIdentity(i);
                                 break;
                             }
                         }
-
-                        viewModel.setSelectedIdentity(selected);
                     }
                 })
         );

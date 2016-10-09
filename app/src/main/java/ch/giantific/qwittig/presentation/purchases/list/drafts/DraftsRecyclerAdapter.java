@@ -5,11 +5,13 @@
 package ch.giantific.qwittig.presentation.purchases.list.drafts;
 
 import android.support.annotation.NonNull;
+import android.support.v7.util.SortedList;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowDraftsBinding;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.DraftItemViewModel;
 
@@ -18,9 +20,9 @@ import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.
  * <p>
  * Subclass of {@link android.support.v7.widget.RecyclerView.Adapter}.
  */
-public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDraftsBinding>> {
-
-    private final DraftsContract.Presenter presenter;
+public class DraftsRecyclerAdapter extends BaseSortedListRecyclerAdapter<DraftItemViewModel,
+        DraftsContract.Presenter,
+        BindingRow<RowDraftsBinding>> {
 
     /**
      * Constructs a new {@link DraftsRecyclerAdapter}.
@@ -28,9 +30,13 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDra
      * @param presenter the main view's presenter
      */
     public DraftsRecyclerAdapter(@NonNull DraftsContract.Presenter presenter) {
-        super();
+        super(presenter);
+    }
 
-        this.presenter = presenter;
+    @Override
+    protected SortedList<DraftItemViewModel> createList() {
+        return new SortedList<>(DraftItemViewModel.class,
+                new SortedListCallback<>(this, presenter));
     }
 
     @NonNull
@@ -44,21 +50,10 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDra
     @Override
     public void onBindViewHolder(BindingRow<RowDraftsBinding> holder, int position) {
         final RowDraftsBinding binding = holder.getBinding();
-        final DraftItemViewModel viewModel = presenter.getItemAtPosition(position);
+        final DraftItemViewModel viewModel = getItemAtPosition(position);
 
         binding.setPresenter(presenter);
         binding.setViewModel(viewModel);
         binding.executePendingBindings();
-    }
-
-    @Override
-    public void scrollToPosition(final int position) {
-        // override to let RecyclerView layout its items first
-        recyclerView.post(() -> recyclerView.scrollToPosition(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return presenter.getItemCount();
     }
 }

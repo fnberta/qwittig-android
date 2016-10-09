@@ -1,9 +1,7 @@
 package ch.giantific.qwittig.presentation.settings.profile;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -12,6 +10,8 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
@@ -33,7 +33,6 @@ import timber.log.Timber;
 public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileContract.ViewListener>
         implements SettingsProfileContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = SettingsProfileViewModel.class.getCanonicalName();
     private final SettingsProfileViewModel viewModel;
     private final List<String> groupNicknames;
     private final GroupRepository groupRepo;
@@ -41,32 +40,16 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     private String emailOrig;
     private String nicknameOrig;
 
-    public SettingsProfilePresenter(@Nullable Bundle savedState,
-                                    @NonNull Navigator navigator,
+    @Inject
+    public SettingsProfilePresenter(@NonNull Navigator navigator,
+                                    @NonNull SettingsProfileViewModel viewModel,
                                     @NonNull UserRepository userRepo,
                                     @NonNull GroupRepository groupRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.groupRepo = groupRepo;
         groupNicknames = new ArrayList<>();
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new SettingsProfileViewModel();
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public SettingsProfileViewModel getViewModel() {
-        return viewModel;
     }
 
     @Override

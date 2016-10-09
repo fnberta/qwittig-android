@@ -13,9 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseShowReceiptBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
 
 /**
  * Shows the receipt image taken by the user when adding a new purchase.
@@ -24,6 +27,8 @@ import ch.giantific.qwittig.presentation.common.BaseFragment;
  */
 public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAddEditContract.Presenter> extends BaseFragment<T, S, BaseFragment.ActivityListener<T>> {
 
+    @Inject
+    PurchaseAddEditViewModel viewModel;
     private FragmentPurchaseShowReceiptBinding binding;
 
     public BasePurchaseAddEditReceiptFragment() {
@@ -48,7 +53,7 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -56,7 +61,7 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
         menu.clear();
         inflater.inflate(R.menu.menu_purchase_edit_receipt_fragment, menu);
 
-        if (presenter.getViewModel().isReceiptAvailable()) {
+        if (viewModel.isReceiptAvailable()) {
             menu.findItem(R.id.action_purchase_edit_receipt_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_edit_receipt_delete).setVisible(true);
         } else {

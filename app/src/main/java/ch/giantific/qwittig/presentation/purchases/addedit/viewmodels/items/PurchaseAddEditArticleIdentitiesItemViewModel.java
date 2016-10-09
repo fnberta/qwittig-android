@@ -8,7 +8,7 @@ import android.os.Parcel;
 import android.support.annotation.NonNull;
 
 /**
- * Provides a row filled with identities that belong to a list item in the add or edit purchase screen.
+ * Provides a row filled with identities that belong to a list item in the addItemAtPosition or edit purchase screen.
  */
 public class PurchaseAddEditArticleIdentitiesItemViewModel
         implements BasePurchaseAddEditItemViewModel {

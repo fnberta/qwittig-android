@@ -4,19 +4,17 @@
 
 package ch.giantific.qwittig.presentation.assignments.details;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.AssignmentRepository;
@@ -29,9 +27,7 @@ import ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsCo
 import ch.giantific.qwittig.presentation.assignments.details.viewmodels.AssignmentDetailsViewModel;
 import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.AssignmentDetailsHeaderItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.AssignmentDetailsHistoryItemViewModel;
-import ch.giantific.qwittig.presentation.assignments.details.viewmodels.items.BaseAssignmentDetailsItemViewModel;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import rx.Observable;
@@ -42,48 +38,24 @@ import rx.Observable;
 public class AssignmentDetailsPresenter extends BasePresenterImpl<AssignmentDetailsContract.ViewListener>
         implements AssignmentDetailsContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = AssignmentDetailsViewModel.class.getCanonicalName();
     private final AssignmentDetailsViewModel viewModel;
-    private final List<BaseAssignmentDetailsItemViewModel> items = new ArrayList<>();
     private final String assignmentId;
     private final AssignmentRepository assignmentRepo;
-    private ListInteraction listInteraction;
     private Assignment assignment;
     private String currentIdentityId;
     private boolean identitiesActive = true;
 
-    public AssignmentDetailsPresenter(@Nullable Bundle savedState,
-                                      @NonNull Navigator navigator,
+    @Inject
+    public AssignmentDetailsPresenter(@NonNull Navigator navigator,
+                                      @NonNull AssignmentDetailsViewModel viewModel,
                                       @NonNull UserRepository userRepo,
                                       @NonNull AssignmentRepository assignmentRepo,
                                       @NonNull String assignmentId) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.assignmentRepo = assignmentRepo;
         this.assignmentId = assignmentId;
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new AssignmentDetailsViewModel(true);
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public AssignmentDetailsViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        this.listInteraction = listInteraction;
     }
 
     @Override
@@ -101,8 +73,8 @@ public class AssignmentDetailsPresenter extends BasePresenterImpl<AssignmentDeta
                 .doOnNext(assignment -> {
                     this.assignment = assignment;
                     updateToolbarHeader();
-                    items.clear();
-                    items.add(new AssignmentDetailsHeaderItemViewModel(R.string.header_assignment_history));
+                    view.clearItems();
+                    view.addItem(new AssignmentDetailsHeaderItemViewModel(R.string.header_assignment_history));
                 })
                 .flatMap(assignment -> Observable.from(assignment.getIdentityIdsSorted())
                         .concatMap(identityId -> userRepo.getIdentity(identityId).toObservable())
@@ -136,13 +108,13 @@ public class AssignmentDetailsPresenter extends BasePresenterImpl<AssignmentDeta
 
                     @Override
                     public void onNext(List<AssignmentDetailsHistoryItemViewModel> itemViewModels) {
-                        items.clear();
+                        view.clearItems();
                         if (!itemViewModels.isEmpty()) {
-                            items.add(new AssignmentDetailsHeaderItemViewModel(R.string.header_assignment_history));
-                            items.addAll(itemViewModels);
+                            view.addItem(new AssignmentDetailsHeaderItemViewModel(R.string.header_assignment_history));
+                            view.addItems(itemViewModels);
                             viewModel.setEmpty(false);
                         }
-                        listInteraction.notifyDataSetChanged();
+                        view.notifyItemsChanged();
                         viewModel.setLoading(false);
                         view.startPostponedEnterTransition();
                     }
@@ -196,16 +168,6 @@ public class AssignmentDetailsPresenter extends BasePresenterImpl<AssignmentDeta
                 break;
             }
         }
-    }
-
-    @Override
-    public BaseAssignmentDetailsItemViewModel getItemAtPosition(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
     }
 
     @Override

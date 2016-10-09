@@ -11,22 +11,25 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditDateItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditStoreItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditTotalItemViewModel;
 
 public class PurchaseAddEditViewModel extends BaseObservable
-        implements PurchaseReceiptViewModel,
+        implements Parcelable,
+        PurchaseReceiptViewModel,
         PurchaseAddEditDateItemViewModel,
         PurchaseAddEditStoreItemViewModel,
-        PurchaseAddEditTotalItemViewModel,
-        Parcelable {
+        PurchaseAddEditTotalItemViewModel {
 
+    public static final String TAG = PurchaseAddEditViewModel.class.getCanonicalName();
     public static final Creator<PurchaseAddEditViewModel> CREATOR = new Creator<PurchaseAddEditViewModel>() {
         @Override
         public PurchaseAddEditViewModel createFromParcel(Parcel in) {
@@ -38,7 +41,8 @@ public class PurchaseAddEditViewModel extends BaseObservable
             return new PurchaseAddEditViewModel[size];
         }
     };
-    private final List<String> supportedCurrencies;
+    private final ArrayList<BasePurchaseAddEditItemViewModel> items;
+    private List<String> supportedCurrencies;
     private boolean loading;
     private String receipt;
     private String currency;
@@ -51,19 +55,17 @@ public class PurchaseAddEditViewModel extends BaseObservable
     private double total;
     private String totalFormatted;
     private String myShare;
+    private boolean fetchingExchangeRates;
+    private boolean dataSet;
 
-    public PurchaseAddEditViewModel(@NonNull List<String> supportedCurrencies,
-                                    boolean loading,
-                                    @NonNull Date date,
-                                    @NonNull String dateFormatted) {
-        this.supportedCurrencies = supportedCurrencies;
-        this.loading = loading;
-        this.date = date;
-        this.dateFormatted = dateFormatted;
+    public PurchaseAddEditViewModel() {
+        items = new ArrayList<>();
         this.exchangeRate = 1;
     }
 
     private PurchaseAddEditViewModel(Parcel in) {
+        items = new ArrayList<>();
+        in.readList(items, BasePurchaseAddEditItemViewModel.class.getClassLoader());
         supportedCurrencies = in.createStringArrayList();
         loading = in.readByte() != 0;
         receipt = in.readString();
@@ -76,10 +78,13 @@ public class PurchaseAddEditViewModel extends BaseObservable
         total = in.readDouble();
         totalFormatted = in.readString();
         myShare = in.readString();
+        fetchingExchangeRates = in.readByte() != 0;
+        dataSet = in.readByte() != 0;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(items);
         dest.writeStringList(supportedCurrencies);
         dest.writeByte((byte) (loading ? 1 : 0));
         dest.writeString(receipt);
@@ -92,6 +97,8 @@ public class PurchaseAddEditViewModel extends BaseObservable
         dest.writeDouble(total);
         dest.writeString(totalFormatted);
         dest.writeString(myShare);
+        dest.writeByte((byte) (fetchingExchangeRates ? 1 : 0));
+        dest.writeByte((byte) (dataSet ? 1 : 0));
     }
 
     @Override
@@ -99,8 +106,20 @@ public class PurchaseAddEditViewModel extends BaseObservable
         return 0;
     }
 
+    public ArrayList<BasePurchaseAddEditItemViewModel> getItems() {
+        return items;
+    }
+
+    public void addItem(@NonNull BasePurchaseAddEditItemViewModel item) {
+        items.add(item);
+    }
+
     public List<String> getSupportedCurrencies() {
         return supportedCurrencies;
+    }
+
+    public void setSupportedCurrencies(@NonNull List<String> supportedCurrencies) {
+        this.supportedCurrencies = supportedCurrencies;
     }
 
     @Override
@@ -253,4 +272,19 @@ public class PurchaseAddEditViewModel extends BaseObservable
         return exchangeRate != 1;
     }
 
+    public boolean isFetchingExchangeRates() {
+        return fetchingExchangeRates;
+    }
+
+    public void setFetchingExchangeRates(boolean fetchingExchangeRates) {
+        this.fetchingExchangeRates = fetchingExchangeRates;
+    }
+
+    public boolean isDataSet() {
+        return dataSet;
+    }
+
+    public void setDataSet(boolean dataSet) {
+        this.dataSet = dataSet;
+    }
 }

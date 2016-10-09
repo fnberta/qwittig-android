@@ -17,6 +17,7 @@ import ch.giantific.qwittig.presentation.assignments.addedit.di.AssignmentEditPr
 import ch.giantific.qwittig.presentation.assignments.addedit.di.DaggerAssignmentEditComponent;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 
 /**
  * Hosts {@link AssignmentAddFragment} that allows the user to edit a task.
@@ -34,7 +35,8 @@ public class AssignmentEditActivity extends BaseAssignmentAddEditActivity<Assign
         component = DaggerAssignmentEditComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .assignmentEditPresenterModule(new AssignmentEditPresenterModule(savedInstanceState, assignmentId))
+                .assignmentEditPresenterModule(new AssignmentEditPresenterModule(assignmentId))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .build();
         component.inject(this);
     }

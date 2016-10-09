@@ -1,10 +1,6 @@
 package ch.giantific.qwittig.presentation.finance.unpaid;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.SortedList;
-import android.text.TextUtils;
 
 import com.google.firebase.auth.FirebaseUser;
 
@@ -14,20 +10,19 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.CompensationRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
-import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
+import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber2;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.CompsUnpaidViewModel;
 import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel;
-import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel.ViewType;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
@@ -37,58 +32,27 @@ import timber.log.Timber;
 public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.ViewListener>
         implements CompsUnpaidContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = CompsUnpaidViewModel.class.getCanonicalName();
-    private static final String STATE_COMP_CHANGE_AMOUNT = "STATE_COMP_CHANGE_AMOUNT";
     private final CompsUnpaidViewModel viewModel;
-    private final SortedList<CompUnpaidItemViewModel> items;
-    private final SortedListCallback<CompUnpaidItemViewModel> listCallback;
     private final CompensationRepository compsRepo;
-    private String currentGroupId;
-    private String compConfirmingId;
-    private String groupCurrency;
     private NumberFormat moneyFormatter;
+    private String currentGroupId;
+    private String groupCurrency;
 
-    public CompsUnpaidPresenter(@Nullable Bundle savedState,
-                                @NonNull Navigator navigator,
+    @Inject
+    public CompsUnpaidPresenter(@NonNull Navigator navigator,
+                                @NonNull CompsUnpaidViewModel viewModel,
                                 @NonNull UserRepository userRepo,
                                 @NonNull CompensationRepository compsRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.compsRepo = compsRepo;
-        listCallback = new SortedListCallback<CompUnpaidItemViewModel>() {
-            @Override
-            public int compare(CompUnpaidItemViewModel o1, CompUnpaidItemViewModel o2) {
-                return o1.compareTo(o2);
-            }
-        };
-        items = new SortedList<>(CompUnpaidItemViewModel.class, listCallback);
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-            compConfirmingId = savedState.getString(STATE_COMP_CHANGE_AMOUNT);
-        } else {
-            viewModel = new CompsUnpaidViewModel(true);
-        }
     }
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-        if (!TextUtils.isEmpty(compConfirmingId)) {
-            outState.putString(STATE_COMP_CHANGE_AMOUNT, compConfirmingId);
-        }
-    }
-
-    @Override
-    public CompsUnpaidViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        listCallback.setListInteraction(listInteraction);
+    public int compareItemViewModels(@NonNull CompUnpaidItemViewModel item1,
+                                     @NonNull CompUnpaidItemViewModel item2) {
+        return item1.compareTo(item2);
     }
 
     @Override
@@ -106,7 +70,7 @@ public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.
                         final String identityId = identity.getId();
                         final String groupId = identity.getGroup();
                         if (!Objects.equals(currentGroupId, groupId)) {
-                            items.clear();
+                            view.clearItems();
                         }
                         currentGroupId = groupId;
                         addDataListener(identityId, groupId);
@@ -120,15 +84,15 @@ public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.
                 .flatMap(compensation -> getItemViewModel(compensation, EventType.NONE, identityId))
                 .toList()
                 .doOnNext(compUnpaidItemViewModels -> {
-                    items.addAll(compUnpaidItemViewModels);
-                    viewModel.setEmpty(getItemCount() == 0);
+                    view.addItems(compUnpaidItemViewModels);
+                    viewModel.setEmpty(view.isItemsEmpty());
                     viewModel.setLoading(false);
                 });
         subscriptions.add(compsRepo.observeCompensationChildren(groupId, identityId, false)
                 .skipUntil(initialData)
                 .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), identityId))
-                .subscribe(new ChildEventSubscriber<>(items, viewModel, e ->
+                .subscribe(new ChildEventSubscriber2<>(view, viewModel, e ->
                         view.showMessage(R.string.toast_error_comps_load)))
         );
     }
@@ -146,40 +110,23 @@ public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.
     }
 
     @Override
-    public CompUnpaidItemViewModel getItemAtPosition(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
-    }
-
-    @Override
     public void onConfirmButtonClick(@NonNull CompUnpaidItemViewModel itemViewModel) {
         final BigFraction amount = itemViewModel.getAmountFraction();
-        compConfirmingId = itemViewModel.getId();
-        view.showCompensationAmountConfirmDialog(amount, itemViewModel.getNickname(), groupCurrency);
+        viewModel.setConfirmingId(itemViewModel.getId());
+        view.showConfirmAmountDialog(amount, itemViewModel.getNickname(), groupCurrency);
     }
 
     @Override
     public void onAmountConfirmed(double confirmedAmount) {
-        for (int i = 0, size = getItemCount(); i < size; i++) {
-            final CompUnpaidItemViewModel itemViewModel = getItemAtPosition(i);
-            if (itemViewModel.getViewType() != ViewType.CREDIT
-                    || !Objects.equals(itemViewModel.getId(), compConfirmingId)) {
-                continue;
-            }
-
-            BigFraction amount = itemViewModel.getAmountFraction();
-            boolean amountChanged = false;
-            if (Math.abs(amount.doubleValue() - confirmedAmount) >= MoneyUtils.MIN_DIFF) {
-                amount = new BigFraction(confirmedAmount);
-                amountChanged = true;
-            }
-            confirmCompensation(itemViewModel, amount, amountChanged);
-            return;
+        final CompUnpaidItemViewModel item = view.getItemForId(viewModel.getConfirmingId());
+        BigFraction amount = item.getAmountFraction();
+        boolean amountChanged = false;
+        if (Math.abs(amount.doubleValue() - confirmedAmount) >= MoneyUtils.MIN_DIFF) {
+            amount = new BigFraction(confirmedAmount);
+            amountChanged = true;
         }
+
+        confirmCompensation(item, amount, amountChanged);
     }
 
     private void confirmCompensation(@NonNull CompUnpaidItemViewModel itemViewModel,

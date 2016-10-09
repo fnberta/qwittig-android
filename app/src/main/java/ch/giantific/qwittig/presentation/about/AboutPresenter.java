@@ -1,11 +1,12 @@
 package ch.giantific.qwittig.presentation.about;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.about.viewmodels.items.AboutHeaderViewModel;
 import ch.giantific.qwittig.presentation.about.viewmodels.items.AboutItemViewModel;
 import ch.giantific.qwittig.presentation.about.viewmodels.items.BaseAboutItemViewModel;
@@ -31,20 +32,15 @@ public class AboutPresenter extends BasePresenterImpl<AboutContract.ViewListener
     private static final String TWITTER_URL = "http://twitter.com/qwittig";
     private static final String WEBSITE_URL = "http://www.qwittig.ch";
 
-    public AboutPresenter(@Nullable Bundle savedState,
-                          @NonNull Navigator navigator,
+    @Inject
+    public AboutPresenter(@NonNull Navigator navigator,
                           @NonNull UserRepository userRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
     }
 
     @Override
-    public BaseAboutItemViewModel getItemAtPosition(int position) {
-        return ABOUT_ITEMS[position];
-    }
-
-    @Override
-    public int getItemCount() {
-        return ABOUT_ITEMS.length;
+    public BaseAboutItemViewModel[] getAboutItems() {
+        return ABOUT_ITEMS;
     }
 
     @Override

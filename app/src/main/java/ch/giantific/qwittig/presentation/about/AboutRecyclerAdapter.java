@@ -15,7 +15,6 @@ import ch.giantific.qwittig.presentation.about.viewmodels.items.AboutHeaderViewM
 import ch.giantific.qwittig.presentation.about.viewmodels.items.AboutItemViewModel;
 import ch.giantific.qwittig.presentation.about.viewmodels.items.BaseAboutItemViewModel;
 import ch.giantific.qwittig.presentation.about.viewmodels.items.BaseAboutItemViewModel.ViewType;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 
 /**
@@ -23,9 +22,10 @@ import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
+public class AboutRecyclerAdapter extends RecyclerView.Adapter {
 
     private final AboutContract.Presenter presenter;
+    private final BaseAboutItemViewModel[] items;
 
     /**
      * Constructs a new {@link AboutRecyclerAdapter}.
@@ -36,6 +36,7 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
         super();
 
         this.presenter = presenter;
+        this.items = presenter.getAboutItems();
     }
 
     @NonNull
@@ -54,15 +55,15 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
                 return new BindingRow<>(binding);
             }
             default:
-                return super.onCreateViewHolder(parent, viewType);
+                throw new RuntimeException("There is no type that matches the type " + viewType +
+                        ", make sure your using types correctly!");
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final BaseAboutItemViewModel viewModel = presenter.getItemAtPosition(position);
-
+        final BaseAboutItemViewModel viewModel = items[position];
         int viewType = getItemViewType(position);
         switch (viewType) {
             case ViewType.ABOUT: {
@@ -88,11 +89,11 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return presenter.getItemAtPosition(position).getViewType();
+        return items[position].getViewType();
     }
 
     @Override
     public int getItemCount() {
-        return presenter.getItemCount();
+        return items.length;
     }
 }

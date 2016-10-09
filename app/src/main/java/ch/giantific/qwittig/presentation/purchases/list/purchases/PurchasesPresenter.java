@@ -4,10 +4,7 @@
 
 package ch.giantific.qwittig.presentation.purchases.list.purchases;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.SortedList;
 
 import com.google.firebase.auth.FirebaseUser;
 
@@ -16,16 +13,16 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
-import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
+import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber2;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.PurchasesViewModel;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.items.PurchaseItemViewModel;
@@ -40,58 +37,26 @@ import rx.Observable;
 public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.ViewListener>
         implements PurchasesContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = PurchasesViewModel.class.getCanonicalName();
     private final PurchasesViewModel viewModel;
-    private final SortedList<PurchaseItemViewModel> items;
-    private final SortedListCallback<PurchaseItemViewModel> listCallback;
-    private final ChildEventSubscriber<PurchaseItemViewModel, PurchasesViewModel> subscriber;
     private final PurchaseRepository purchaseRepo;
     private NumberFormat moneyFormatter;
     private DateFormat dateFormatter;
     private String currentGroupId;
 
-    public PurchasesPresenter(@Nullable Bundle savedState,
-                              @NonNull Navigator navigator,
+    @Inject
+    public PurchasesPresenter(@NonNull Navigator navigator,
+                              @NonNull PurchasesViewModel viewModel,
                               @NonNull UserRepository userRepo,
                               @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.purchaseRepo = purchaseRepo;
-
-        listCallback = new SortedListCallback<PurchaseItemViewModel>() {
-            @Override
-            public int compare(PurchaseItemViewModel o1, PurchaseItemViewModel o2) {
-                return o1.compareTo(o2);
-            }
-        };
-        items = new SortedList<>(PurchaseItemViewModel.class, listCallback);
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new PurchasesViewModel(true);
-        }
-
-        //noinspection ConstantConditions
-        subscriber = new ChildEventSubscriber<>(items, viewModel, e ->
-                view.showMessage(R.string.toast_error_purchases_load));
     }
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public PurchasesViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        listCallback.setListInteraction(listInteraction);
+    public int compareItemViewModels(@NonNull PurchaseItemViewModel item1, @NonNull PurchaseItemViewModel item2) {
+        return item1.compareTo(item2);
     }
 
     @Override
@@ -110,7 +75,7 @@ public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.View
                         final String identityId = identity.getId();
                         final String groupId = identity.getGroup();
                         if (!Objects.equals(currentGroupId, groupId)) {
-                            items.clear();
+                            view.clearItems();
                         }
                         currentGroupId = groupId;
                         addDataListener(identityId, groupId);
@@ -124,8 +89,8 @@ public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.View
                 .flatMap(purchase -> getItemViewModel(purchase, EventType.NONE, identityId))
                 .toList()
                 .doOnNext(purchaseItemViewModels -> {
-                    items.addAll(purchaseItemViewModels);
-                    viewModel.setEmpty(getItemCount() == 0);
+                    view.addItems(purchaseItemViewModels);
+                    viewModel.setEmpty(view.isItemsEmpty());
                     viewModel.setLoading(false);
                 });
         subscriptions.add(purchaseRepo.observePurchaseChildren(groupId, identityId, false)
@@ -133,7 +98,8 @@ public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.View
                 .takeWhile(purchaseRxChildEvent ->
                         Objects.equals(purchaseRxChildEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), identityId))
-                .subscribe(subscriber)
+                .subscribe(new ChildEventSubscriber2<>(view, viewModel, e ->
+                        view.showMessage(R.string.toast_error_purchases_load)))
         );
     }
 
@@ -148,16 +114,6 @@ public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.View
     }
 
     @Override
-    public PurchaseItemViewModel getItemAtPosition(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
-    }
-
-    @Override
     public void onPurchaseRowItemClick(@NonNull PurchaseItemViewModel itemViewModel) {
         navigator.startPurchaseDetails(itemViewModel.getId());
     }
@@ -165,7 +121,7 @@ public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.View
     @Override
     public void onPurchaseDeleted(@NonNull String purchaseId) {
         view.showMessage(R.string.toast_purchase_deleted);
-        items.removeItemAt(subscriber.getPositionForId(purchaseId));
-        viewModel.setEmpty(getItemCount() == 0);
+        view.removeItemAtPosition(view.getItemPositionForId(purchaseId));
+        viewModel.setEmpty(view.isItemsEmpty());
     }
 }

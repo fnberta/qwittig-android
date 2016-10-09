@@ -9,8 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ch.giantific.qwittig.databinding.RowPurchaseDetailsArticleBinding;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsArticleItemViewModel;
 
@@ -20,14 +22,14 @@ import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.Purc
  * <p>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchaseDetailsArticleBinding>> {
+public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<BindingRow<RowPurchaseDetailsArticleBinding>> {
 
-    private final PurchaseDetailsContract.Presenter presenter;
+    private final List<PurchaseDetailsArticleItemViewModel> items;
 
-    public PurchaseDetailsRecyclerAdapter(@NonNull PurchaseDetailsContract.Presenter presenter) {
+    public PurchaseDetailsRecyclerAdapter() {
         super();
 
-        this.presenter = presenter;
+        items = new ArrayList<>();
     }
 
     @Override
@@ -41,7 +43,7 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<BindingR
     @Override
     public void onBindViewHolder(BindingRow<RowPurchaseDetailsArticleBinding> holder, int position) {
         final RowPurchaseDetailsArticleBinding binding = holder.getBinding();
-        final PurchaseDetailsArticleItemViewModel viewModel = presenter.getItemAtPosition(position);
+        final PurchaseDetailsArticleItemViewModel viewModel = items.get(position);
 
         binding.setViewModel(viewModel);
         binding.executePendingBindings();
@@ -49,6 +51,14 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<BindingR
 
     @Override
     public int getItemCount() {
-        return presenter.getItemCount();
+        return items.size();
+    }
+
+    public void addItem(@NonNull PurchaseDetailsArticleItemViewModel item) {
+        items.add(item);
+    }
+
+    public void clearItems() {
+        items.clear();
     }
 }

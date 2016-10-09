@@ -27,6 +27,7 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
@@ -35,7 +36,6 @@ import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListen
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
 import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileComponent;
-import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfilePresenterModule;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import rx.Single;
 
@@ -60,6 +60,8 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
     @Inject
     SettingsProfileContract.Presenter presenter;
     @Inject
+    SettingsProfileViewModel viewModel;
+    @Inject
     GoogleApiClientDelegate googleApiDelegate;
 
     @Override
@@ -68,7 +70,7 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         final ActivitySettingsProfileBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_settings_profile);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
 
         supportPostponeEnterTransition();
 
@@ -91,8 +93,8 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         component = DaggerSettingsProfileComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, null))
-                .settingsProfilePresenterModule(new SettingsProfilePresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }
@@ -100,6 +102,13 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
     @Override
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(SettingsProfileViewModel.TAG, viewModel);
     }
 
     @Override
