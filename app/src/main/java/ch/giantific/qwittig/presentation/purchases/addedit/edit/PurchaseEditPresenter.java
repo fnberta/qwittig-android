@@ -109,8 +109,9 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
             final PurchaseAddEditArticleItemViewModel articleItem =
                     new PurchaseAddEditArticleItemViewModel(article.getName(), priceFormatted,
                             price, getArticleIdentities(identities));
-            final int pos = viewModel.getItems().size() - 2;
-            view.addItemAtPosition(pos, articleItem);
+            final int pos = viewModel.getItemCount() - 2;
+            viewModel.addItemAtPosition(pos, articleItem);
+            view.notifyItemAdded(pos);
         }
     }
 
@@ -152,38 +153,8 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
             return true;
         }
 
-        final List<Article> oldArticles = editPurchase.getArticles();
-        final ArrayList<BasePurchaseAddEditItemViewModel> items = viewModel.getItems();
-        for (int i = 0, size = items.size(), skipCount = 0; i < size; i++) {
-            final BasePurchaseAddEditItemViewModel addEditItem = items.get(i);
-            if (addEditItem.getViewType() != ViewType.ARTICLE) {
-                skipCount++;
-                continue;
-            }
-
-            final Article articleOld;
-            try {
-                articleOld = oldArticles.get(i - skipCount);
-            } catch (IndexOutOfBoundsException e) {
-                return true;
-            }
-            final PurchaseAddEditArticleItemViewModel articleItem = (PurchaseAddEditArticleItemViewModel) addEditItem;
-            if (!Objects.equals(articleOld.getName(), articleItem.name.get())) {
-                return true;
-            }
-
-            final double oldPrice = articleOld.getPriceForeign(editPurchase.getExchangeRate());
-            final double newPrice = articleItem.getPriceParsed();
-            if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
-                return true;
-            }
-
-            final Set<String> identitiesOld = articleOld.getIdentitiesIds();
-            final List<String> identitiesNew = articleItem.getSelectedIdentitiesIds();
-            if (!identitiesNew.containsAll(identitiesOld) ||
-                    !identitiesOld.containsAll(identitiesNew)) {
-                return true;
-            }
+        if (viewModel.isItemsChanged(editPurchase.getArticles(), editPurchase.getExchangeRate())) {
+            return true;
         }
 
         if (deleteOldReceipt || !Objects.equals(viewModel.getReceipt(), editPurchase.getReceipt())) {

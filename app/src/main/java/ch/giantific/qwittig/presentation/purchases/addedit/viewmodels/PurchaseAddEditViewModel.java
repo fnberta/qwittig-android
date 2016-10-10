@@ -11,16 +11,27 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.domain.models.Article;
 import ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel.ViewType;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditDateItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditStoreItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditTotalItemViewModel;
+import ch.giantific.qwittig.utils.MoneyUtils;
 
 public class PurchaseAddEditViewModel extends BaseObservable
         implements Parcelable,
@@ -104,22 +115,6 @@ public class PurchaseAddEditViewModel extends BaseObservable
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    public ArrayList<BasePurchaseAddEditItemViewModel> getItems() {
-        return items;
-    }
-
-    public void addItem(@NonNull BasePurchaseAddEditItemViewModel item) {
-        items.add(item);
-    }
-
-    public List<String> getSupportedCurrencies() {
-        return supportedCurrencies;
-    }
-
-    public void setSupportedCurrencies(@NonNull List<String> supportedCurrencies) {
-        this.supportedCurrencies = supportedCurrencies;
     }
 
     @Override
@@ -240,6 +235,14 @@ public class PurchaseAddEditViewModel extends BaseObservable
         }
     }
 
+    public List<String> getSupportedCurrencies() {
+        return supportedCurrencies;
+    }
+
+    public void setSupportedCurrencies(@NonNull List<String> supportedCurrencies) {
+        this.supportedCurrencies = supportedCurrencies;
+    }
+
     @Override
     @Bindable
     public int getCurrencySelected() {
@@ -286,5 +289,200 @@ public class PurchaseAddEditViewModel extends BaseObservable
 
     public void setDataSet(boolean dataSet) {
         this.dataSet = dataSet;
+    }
+
+    public Iterator<BasePurchaseAddEditItemViewModel> getItemsIterator() {
+        return items.iterator();
+    }
+
+    public int getItemCount() {
+        return items.size();
+    }
+
+    public BasePurchaseAddEditItemViewModel getItemAtPosition(int position) {
+        return items.get(position);
+    }
+
+    public int getPositionForItem(@NonNull BasePurchaseAddEditItemViewModel item) {
+        return items.indexOf(item);
+    }
+
+    public void addItem(@NonNull BasePurchaseAddEditItemViewModel item) {
+        items.add(item);
+    }
+
+    public void addItemAtPosition(int position, @NonNull BasePurchaseAddEditItemViewModel item) {
+        items.add(position, item);
+    }
+
+    public void removeItemAtPosition(int position) {
+        items.remove(position);
+    }
+
+    public void updateTotalAndMyShare(@NonNull String currentIdentityId,
+                                      @NonNull NumberFormat moneyFormatter) {
+        double total = 0;
+        double myShare = 0;
+        for (BasePurchaseAddEditItemViewModel itemViewModel : items) {
+            if (itemViewModel.getViewType() != ViewType.ARTICLE) {
+                continue;
+            }
+
+            final PurchaseAddEditArticleItemViewModel articleItem =
+                    (PurchaseAddEditArticleItemViewModel) itemViewModel;
+            final double itemPrice = articleItem.getPriceParsed();
+
+            // update total price
+            total += itemPrice;
+
+            // update my share
+            final PurchaseAddEditArticleIdentityItemViewModel[] articleIdentities =
+                    articleItem.getIdentities();
+            int selectedCount = 0;
+            boolean currentIdentityInvolved = false;
+            for (PurchaseAddEditArticleIdentityItemViewModel articleIdentity : articleIdentities) {
+                if (!articleIdentity.isSelected()) {
+                    continue;
+                }
+
+                selectedCount++;
+                if (Objects.equals(articleIdentity.getIdentityId(), currentIdentityId)) {
+                    currentIdentityInvolved = true;
+                }
+            }
+            if (currentIdentityInvolved) {
+                myShare += (itemPrice / selectedCount);
+            }
+        }
+
+        setTotal(total, moneyFormatter.format(total));
+        setMyShare(moneyFormatter.format(myShare));
+    }
+
+    public int getOpenIdentityRowPosition() {
+        for (int i = 0, size = getItemCount(); i < size; i++) {
+            final BasePurchaseAddEditItemViewModel itemViewModel = getItemAtPosition(i);
+            if (itemViewModel.getViewType() == ViewType.IDENTITIES) {
+                return i;
+            }
+        }
+
+        throw new RuntimeException("no identity row open!");
+    }
+
+    public boolean isItemsValid() {
+        boolean allValid = true;
+        for (BasePurchaseAddEditItemViewModel itemViewModel : items) {
+            if (itemViewModel.getViewType() != ViewType.ARTICLE) {
+                continue;
+            }
+
+            final PurchaseAddEditArticleItemViewModel articleItem =
+                    (PurchaseAddEditArticleItemViewModel) itemViewModel;
+            if (!articleItem.isInputValid()) {
+                allValid = false;
+            }
+        }
+
+        return allValid;
+    }
+
+    public boolean isItemsChanged(@NonNull List<Article> oldArticles, double exchangeRate) {
+        for (int i = 0, size = getItemCount(), skipCount = 0; i < size; i++) {
+            final BasePurchaseAddEditItemViewModel addEditItem = getItemAtPosition(i);
+            if (addEditItem.getViewType() != ViewType.ARTICLE) {
+                skipCount++;
+                continue;
+            }
+
+            final Article articleOld;
+            try {
+                articleOld = oldArticles.get(i - skipCount);
+            } catch (IndexOutOfBoundsException e) {
+                return true;
+            }
+            final PurchaseAddEditArticleItemViewModel articleItem = (PurchaseAddEditArticleItemViewModel) addEditItem;
+            if (!Objects.equals(articleOld.getName(), articleItem.name.get())) {
+                return true;
+            }
+
+            final double oldPrice = articleOld.getPriceForeign(exchangeRate);
+            final double newPrice = articleItem.getPriceParsed();
+            if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
+                return true;
+            }
+
+            final Set<String> identitiesOld = articleOld.getIdentitiesIds();
+            final List<String> identitiesNew = articleItem.getSelectedIdentitiesIds();
+            if (!identitiesNew.containsAll(identitiesOld) ||
+                    !identitiesOld.containsAll(identitiesNew)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public List<Article> getArticlesFromItems(@NonNull NumberFormat moneyFormatter) {
+        final List<Article> articles = new ArrayList<>();
+        final int fractionDigits = MoneyUtils.getFractionDigits(currency);
+
+        for (BasePurchaseAddEditItemViewModel itemViewModel : items) {
+            if (itemViewModel.getViewType() != ViewType.ARTICLE) {
+                continue;
+            }
+
+            final PurchaseAddEditArticleItemViewModel articleItem =
+                    (PurchaseAddEditArticleItemViewModel) itemViewModel;
+            final String itemName = articleItem.name.get();
+            final String name = itemName != null ? itemName : "";
+            final String price = articleItem.getPrice();
+
+            final List<String> identities = new ArrayList<>();
+            for (PurchaseAddEditArticleIdentityItemViewModel row : articleItem.getIdentities()) {
+                if (row.isSelected()) {
+                    final String identityId = row.getIdentityId();
+                    identities.add(identityId);
+                }
+            }
+
+            final double priceRounded = convertRoundItemPrice(price, moneyFormatter, fractionDigits);
+            final Article article = new Article(name, priceRounded, identities);
+            articles.add(article);
+        }
+
+        return articles;
+    }
+
+    private double convertRoundItemPrice(@NonNull String priceText,
+                                         @NonNull NumberFormat moneyFormatter,
+                                         int fractionDigits) {
+        try {
+            final double price = new BigDecimal(priceText)
+                    .setScale(fractionDigits, BigDecimal.ROUND_HALF_UP)
+                    .doubleValue();
+            if (exchangeRate == 1) {
+                return price;
+            }
+
+            return new BigDecimal(price * exchangeRate)
+                    .setScale(MoneyUtils.CONVERTED_PRICE_FRACTION_DIGITS, BigDecimal.ROUND_HALF_UP)
+                    .doubleValue();
+        } catch (NumberFormatException e) {
+            try {
+                final double parsed = moneyFormatter.parse(priceText).doubleValue();
+                if (exchangeRate == 1) {
+                    return new BigDecimal(parsed)
+                            .setScale(fractionDigits, BigDecimal.ROUND_HALF_UP)
+                            .doubleValue();
+                }
+
+                return new BigDecimal(parsed * exchangeRate)
+                        .setScale(MoneyUtils.CONVERTED_PRICE_FRACTION_DIGITS, BigDecimal.ROUND_HALF_UP)
+                        .doubleValue();
+            } catch (ParseException e1) {
+                return 0;
+            }
+        }
     }
 }

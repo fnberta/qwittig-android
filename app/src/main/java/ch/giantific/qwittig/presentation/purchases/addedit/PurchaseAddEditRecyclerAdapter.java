@@ -44,7 +44,6 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
 
     private final PurchaseAddEditContract.Presenter presenter;
     private final PurchaseAddEditViewModel viewModel;
-    private final ArrayList<BasePurchaseAddEditItemViewModel> items;
 
     public PurchaseAddEditRecyclerAdapter(@NonNull PurchaseAddEditContract.Presenter presenter,
                                           @NonNull PurchaseAddEditViewModel viewModel) {
@@ -52,7 +51,6 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
 
         this.presenter = presenter;
         this.viewModel = viewModel;
-        this.items = viewModel.getItems();
     }
 
     @Override
@@ -104,7 +102,7 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final BasePurchaseAddEditItemViewModel itemViewModel = getItemAtPosition(position);
+        final BasePurchaseAddEditItemViewModel itemViewModel = viewModel.getItemAtPosition(position);
         final int type = getItemViewType(position);
         switch (type) {
             case ViewType.HEADER: {
@@ -177,28 +175,12 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return viewModel.getItemCount();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return getItemAtPosition(position).getViewType();
-    }
-
-    public BasePurchaseAddEditItemViewModel getItemAtPosition(int position) {
-        return items.get(position);
-    }
-
-    public void addItemAtPosition(int position, BasePurchaseAddEditItemViewModel item) {
-        items.add(position, item);
-        notifyItemInserted(position);
-    }
-
-    public void removeItemAtPosition(int position, boolean notify) {
-        items.remove(position);
-        if (notify) {
-            notifyItemRemoved(position);
-        }
+        return viewModel.getItemAtPosition(position).getViewType();
     }
 
     public static class ArticleIdentitiesRow extends BindingRow<RowPurchaseAddEditArticleIdentitiesBinding> {

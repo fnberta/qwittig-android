@@ -98,8 +98,9 @@ public class PurchaseAddOcrPresenter extends PurchaseAddPresenter
                 final PurchaseAddEditArticleItemViewModel articleItem =
                         new PurchaseAddEditArticleItemViewModel(name, priceFormatted,
                                 price, getArticleIdentities());
-                final int pos = viewModel.getItems().size() - 2;
-                view.addItemAtPosition(pos, articleItem);
+                final int pos = viewModel.getItemCount() - 2;
+                viewModel.addItemAtPosition(pos, articleItem);
+                view.notifyItemAdded(pos);
             }
         }
     }

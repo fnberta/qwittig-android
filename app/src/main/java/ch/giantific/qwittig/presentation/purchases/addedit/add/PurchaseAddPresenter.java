@@ -12,7 +12,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -62,9 +61,9 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     private static final int FIXED_ROWS_COUNT = 6;
     protected final PurchaseAddEditViewModel viewModel;
     protected final PurchaseRepository purchaseRepo;
-    protected final RemoteConfigHelper configHelper;
     protected final NumberFormat exchangeRateFormatter;
     protected final DateFormat dateFormatter;
+    final RemoteConfigHelper configHelper;
     private final GroupRepository groupRepo;
     protected List<Identity> identities;
     protected NumberFormat moneyFormatter;
@@ -87,7 +86,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         dateFormatter = DateUtils.getDateFormatter(false);
         exchangeRateFormatter = MoneyUtils.getExchangeRateFormatter();
 
-        if (viewModel.getItems().size() == 0) {
+        if (viewModel.getItemCount() == 0) {
             // first start, set some default values for view model
             initDefaultValues();
         } else {
@@ -122,8 +121,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> value) {
-                        // fill with one article row on first start
-                        if (viewModel.getItems().size() == FIXED_ROWS_COUNT) {
+                        // fill with one article row if articles empty
+                        if (viewModel.getItemCount() == FIXED_ROWS_COUNT) {
                             addArticleOnFirstRun();
                         }
                     }
@@ -172,7 +171,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         final PurchaseAddEditArticleItemViewModel articleItem =
                 new PurchaseAddEditArticleItemViewModel(getArticleIdentities());
         // addItemAtPosition right above 'addItemAtPosition article' row
-        view.addItemAtPosition(4, articleItem);
+        viewModel.addItemAtPosition(4, articleItem);
+        view.notifyItemAdded(4);
     }
 
     final PurchaseAddEditArticleIdentityItemViewModel[] getArticleIdentities() {
@@ -225,10 +225,11 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @Override
     public void onAddRowClick(@NonNull BasePurchaseAddEditItemViewModel itemViewModel) {
-        final int position = viewModel.getItems().indexOf(itemViewModel);
+        final int position = viewModel.getPositionForItem(itemViewModel);
         final PurchaseAddEditArticleItemViewModel articleItem =
                 new PurchaseAddEditArticleItemViewModel(getArticleIdentities());
-        view.addItemAtPosition(position, articleItem);
+        viewModel.addItemAtPosition(position, articleItem);
+        view.notifyItemAdded(position);
         view.scrollToPosition(position + 1);
     }
 
@@ -239,47 +240,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         itemViewModel.setPrice(priceString, MoneyUtils.parsePrice(priceString, moneyFormatter));
 
         if (currentIdentity != null) {
-            updateTotalAndMyShare();
+            viewModel.updateTotalAndMyShare(currentIdentity.getId(), moneyFormatter);
         }
-    }
-
-    private void updateTotalAndMyShare() {
-        double total = 0;
-        double myShare = 0;
-        for (BasePurchaseAddEditItemViewModel itemViewModel : viewModel.getItems()) {
-            if (itemViewModel.getViewType() != ViewType.ARTICLE) {
-                continue;
-            }
-
-            final PurchaseAddEditArticleItemViewModel articleItem =
-                    (PurchaseAddEditArticleItemViewModel) itemViewModel;
-            final double itemPrice = articleItem.getPriceParsed();
-
-            // update total price
-            total += itemPrice;
-
-            // update my share
-            final PurchaseAddEditArticleIdentityItemViewModel[] articleIdentities =
-                    articleItem.getIdentities();
-            int selectedCount = 0;
-            boolean currentIdentityInvolved = false;
-            for (PurchaseAddEditArticleIdentityItemViewModel articleIdentity : articleIdentities) {
-                if (!articleIdentity.isSelected()) {
-                    continue;
-                }
-
-                selectedCount++;
-                if (Objects.equals(articleIdentity.getIdentityId(), currentIdentity.getId())) {
-                    currentIdentityInvolved = true;
-                }
-            }
-            if (currentIdentityInvolved) {
-                myShare += (itemPrice / selectedCount);
-            }
-        }
-
-        viewModel.setTotal(total, moneyFormatter.format(total));
-        viewModel.setMyShare(moneyFormatter.format(myShare));
     }
 
     @Override
@@ -293,31 +255,32 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @Override
     public void onToggleIdentitiesClick(@NonNull PurchaseAddEditArticleItemViewModel itemViewModel) {
-        final ArrayList<BasePurchaseAddEditItemViewModel> items = viewModel.getItems();
-        final int insertPos = items.indexOf(itemViewModel) + 1;
-        if (items.size() < insertPos) {
-            expandArticleRow(insertPos, itemViewModel);
-            collapseOtherArticleRows(insertPos);
-        } else if (items.get(insertPos).getViewType() == ViewType.IDENTITIES) {
-            view.removeItemAtPosition(insertPos, true);
+        final int insertPos = viewModel.getPositionForItem(itemViewModel) + 1;
+        if (viewModel.getItemCount() < insertPos) {
+            expandIdentityRow(insertPos, itemViewModel);
+            collapseOtherIdentityRows(insertPos);
+        } else if (viewModel.getItemAtPosition(insertPos).getViewType() == ViewType.IDENTITIES) {
+            viewModel.removeItemAtPosition(insertPos);
+            view.notifyItemRemoved(insertPos);
         } else {
-            expandArticleRow(insertPos, itemViewModel);
-            collapseOtherArticleRows(insertPos);
+            expandIdentityRow(insertPos, itemViewModel);
+            collapseOtherIdentityRows(insertPos);
         }
     }
 
-    private void expandArticleRow(int pos, @NonNull BasePurchaseAddEditItemViewModel parentItem) {
+    private void expandIdentityRow(int pos, @NonNull BasePurchaseAddEditItemViewModel parentItem) {
         final PurchaseAddEditArticleItemViewModel articleItem =
                 (PurchaseAddEditArticleItemViewModel) parentItem;
-        view.addItemAtPosition(pos, new PurchaseAddEditArticleIdentitiesItemViewModel(articleItem.getIdentities()));
+
+        viewModel.addItemAtPosition(pos, new PurchaseAddEditArticleIdentitiesItemViewModel(articleItem.getIdentities()));
+        view.notifyItemAdded(pos);
     }
 
-    private void collapseOtherArticleRows(int insertPos) {
+    private void collapseOtherIdentityRows(int insertPos) {
         int pos = 0;
-        for (Iterator<BasePurchaseAddEditItemViewModel> iterator =
-             viewModel.getItems().iterator(); iterator.hasNext(); ) {
-            final int type = iterator.next().getViewType();
-            if (type == ViewType.IDENTITIES && pos != insertPos) {
+        for (Iterator<BasePurchaseAddEditItemViewModel> iterator = viewModel.getItemsIterator(); iterator.hasNext(); ) {
+            final int viewType = iterator.next().getViewType();
+            if (viewType == ViewType.IDENTITIES && pos != insertPos) {
                 iterator.remove();
                 view.notifyItemRemoved(pos);
             }
@@ -331,24 +294,17 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         // toggle identity selection state
         identityViewModel.setSelected(!identityViewModel.isSelected());
 
-        final ArrayList<BasePurchaseAddEditItemViewModel> items = viewModel.getItems();
-        for (int i = 0, size = items.size(); i < size; i++) {
-            final BasePurchaseAddEditItemViewModel itemViewModel = items.get(i);
-            if (itemViewModel.getViewType() == ViewType.IDENTITIES) {
-                // notify selection state changed
-                view.notifyItemIdentityChanged(i, identityViewModel);
+        final int identityRowPos = viewModel.getOpenIdentityRowPosition();
+        // notify selection state changed
+        view.notifyItemIdentityChanged(identityRowPos, identityViewModel);
 
-                // load and set appropriate toggle image
-                final PurchaseAddEditArticleItemViewModel articleItem =
-                        (PurchaseAddEditArticleItemViewModel) items.get(i - 1);
-                articleItem.notifyPropertyChanged(BR.identities);
-
-                break;
-            }
-        }
+        // load and set appropriate toggle image
+        final PurchaseAddEditArticleItemViewModel articleItem =
+                (PurchaseAddEditArticleItemViewModel) viewModel.getItemAtPosition(identityRowPos - 1);
+        articleItem.notifyPropertyChanged(BR.identities);
 
         // update total and my share
-        updateTotalAndMyShare();
+        viewModel.updateTotalAndMyShare(currentIdentity.getId(), moneyFormatter);
     }
 
     @Override
@@ -356,9 +312,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         // toggle identity selection state
         identityViewModel.setSelected(!identityViewModel.isSelected());
 
-        final ArrayList<BasePurchaseAddEditItemViewModel> items = viewModel.getItems();
-        for (int i = 0, size = items.size(); i < size; i++) {
-            final BasePurchaseAddEditItemViewModel itemViewModel = items.get(i);
+        for (int i = 0, size = viewModel.getItemCount(); i < size; i++) {
+            final BasePurchaseAddEditItemViewModel itemViewModel = viewModel.getItemAtPosition(i);
             final int viewType = itemViewModel.getViewType();
             switch (viewType) {
                 case ViewType.IDENTITIES:
@@ -376,23 +331,23 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         }
 
         // update total and my share
-        updateTotalAndMyShare();
+        viewModel.updateTotalAndMyShare(currentIdentity.getId(), moneyFormatter);
 
         return true;
     }
 
     @Override
     public void onArticleDismiss(int position) {
-        view.removeItemAtPosition(position, false);
+        viewModel.removeItemAtPosition(position);
         // if identity row was open, removeItem it as well
-        if (viewModel.getItems().get(position).getViewType() == ViewType.IDENTITIES) {
-            view.removeItemAtPosition(position, false);
+        if (viewModel.getItemAtPosition(position).getViewType() == ViewType.IDENTITIES) {
+            viewModel.removeItemAtPosition(position);
             view.notifyItemRangeRemoved(position, 2);
         } else {
             view.notifyItemRemoved(position);
         }
 
-        updateTotalAndMyShare();
+        viewModel.updateTotalAndMyShare(currentIdentity.getId(), moneyFormatter);
     }
 
     @Override
@@ -519,7 +474,12 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
             return;
         }
 
-        if (!validateItems()) {
+        if (viewModel.getItemCount() <= FIXED_ROWS_COUNT) {
+            this.view.showMessage(R.string.toast_min_one_article);
+            return;
+        }
+
+        if (!viewModel.isItemsValid()) {
             return;
         }
 
@@ -536,30 +496,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         startPurchaseSave(true);
     }
 
-    private boolean validateItems() {
-        boolean hasItem = false;
-        boolean allValid = true;
-        for (BasePurchaseAddEditItemViewModel itemViewModel : viewModel.getItems()) {
-            if (itemViewModel.getViewType() != ViewType.ARTICLE) {
-                continue;
-            }
-
-            hasItem = true;
-            final PurchaseAddEditArticleItemViewModel articleItem =
-                    (PurchaseAddEditArticleItemViewModel) itemViewModel;
-            if (!articleItem.isInputValid()) {
-                allValid = false;
-            }
-        }
-
-        if (!hasItem) {
-            view.showMessage(R.string.toast_min_one_article);
-            return false;
-        }
-
-        return allValid;
-    }
-
     private void startPurchaseSave(final boolean asDraft) {
         final Purchase purchase = getPurchase(asDraft);
         savePurchase(purchase, asDraft);
@@ -568,38 +504,18 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @NonNull
     private Purchase getPurchase(final boolean isDraft) {
+        final List<Article> articles = viewModel.getArticlesFromItems(moneyFormatter);
         final List<String> purchaseIdentities = new ArrayList<>();
-        final List<Article> purchaseArticles = new ArrayList<>();
-        final int fractionDigits = MoneyUtils.getFractionDigits(viewModel.getCurrency());
-
-        for (BasePurchaseAddEditItemViewModel itemViewModel : viewModel.getItems()) {
-            if (itemViewModel.getViewType() != ViewType.ARTICLE) {
-                continue;
-            }
-
-            final PurchaseAddEditArticleItemViewModel articleItem =
-                    (PurchaseAddEditArticleItemViewModel) itemViewModel;
-            final String itemName = articleItem.name.get();
-            final String name = itemName != null ? itemName : "";
-            final String price = articleItem.getPrice();
-
-            final List<String> identities = new ArrayList<>();
-            for (PurchaseAddEditArticleIdentityItemViewModel row : articleItem.getIdentities()) {
-                if (row.isSelected()) {
-                    final String identityId = row.getIdentityId();
-                    identities.add(identityId);
-                    if (!purchaseIdentities.contains(identityId)) {
-                        purchaseIdentities.add(identityId);
-                    }
+        for (Article article : articles) {
+            for (String identityId : article.getIdentitiesIds()) {
+                if (!purchaseIdentities.contains(identityId)) {
+                    purchaseIdentities.add(identityId);
                 }
             }
-
-            final double priceRounded = convertRoundItemPrice(price, fractionDigits);
-            final Article article = new Article(name, priceRounded, identities);
-            purchaseArticles.add(article);
         }
 
-        return createPurchase(purchaseIdentities, purchaseArticles, fractionDigits, isDraft);
+        final int fractionDigits = MoneyUtils.getFractionDigits(viewModel.getCurrency());
+        return createPurchase(purchaseIdentities, articles, fractionDigits, isDraft);
     }
 
     protected void savePurchase(@NonNull Purchase purchase, boolean asDraft) {
@@ -612,37 +528,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     protected void onPurchaseSaved(boolean asDraft) {
         navigator.finish(asDraft ? PurchaseResult.PURCHASE_DRAFT : PurchaseResult.PURCHASE_SAVED);
-    }
-
-    private double convertRoundItemPrice(@NonNull String priceText, int fractionDigits) {
-        final double exchangeRate = viewModel.getExchangeRate();
-        try {
-            final double price = new BigDecimal(priceText)
-                    .setScale(fractionDigits, BigDecimal.ROUND_HALF_UP)
-                    .doubleValue();
-            if (exchangeRate == 1) {
-                return price;
-            }
-
-            return new BigDecimal(price * exchangeRate)
-                    .setScale(MoneyUtils.CONVERTED_PRICE_FRACTION_DIGITS, BigDecimal.ROUND_HALF_UP)
-                    .doubleValue();
-        } catch (NumberFormatException e) {
-            try {
-                final double parsed = moneyFormatter.parse(priceText).doubleValue();
-                if (exchangeRate == 1) {
-                    return new BigDecimal(parsed)
-                            .setScale(fractionDigits, BigDecimal.ROUND_HALF_UP)
-                            .doubleValue();
-                }
-
-                return new BigDecimal(parsed * exchangeRate)
-                        .setScale(MoneyUtils.CONVERTED_PRICE_FRACTION_DIGITS, BigDecimal.ROUND_HALF_UP)
-                        .doubleValue();
-            } catch (ParseException e1) {
-                return 0;
-            }
-        }
     }
 
     @NonNull

@@ -108,11 +108,9 @@ public interface PurchaseAddEditContract {
 
         void reloadOptionsMenu();
 
-        void addItemAtPosition(int position, @NonNull BasePurchaseAddEditItemViewModel item);
-
         void scrollToPosition(int position);
 
-        void removeItemAtPosition(int position, boolean notify);
+        void notifyItemAdded(int position);
 
         void notifyItemIdentityChanged(int position,
                                        @NonNull PurchaseAddEditArticleIdentityItemViewModel identityViewModel);

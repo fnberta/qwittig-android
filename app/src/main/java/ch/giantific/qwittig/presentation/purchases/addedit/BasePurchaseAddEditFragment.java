@@ -67,7 +67,7 @@ public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditCo
             @Override
             public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 final int position = viewHolder.getAdapterPosition();
-                if (recyclerAdapter.getItemAtPosition(position).getViewType() != ViewType.ARTICLE) {
+                if (viewModel.getItemAtPosition(position).getViewType() != ViewType.ARTICLE) {
                     return 0;
                 }
 

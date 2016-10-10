@@ -42,7 +42,6 @@ import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.DiscardPurcha
 import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.ExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.NoteDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -299,18 +298,13 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     }
 
     @Override
-    public void addItemAtPosition(int position, @NonNull BasePurchaseAddEditItemViewModel item) {
-        addEditFragment.getRecyclerAdapter().addItemAtPosition(position, item);
-    }
-
-    @Override
     public void scrollToPosition(int position) {
         addEditFragment.scrollToPosition(position);
     }
 
     @Override
-    public void removeItemAtPosition(int position, boolean notify) {
-        addEditFragment.getRecyclerAdapter().removeItemAtPosition(position, notify);
+    public void notifyItemAdded(int position) {
+        addEditFragment.getRecyclerAdapter().notifyItemInserted(position);
     }
 
     @Override
