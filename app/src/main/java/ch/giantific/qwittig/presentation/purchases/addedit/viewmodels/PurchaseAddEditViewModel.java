@@ -66,12 +66,13 @@ public class PurchaseAddEditViewModel extends BaseObservable
     private double total;
     private String totalFormatted;
     private String myShare;
-    private boolean fetchingExchangeRates;
+    private boolean exchangeRateAvailable;
     private boolean dataSet;
 
     public PurchaseAddEditViewModel() {
         items = new ArrayList<>();
-        this.exchangeRate = 1;
+        exchangeRate = 1;
+        exchangeRateAvailable = true;
     }
 
     private PurchaseAddEditViewModel(Parcel in) {
@@ -89,7 +90,7 @@ public class PurchaseAddEditViewModel extends BaseObservable
         total = in.readDouble();
         totalFormatted = in.readString();
         myShare = in.readString();
-        fetchingExchangeRates = in.readByte() != 0;
+        exchangeRateAvailable = in.readByte() != 0;
         dataSet = in.readByte() != 0;
     }
 
@@ -108,7 +109,7 @@ public class PurchaseAddEditViewModel extends BaseObservable
         dest.writeDouble(total);
         dest.writeString(totalFormatted);
         dest.writeString(myShare);
-        dest.writeByte((byte) (fetchingExchangeRates ? 1 : 0));
+        dest.writeByte((byte) (exchangeRateAvailable ? 1 : 0));
         dest.writeByte((byte) (dataSet ? 1 : 0));
     }
 
@@ -275,12 +276,12 @@ public class PurchaseAddEditViewModel extends BaseObservable
         return exchangeRate != 1;
     }
 
-    public boolean isFetchingExchangeRates() {
-        return fetchingExchangeRates;
+    public boolean isExchangeRateAvailable() {
+        return exchangeRateAvailable;
     }
 
-    public void setFetchingExchangeRates(boolean fetchingExchangeRates) {
-        this.fetchingExchangeRates = fetchingExchangeRates;
+    public void setExchangeRateAvailable(boolean exchangeRateAvailable) {
+        this.exchangeRateAvailable = exchangeRateAvailable;
     }
 
     public boolean isDataSet() {

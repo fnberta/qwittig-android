@@ -65,9 +65,9 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     protected final DateFormat dateFormatter;
     final RemoteConfigHelper configHelper;
     private final GroupRepository groupRepo;
-    protected List<Identity> identities;
     protected NumberFormat moneyFormatter;
     protected Identity currentIdentity;
+    protected List<Identity> identities;
 
     @Inject
     public PurchaseAddPresenter(@NonNull Navigator navigator,
@@ -209,7 +209,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     }
 
     @Override
-    public void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
+    public void onCurrencySelected(@NonNull AdapterView<?> parent, View v, int position, long id) {
         final String newCurrency = (String) parent.getItemAtPosition(position);
         final String currency = viewModel.getCurrency();
         if (TextUtils.isEmpty(currency) || Objects.equals(newCurrency, currency)) {
@@ -218,7 +218,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
         moneyFormatter = MoneyUtils.getMoneyFormatter(newCurrency, false, true);
         viewModel.setCurrency(newCurrency, false);
-        this.view.loadFetchExchangeRatesWorker(currentIdentity.getGroupCurrency(), newCurrency);
+        viewModel.setExchangeRateAvailable(false);
+        view.loadFetchExchangeRatesWorker(currentIdentity.getGroupCurrency(), newCurrency);
 
         // TODO: once we support currencies with other than 2 decimal values, update items, total and myShare
     }
@@ -421,7 +422,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                     @Override
                     public void onSuccess(Float exchangeRate) {
                         view.removeWorker(workerTag);
-                        viewModel.setFetchingExchangeRates(false);
+                        viewModel.setExchangeRateAvailable(true);
                         viewModel.setExchangeRate(exchangeRate,
                                 exchangeRateFormatter.format(exchangeRate));
                     }
@@ -429,7 +430,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
                     @Override
                     public void onError(Throwable error) {
                         view.removeWorker(workerTag);
-                        viewModel.setFetchingExchangeRates(false);
                         view.showMessageWithAction(R.string.toast_error_exchange_rate,
                                 new MessageAction(R.string.action_retry) {
                                     @Override
@@ -448,18 +448,19 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         final BigDecimal roundedExchangeRate = MoneyUtils.roundExchangeRate(exchangeRate);
         final double doubleValue = roundedExchangeRate.doubleValue();
         viewModel.setExchangeRate(doubleValue, exchangeRateFormatter.format(doubleValue));
+        viewModel.setExchangeRateAvailable(true);
     }
 
     @Override
-    public void onSavePurchaseClick(View view) {
-        if (viewModel.isFetchingExchangeRates()) {
-            this.view.showMessage(R.string.toast_exchange_rate_fetching);
+    public void onSavePurchaseClick(View v) {
+        if (!viewModel.isExchangeRateAvailable()) {
+            view.showMessage(R.string.toast_exchange_rate_fetching);
             return;
         }
 
         if (!Objects.equals(viewModel.getCurrency(), currentIdentity.getGroupCurrency())
                 && viewModel.getExchangeRate() == 1) {
-            this.view.showMessageWithAction(R.string.toast_exchange_no_data,
+            view.showMessageWithAction(R.string.toast_exchange_no_data,
                     new MessageAction(R.string.action_purchase_save_draft) {
                         @Override
                         public void onClick(View v) {
@@ -470,12 +471,12 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         }
 
         if (TextUtils.isEmpty(viewModel.getStore())) {
-            this.view.showMessage(R.string.toast_store_empty);
+            view.showMessage(R.string.toast_store_empty);
             return;
         }
 
         if (viewModel.getItemCount() <= FIXED_ROWS_COUNT) {
-            this.view.showMessage(R.string.toast_min_one_article);
+            view.showMessage(R.string.toast_min_one_article);
             return;
         }
 
@@ -488,7 +489,7 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
 
     @Override
     public void onSaveAsDraftMenuClick() {
-        if (viewModel.isFetchingExchangeRates()) {
+        if (!viewModel.isExchangeRateAvailable()) {
             view.showMessage(R.string.toast_exchange_rate_fetching);
             return;
         }
@@ -518,18 +519,6 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         return createPurchase(purchaseIdentities, articles, fractionDigits, isDraft);
     }
 
-    protected void savePurchase(@NonNull Purchase purchase, boolean asDraft) {
-        if (asDraft) {
-            purchaseRepo.saveDraft(purchase, null);
-        } else {
-            purchaseRepo.savePurchase(purchase, null, currentIdentity.getUser(), false);
-        }
-    }
-
-    protected void onPurchaseSaved(boolean asDraft) {
-        navigator.finish(asDraft ? PurchaseResult.PURCHASE_DRAFT : PurchaseResult.PURCHASE_SAVED);
-    }
-
     @NonNull
     protected Purchase createPurchase(@NonNull List<String> purchaseIdentities,
                                       @NonNull List<Article> purchaseArticles,
@@ -552,6 +541,18 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
         final double totalConverted = total * exchangeRate;
         return new BigDecimal(totalConverted).setScale(MoneyUtils.CONVERTED_PRICE_FRACTION_DIGITS,
                 BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+
+    protected void savePurchase(@NonNull Purchase purchase, boolean asDraft) {
+        if (asDraft) {
+            purchaseRepo.saveDraft(purchase, null);
+        } else {
+            purchaseRepo.savePurchase(purchase, null, currentIdentity.getUser(), false);
+        }
+    }
+
+    protected void onPurchaseSaved(boolean asDraft) {
+        navigator.finish(asDraft ? PurchaseResult.PURCHASE_DRAFT : PurchaseResult.PURCHASE_SAVED);
     }
 
     @Override
