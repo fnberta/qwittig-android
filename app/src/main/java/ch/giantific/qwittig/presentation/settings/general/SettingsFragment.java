@@ -164,13 +164,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        presenter.onViewVisible();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -215,13 +208,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onPause();
 
         sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        presenter.onViewGone();
     }
 
     @Override
