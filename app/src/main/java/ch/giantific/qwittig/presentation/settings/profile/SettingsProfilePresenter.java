@@ -149,14 +149,14 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
     }
 
     @Override
-    public void onSaveProfileClick(View view) {
+    public void onSaveProfileClick(View v) {
         if (!viewModel.isInputValid()) {
             return;
         }
 
         final String nickname = viewModel.nickname.get();
         if (!Objects.equals(nickname, nicknameOrig) && groupNicknames.contains(nickname)) {
-            this.view.showMessage(R.string.toast_profile_nickname_taken);
+            view.showMessage(R.string.toast_profile_nickname_taken);
             return;
         }
 
@@ -172,7 +172,7 @@ public class SettingsProfilePresenter extends BasePresenterImpl<SettingsProfileC
                              : viewModel.email.get();
         final String password = googleUser || facebookUser ? null : viewModel.getPassword();
         if (!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
-            this.view.showReAuthenticateDialog(emailOrig);
+            view.showReAuthenticateDialog(emailOrig);
             return;
         }
 

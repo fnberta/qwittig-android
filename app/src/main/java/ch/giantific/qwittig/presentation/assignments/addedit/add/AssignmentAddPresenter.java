@@ -125,22 +125,22 @@ public class AssignmentAddPresenter extends BasePresenterImpl<AssignmentAddEditC
     }
 
     @Override
-    public void onDeadlineClicked(View view) {
-        this.view.showDatePickerDialog();
+    public void onDeadlineClicked(View v) {
+        view.showDatePickerDialog();
     }
 
     @Override
-    public void onSaveAssignmentClick(View view) {
+    public void onSaveAssignmentClick(View v) {
         final String title = viewModel.getTitle();
         if (TextUtils.isEmpty(title)) {
-            this.view.showMessage(R.string.error_assignment_title);
+            view.showMessage(R.string.error_assignment_title);
             return;
         }
 
         final String timeFrame = getTimeFrameSelected();
         final List<String> identities = getSelectedIdentityIds();
         if (Objects.equals(timeFrame, TimeFrame.ONE_TIME) && identities.size() > 1) {
-            this.view.showMessage(R.string.toast_assignment_max_one_user_one_time);
+            view.showMessage(R.string.toast_assignment_max_one_user_one_time);
             return;
         }
 

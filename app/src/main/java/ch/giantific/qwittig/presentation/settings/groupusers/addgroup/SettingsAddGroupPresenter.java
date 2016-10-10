@@ -80,7 +80,7 @@ public class SettingsAddGroupPresenter extends BasePresenterImpl<SettingsAddGrou
     }
 
     @Override
-    public void onCreateClick(View view) {
+    public void onCreateClick(View v) {
         if (!viewModel.isInputValid()) {
             return;
         }
@@ -95,10 +95,10 @@ public class SettingsAddGroupPresenter extends BasePresenterImpl<SettingsAddGrou
         if (newGroup) {
             groupRepo.createGroup(currentIdentity.getUser(), name, viewModel.getCurrency(),
                     currentIdentity.getNickname(), currentIdentity.getAvatar());
-            this.view.setScreenResult(name);
-            this.view.showAddUsers();
+            view.setScreenResult(name);
+            view.showAddUsers();
         } else {
-            this.view.showMessage(R.string.toast_group_already_in_list);
+            view.showMessage(R.string.toast_group_already_in_list);
         }
     }
 }

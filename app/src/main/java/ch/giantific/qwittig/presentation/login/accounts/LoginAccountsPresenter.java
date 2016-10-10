@@ -105,7 +105,7 @@ public class LoginAccountsPresenter extends BasePresenterImpl<LoginAccountsContr
     }
 
     @Override
-    public void onUseEmailClick(View view) {
-        this.view.showEmailLogin(viewModel.getJoinIdentityId());
+    public void onUseEmailClick(View v) {
+        view.showEmailLogin(viewModel.getJoinIdentityId());
     }
 }

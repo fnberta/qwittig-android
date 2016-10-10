@@ -36,13 +36,13 @@ public class OcrRatingPresenter extends BasePresenterImpl<OcrRatingContract.View
     }
 
     @Override
-    public void onDoneClick(View view) {
+    public void onDoneClick(View v) {
         if (viewModel.getSatisfaction() == 0f) {
-            this.view.showMessage(R.string.toast_ocr_rating_satisfaction);
+            view.showMessage(R.string.toast_ocr_rating_satisfaction);
             return;
         }
 
-        this.view.showRatingDetails();
+        view.showRatingDetails();
     }
 
     @Override

@@ -96,15 +96,15 @@ public class LoginEmailPresenter extends BasePresenterImpl<LoginEmailContract.Vi
     }
 
     @Override
-    public void onLoginClick(View view) {
+    public void onLoginClick(View v) {
         if (viewModel.isInputValid(false)) {
             viewModel.setLoading(true);
-            this.view.loadEmailLoginWorker(viewModel.email.get(), viewModel.password.get());
+            view.loadEmailLoginWorker(viewModel.email.get(), viewModel.password.get());
         }
     }
 
     @Override
-    public void onSignUpClick(View view) {
+    public void onSignUpClick(View v) {
         if (!viewModel.isSignUp()) {
             viewModel.setSignUp(true);
             return;
@@ -112,14 +112,14 @@ public class LoginEmailPresenter extends BasePresenterImpl<LoginEmailContract.Vi
 
         if (viewModel.isInputValid(true)) {
             viewModel.setLoading(true);
-            this.view.hideKeyboard();
-            this.view.loadEmailSignUpWorker(viewModel.email.get(), viewModel.password.get());
+            view.hideKeyboard();
+            view.loadEmailSignUpWorker(viewModel.email.get(), viewModel.password.get());
         }
     }
 
     @Override
-    public void onResetPasswordClick(View view) {
-        this.view.showResetPasswordDialog(viewModel.email.get());
+    public void onResetPasswordClick(View v) {
+        view.showResetPasswordDialog(viewModel.email.get());
     }
 
     @Override

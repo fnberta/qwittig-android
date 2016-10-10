@@ -199,8 +199,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     }
 
     @Override
-    public void onDateClick(View view) {
-        this.view.showDatePickerDialog();
+    public void onDateClick(View v) {
+        view.showDatePickerDialog();
     }
 
     @Override
@@ -410,8 +410,8 @@ public class PurchaseAddPresenter extends BasePresenterImpl<PurchaseAddEditContr
     }
 
     @Override
-    public void onExchangeRateClick(View view) {
-        this.view.showManualExchangeRateSelectorDialog(((TextView) view).getText().toString());
+    public void onExchangeRateClick(View v) {
+        view.showManualExchangeRateSelectorDialog(((TextView) v).getText().toString());
     }
 
     @Override

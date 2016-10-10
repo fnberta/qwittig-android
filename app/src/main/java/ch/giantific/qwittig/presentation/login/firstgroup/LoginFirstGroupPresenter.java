@@ -93,7 +93,7 @@ public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupC
     }
 
     @Override
-    public void onDoneClick(View view) {
+    public void onDoneClick(View v) {
         final String groupName = viewModel.groupName.get();
         final String groupCurrency = viewModel.getGroupCurrency();
         if (!Objects.equals(groupName, identity.getGroupName()) ||
@@ -107,7 +107,7 @@ public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupC
 
                         @Override
                         public void onError(Throwable error) {
-                            LoginFirstGroupPresenter.this.view.showMessage(R.string.toast_error_profile);
+                            view.showMessage(R.string.toast_error_profile);
                         }
                     })
             );
