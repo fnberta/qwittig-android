@@ -30,7 +30,7 @@ import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseA
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel.ViewType;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
-import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber2;
+import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
@@ -118,7 +118,7 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
                 .skipUntil(initialData)
                 .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), currentIdentityId))
-                .subscribe(new ChildEventSubscriber2<>(view, viewModel, e ->
+                .subscribe(new ChildEventSubscriber<>(view, viewModel, e ->
                         view.showMessage(R.string.toast_error_assignments_load)))
         );
     }

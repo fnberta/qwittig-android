@@ -21,7 +21,7 @@ import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
-import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber2;
+import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.finance.paid.viewmodels.CompsPaidViewModel;
 import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewModel;
@@ -111,7 +111,7 @@ public class CompsPaidPresenter extends BasePresenterImpl<CompsPaidContract.View
                 .skipUntil(initialData)
                 .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), identityId))
-                .subscribe(new ChildEventSubscriber2<>(view, viewModel, e ->
+                .subscribe(new ChildEventSubscriber<>(view, viewModel, e ->
                         view.showMessage(R.string.toast_error_comps_load)))
         );
     }

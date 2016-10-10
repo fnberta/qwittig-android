@@ -22,7 +22,7 @@ import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
-import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber2;
+import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
@@ -89,7 +89,7 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
         subscriptions.add(groupRepo.observeGroupIdentityChildren(groupId)
                 .skipUntil(initialData)
                 .flatMap(event -> getItemViewModel(event.getEventType(), event.getValue()))
-                .subscribe(new ChildEventSubscriber2<>(view, viewModel, e ->
+                .subscribe(new ChildEventSubscriber<>(view, viewModel, e ->
                         view.showMessage(R.string.toast_error_users_load)))
         );
     }

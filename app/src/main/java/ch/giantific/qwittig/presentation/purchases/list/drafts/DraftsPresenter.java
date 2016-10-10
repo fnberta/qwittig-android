@@ -21,7 +21,7 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
-import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber2;
+import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.DraftsViewModel;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.DraftItemViewModel;
@@ -109,7 +109,7 @@ public class DraftsPresenter extends BasePresenterImpl<DraftsContract.ViewListen
                     return getItemViewModel(event.getValue(), event.getEventType(),
                             viewModel.isDraftSelected(draft));
                 })
-                .subscribe(new ChildEventSubscriber2<>(view, viewModel, e ->
+                .subscribe(new ChildEventSubscriber<>(view, viewModel, e ->
                         view.showMessage(R.string.toast_error_drafts_load)))
         );
     }

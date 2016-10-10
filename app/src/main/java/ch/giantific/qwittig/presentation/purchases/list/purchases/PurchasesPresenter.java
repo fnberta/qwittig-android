@@ -22,7 +22,7 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
-import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber2;
+import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.PurchasesViewModel;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.items.PurchaseItemViewModel;
@@ -98,7 +98,7 @@ public class PurchasesPresenter extends BasePresenterImpl<PurchasesContract.View
                 .takeWhile(purchaseRxChildEvent ->
                         Objects.equals(purchaseRxChildEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), identityId))
-                .subscribe(new ChildEventSubscriber2<>(view, viewModel, e ->
+                .subscribe(new ChildEventSubscriber<>(view, viewModel, e ->
                         view.showMessage(R.string.toast_error_purchases_load)))
         );
     }
