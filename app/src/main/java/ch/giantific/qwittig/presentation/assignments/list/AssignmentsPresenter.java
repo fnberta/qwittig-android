@@ -25,6 +25,7 @@ import ch.giantific.qwittig.domain.models.AssignmentHistory;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.assignments.list.models.AssignmentDeadline;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.AssignmentsViewModel;
+import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentHeaderViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel.ViewType;
@@ -34,6 +35,7 @@ import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link AssignmentsContract} interface.
@@ -69,8 +71,29 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
     }
 
     @Override
-    public int compareItemViewModels(@NonNull BaseAssignmentItemViewModel item1, @NonNull BaseAssignmentItemViewModel item2) {
-        if (item1.getViewType() == ViewType.ASSIGNMENT && item2.getViewType() == ViewType.ASSIGNMENT) {
+    public int compareItemViewModels(@NonNull BaseAssignmentItemViewModel item1,
+                                     @NonNull BaseAssignmentItemViewModel item2) {
+        final int item1Type = item1.getViewType();
+        final int item2Type = item2.getViewType();
+
+        if (item1Type == ViewType.HEADER_MY && item2Type == ViewType.HEADER_GROUP) {
+            return -1;
+        }
+
+        if (item1Type == ViewType.HEADER_MY && item2Type == ViewType.ASSIGNMENT) {
+            return -1;
+        }
+
+        if (item1Type == ViewType.HEADER_GROUP && item2Type == ViewType.ASSIGNMENT) {
+            if (((AssignmentItemViewModel) item2).isResponsible()) {
+                return 1;
+            }
+
+            return -1;
+        }
+
+        if (item1.getViewType() == ViewType.ASSIGNMENT
+                && item2.getViewType() == ViewType.ASSIGNMENT) {
             return ((AssignmentItemViewModel) item1).compareTo((AssignmentItemViewModel) item2);
         }
 
@@ -108,8 +131,8 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
                 .flatMap(assignment -> getItemViewModel(assignment, EventType.NONE, currentIdentityId))
                 .toList()
                 .doOnNext(itemViewModels -> {
-//                    items.addItemAtPosition(new AssignmentHeaderItem(R.string.assignment_header_my, Type.HEADER_MY));
-//                    items.addItemAtPosition(new AssignmentHeaderItem(R.string.assignment_header_group, Type.HEADER_GROUP));
+                    view.addItem(new AssignmentHeaderViewModel(R.string.assignment_header_my, ViewType.HEADER_MY));
+                    view.addItem(new AssignmentHeaderViewModel(R.string.assignment_header_group, ViewType.HEADER_GROUP));
                     view.addItems(itemViewModels);
                     viewModel.setEmpty(view.isItemsEmpty());
                     viewModel.setLoading(false);
