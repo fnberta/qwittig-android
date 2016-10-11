@@ -76,7 +76,7 @@ public class DraftItemViewModel extends BaseChildItemViewModel
 
     @Override
     public int compareTo(@NonNull DraftItemViewModel itemViewModel) {
-        return date.compareTo(itemViewModel.getDate());
+        return itemViewModel.getDate().compareTo(date);
     }
 
 
