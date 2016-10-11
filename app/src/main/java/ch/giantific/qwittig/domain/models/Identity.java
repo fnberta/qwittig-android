@@ -32,7 +32,6 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
     public static final String PATH_NICKNAME = "nickname";
     public static final String PATH_AVATAR = "avatar";
     public static final String PATH_BALANCE = "balance";
-    public static final String PATH_INVITATION_LINK = "invitationLink";
     public static final String NUMERATOR = "num";
     public static final String DENOMINATOR = "den";
 

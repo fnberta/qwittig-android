@@ -155,7 +155,6 @@ public class GroupRepository {
         childUpdates.put(String.format("%s/%s/%s/%s", User.BASE_PATH, userId, User.PATH_IDENTITIES, joinIdentityId), true);
         childUpdates.put(String.format("%s/%s/%s", User.BASE_PATH, userId, User.PATH_CURRENT_IDENTITY), joinIdentityId);
         childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, joinIdentityId, Identity.PATH_USER), userId);
-        childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, joinIdentityId, Identity.PATH_INVITATION_LINK), null);
         if (!TextUtils.isEmpty(currentNickname)) {
             childUpdates.put(String.format("%s/%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, joinIdentityId, Identity.PATH_NICKNAME), currentNickname);
         }
@@ -217,7 +216,6 @@ public class GroupRepository {
                     childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), null);
                     final Map<String, Object> identityMap = identity.toMap();
                     identityMap.put(Identity.PATH_ACTIVE, false);
-                    identityMap.put(Identity.PATH_INVITATION_LINK, null);
                     childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_INACTIVE, identityId), identityMap);
                     childUpdates.put(String.format("%s/%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_IDENTITIES, identityId), null);
                     databaseRef.updateChildren(childUpdates);
