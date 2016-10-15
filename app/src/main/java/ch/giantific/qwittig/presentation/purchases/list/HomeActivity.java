@@ -304,6 +304,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                 toggleToolbarScrollFlags(true);
                 draftsFragment = new DraftsFragment();
                 tabsAdapter.addFragment(draftsFragment, getString(R.string.tab_drafts));
+                draftsPresenter.onViewVisible();
             }
         } else if (draftsFragment != null) {
             toggleToolbarScrollFlags(false);
