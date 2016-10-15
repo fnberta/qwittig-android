@@ -92,9 +92,9 @@ public class PurchaseAddOcrPresenter extends PurchaseAddPresenter
         final List<Map<String, Object>> articles = (List<Map<String, Object>>) data.get("items");
         if (articles != null && !articles.isEmpty()) {
             for (Map<String, Object> item : articles) {
-                final double price = (double) item.get("price");
+                final double price = Double.valueOf(item.get("price").toString());
                 final String priceFormatted = moneyFormatter.format(price);
-                final String name = (String) item.get("name");
+                final String name = String.valueOf(item.get("name"));
                 final PurchaseAddEditArticleItemViewModel articleItem =
                         new PurchaseAddEditArticleItemViewModel(name, priceFormatted,
                                 price, getArticleIdentities());

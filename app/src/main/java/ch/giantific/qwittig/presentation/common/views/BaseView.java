@@ -1,4 +1,4 @@
-package ch.giantific.qwittig.presentation.common.presenters;
+package ch.giantific.qwittig.presentation.common.views;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
@@ -9,7 +9,7 @@ import ch.giantific.qwittig.presentation.common.MessageAction;
  * Created by fabio on 28.09.16.
  */
 
-public interface BaseViewListener {
+public interface BaseView {
 
     boolean isNetworkAvailable();
 

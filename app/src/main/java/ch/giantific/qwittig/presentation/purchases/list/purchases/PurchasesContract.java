@@ -7,7 +7,7 @@ package ch.giantific.qwittig.presentation.purchases.list.purchases;
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
 import ch.giantific.qwittig.presentation.common.views.SortedListView;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.items.PurchaseItemViewModel;
@@ -25,7 +25,7 @@ public interface PurchasesContract {
         void onPurchaseDeleted(@NonNull String purchaseId);
     }
 
-    interface ViewListener extends BaseViewListener,
+    interface ViewListener extends BaseView,
             SortedListView<PurchaseItemViewModel> {
         // empty
     }

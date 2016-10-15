@@ -16,8 +16,7 @@ import ch.giantific.qwittig.presentation.assignments.list.models.AssignmentDeadl
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
 import ch.giantific.qwittig.presentation.common.views.SortedListView;
 
@@ -44,7 +43,7 @@ public interface AssignmentsContract {
         void onAssignmentDeleted(@NonNull String assignmentId);
     }
 
-    interface ViewListener extends BaseViewListener, SortedListView<BaseAssignmentItemViewModel> {
+    interface ViewListener extends BaseView, SortedListView<BaseAssignmentItemViewModel> {
         String buildUpNextString(@NonNull List<Identity> identities);
 
         String buildDeadlineString(@StringRes int res, Object... args);

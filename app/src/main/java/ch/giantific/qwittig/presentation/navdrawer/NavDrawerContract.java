@@ -12,7 +12,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 
 /**
  * Defines an observable view model for the navigation drawer.
@@ -30,7 +30,7 @@ public interface NavDrawerContract {
         void onAvatarClick(View view);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
         void clearHeaderIdentities();
 
         void addHeaderIdentities(@NonNull List<Identity> identities);

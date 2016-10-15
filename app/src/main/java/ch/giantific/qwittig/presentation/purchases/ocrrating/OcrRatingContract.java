@@ -3,7 +3,7 @@ package ch.giantific.qwittig.presentation.purchases.ocrrating;
 import android.view.View;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 
 /**
  * Created by fabio on 22.06.16.
@@ -16,7 +16,7 @@ public interface OcrRatingContract {
         void onDetailsDoneClick(View view);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void showRatingDetails();
     }

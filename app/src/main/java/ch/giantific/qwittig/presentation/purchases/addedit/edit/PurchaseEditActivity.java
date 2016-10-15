@@ -58,8 +58,7 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
                 .build();
         component.inject(this);
 
-        final boolean draft = isDraft();
-        presenter = draft ? component.getEditDraftPresenter() : component.getEditPresenter();
+        presenter = isDraft() ? component.getEditDraftPresenter() : component.getEditPresenter();
         presenter.attachView(this);
     }
 
@@ -87,6 +86,7 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
         return isDraft() ? new PurchaseEditDraftFragment() : new PurchaseEditFragment();
     }
 
+    @NonNull
     @Override
     protected BasePurchaseAddEditReceiptFragment getReceiptFragment() {
         return isDraft() ? new PurchaseEditDraftReceiptFragment() : new PurchaseEditReceiptFragment();

@@ -18,7 +18,7 @@ import java.lang.annotation.RetentionPolicy;
 import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 
 /**
  * Defines an observable view model for the addItemAtPosition or edit assignment screen.
@@ -65,7 +65,7 @@ public interface AssignmentAddEditContract {
         void onIdentitiesRowItemClick(@NonNull AssignmentAddEditIdentityItemViewModel itemViewModel);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
         void showDiscardChangesDialog();
 
         void showDatePickerDialog();

@@ -11,7 +11,7 @@ import android.widget.AdapterView;
 import java.util.List;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.models.Currency;
 
 /**
@@ -28,7 +28,7 @@ public interface SettingsAddGroupContract {
         void onCreateClick(View view);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void setScreenResult(@NonNull String name);
 

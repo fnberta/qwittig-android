@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.BaseHelpFeedbackItemViewModel;
 import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.HelpFeedbackItemViewModel;
 
@@ -24,7 +24,7 @@ public interface HelpFeedbackContract {
         void onHelpFeedbackItemClicked(@NonNull HelpFeedbackItemViewModel itemViewModel);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
         void sendEmail(@NonNull String recipient, @StringRes int subject);
 
         void sendEmail(@NonNull String recipient, @StringRes int subject, @StringRes int body);

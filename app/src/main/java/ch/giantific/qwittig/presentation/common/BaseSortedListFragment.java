@@ -13,7 +13,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.ChildItemViewModel;
 import ch.giantific.qwittig.presentation.common.views.SortedListView;
 
@@ -29,7 +29,7 @@ public abstract class BaseSortedListFragment<U,
         S extends BaseFragment.ActivityListener<U>,
         V extends ChildItemViewModel>
         extends BaseFragment<U, T, S>
-        implements BaseViewListener, SortedListView<V> {
+        implements BaseView, SortedListView<V> {
 
     protected BaseSortedListRecyclerAdapter<V, T, ? extends RecyclerView.ViewHolder> recyclerAdapter;
 

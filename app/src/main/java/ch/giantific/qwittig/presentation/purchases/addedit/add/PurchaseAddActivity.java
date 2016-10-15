@@ -87,6 +87,7 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
         return ocrDataId;
     }
 
+    @NonNull
     @Override
     protected BasePurchaseAddEditReceiptFragment getReceiptFragment() {
         return TextUtils.isEmpty(getOcrDataId())

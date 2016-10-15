@@ -12,7 +12,7 @@ import java.util.Date;
 
 import ch.giantific.qwittig.data.rest.StatsResult;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import rx.Observable;
@@ -39,7 +39,7 @@ public interface StatsContract {
         void onPeriodSelected(AdapterView<?> parent, View view, int position, long id);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void reloadData();
 

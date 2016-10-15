@@ -9,12 +9,13 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by fabio on 28.09.16.
  */
-public abstract class BasePresenterImpl<T extends BaseViewListener> implements BasePresenter<T> {
+public abstract class BasePresenterImpl<T extends BaseView> implements BasePresenter<T> {
 
     protected final UserRepository userRepo;
     protected final Navigator navigator;

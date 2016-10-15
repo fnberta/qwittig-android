@@ -5,7 +5,7 @@
 package ch.giantific.qwittig.presentation.finance.paid;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
 import ch.giantific.qwittig.presentation.common.views.SortedListView;
 import ch.giantific.qwittig.presentation.finance.paid.viewmodels.items.CompPaidItemViewModel;
@@ -20,7 +20,7 @@ public interface CompsPaidContract {
         // empty
     }
 
-    interface ViewListener extends BaseViewListener,
+    interface ViewListener extends BaseView,
             SortedListView<CompPaidItemViewModel> {
         // empty
     }

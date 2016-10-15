@@ -252,6 +252,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         DiscardChangesDialogFragment.display(getSupportFragmentManager());
     }
 
+    @NonNull
     protected abstract BasePurchaseAddEditReceiptFragment getReceiptFragment();
 
     @Override

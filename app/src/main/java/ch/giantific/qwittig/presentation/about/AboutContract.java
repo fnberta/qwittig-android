@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import ch.giantific.qwittig.presentation.about.viewmodels.items.AboutItemViewModel;
 import ch.giantific.qwittig.presentation.about.viewmodels.items.BaseAboutItemViewModel;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 
 /**
  * Defines an observable view model for a screen showing information about Qwittig.
@@ -23,7 +23,7 @@ public interface AboutContract {
         void onAboutItemClick(@NonNull AboutItemViewModel itemViewModel);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
         // empty
     }
 }

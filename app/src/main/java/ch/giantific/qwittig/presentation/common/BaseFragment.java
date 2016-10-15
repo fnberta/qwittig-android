@@ -15,7 +15,7 @@ import android.view.View;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 
@@ -27,7 +27,7 @@ import ch.giantific.qwittig.utils.WorkerUtils;
  * Subclass of {@link Fragment}.
  */
 public abstract class BaseFragment<U, T extends BasePresenter, S extends BaseFragment.ActivityListener<U>>
-        extends Fragment implements BaseViewListener {
+        extends Fragment implements BaseView {
 
     protected S activity;
     @Inject

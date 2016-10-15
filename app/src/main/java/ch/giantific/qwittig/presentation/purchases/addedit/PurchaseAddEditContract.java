@@ -13,7 +13,7 @@ import java.util.Date;
 
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.ExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.NoteDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
@@ -86,7 +86,7 @@ public interface PurchaseAddEditContract {
         void onDeleteDraftMenuClick();
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         Observable<TransitionEvent> getEnterTransition();
 

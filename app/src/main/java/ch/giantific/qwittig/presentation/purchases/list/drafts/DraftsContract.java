@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.presenters.SelectionModePresenter;
 import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
 import ch.giantific.qwittig.presentation.common.views.SortedListView;
@@ -34,7 +34,7 @@ public interface DraftsContract {
         boolean onDraftRowLongClick(@NonNull DraftItemViewModel itemViewModel);
     }
 
-    interface ViewListener extends BaseViewListener,
+    interface ViewListener extends BaseView,
             SortedListView<DraftItemViewModel> {
 
         void startSelectionMode();

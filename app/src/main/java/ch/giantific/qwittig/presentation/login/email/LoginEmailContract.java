@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
 import ch.giantific.qwittig.presentation.login.LoginWorkerListener;
 
@@ -29,7 +29,7 @@ public interface LoginEmailContract {
         void onResetPasswordClick(View view);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void loadEmailLoginWorker(@NonNull final String email, @NonNull String password);
 
