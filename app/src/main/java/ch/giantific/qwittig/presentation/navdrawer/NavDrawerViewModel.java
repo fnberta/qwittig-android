@@ -6,21 +6,24 @@ package ch.giantific.qwittig.presentation.navdrawer;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 
 /**
  * Provides an implementation of the {@link NavDrawerContract}.
  */
+@PerActivity
 public class NavDrawerViewModel extends BaseObservable {
 
     private String nickname;
     private String avatar;
     private int selectedIdentity;
 
+    @Inject
     public NavDrawerViewModel() {
     }
 

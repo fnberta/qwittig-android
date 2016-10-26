@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 
 /**
  * Defines a view model for header that show a user's current identity balance.
@@ -17,11 +17,10 @@ import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 public interface FinanceHeaderContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
-
-        FinanceHeaderViewModel getViewModel();
+        // empty
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void setColorTheme(@NonNull BigFraction balance);
 

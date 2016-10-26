@@ -27,17 +27,18 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.databinding.ActivityFinanceBinding;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidPresenterModule;
-import ch.giantific.qwittig.presentation.finance.di.FinanceCompsUnpaidPresenterModule;
-import ch.giantific.qwittig.presentation.finance.di.FinanceHeaderPresenterModule;
 import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
 import ch.giantific.qwittig.presentation.finance.paid.CompsPaidContract;
 import ch.giantific.qwittig.presentation.finance.paid.CompsPaidFragment;
+import ch.giantific.qwittig.presentation.finance.paid.viewmodels.CompsPaidViewModel;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompConfirmAmountDialogFragment;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidContract;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidFragment;
+import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.CompsUnpaidViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.utils.Utils;
@@ -57,16 +58,22 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
     @Inject
     FinanceHeaderContract.Presenter headerPresenter;
     @Inject
+    FinanceHeaderViewModel headerViewModel;
+    @Inject
     CompsPaidContract.Presenter paidPresenter;
     @Inject
+    CompsPaidViewModel paidViewModel;
+    @Inject
     CompsUnpaidContract.Presenter unpaidPresenter;
+    @Inject
+    CompsUnpaidViewModel unpaidViewModel;
     private ActivityFinanceBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_finance);
-        binding.setViewModel(headerPresenter.getViewModel());
+        binding.setViewModel(headerViewModel);
 
         postponeEnterTransition();
         checkNavDrawerItem(R.id.nav_finance);
@@ -85,11 +92,18 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
         final String groupId = getIntent().getStringExtra(FcmMessagingService.PUSH_GROUP_ID);
-        component = navComp.plus(new FinanceHeaderPresenterModule(savedInstanceState),
-                new FinanceCompsUnpaidPresenterModule(savedInstanceState),
-                new FinanceCompsPaidPresenterModule(savedInstanceState, groupId));
+        component = navComp.plus(new FinanceCompsPaidPresenterModule(groupId),
+                new PersistentViewModelsModule(savedInstanceState));
         component.inject(this);
         headerPresenter.attachView(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(CompsPaidViewModel.TAG, paidViewModel);
+        outState.putParcelable(CompsUnpaidViewModel.TAG, unpaidViewModel);
     }
 
     @Override

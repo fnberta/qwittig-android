@@ -2,13 +2,11 @@ package ch.giantific.qwittig.presentation.common.subscribers;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.util.SortedList;
 
-import java.util.Objects;
-
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.presentation.common.viewmodels.EmptyViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.ChildItemViewModel;
+import ch.giantific.qwittig.presentation.common.views.SortedListView;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 
 /**
  * Created by fabio on 28.09.16.
@@ -17,17 +15,17 @@ import ch.giantific.qwittig.presentation.common.viewmodels.items.ChildItemViewMo
 public class ChildEventSubscriber<T extends ChildItemViewModel, S extends EmptyViewModel>
         extends IndefiniteSubscriber<T> {
 
-    private final SortedList<T> items;
+    private final SortedListView<T> view;
     private final S viewModel;
     @Nullable
     private final DataErrorCallback errorCallback;
 
-    public ChildEventSubscriber(@NonNull SortedList<T> items,
+    public ChildEventSubscriber(@NonNull SortedListView<T> sortedListView,
                                 @NonNull S viewModel,
                                 @Nullable DataErrorCallback errorCallback) {
-        this.errorCallback = errorCallback;
-        this.items = items;
+        this.view = sortedListView;
         this.viewModel = viewModel;
+        this.errorCallback = errorCallback;
     }
 
     @Override
@@ -39,34 +37,23 @@ public class ChildEventSubscriber<T extends ChildItemViewModel, S extends EmptyV
                 // do nothing
                 break;
             case EventType.ADDED: {
-                items.add(item);
+                view.addItem(item);
                 viewModel.setEmpty(false);
                 break;
             }
             case EventType.CHANGED:
                 // fall through
             case EventType.MOVED: {
-                final int pos = getPositionForId(item.getId());
-                items.updateItemAt(pos, item);
+                final int pos = view.getItemPositionForId(item.getId());
+                view.updateItemAt(pos, item);
                 break;
             }
             case EventType.REMOVED: {
-                items.remove(item);
-                viewModel.setEmpty(items.size() == 0);
+                view.removeItem(item);
+                viewModel.setEmpty(view.isItemsEmpty());
                 break;
             }
         }
-    }
-
-    public int getPositionForId(@NonNull String id) {
-        for (int i = 0, size = items.size(); i < size; i++) {
-            final T item = items.get(i);
-            if (Objects.equals(item.getId(), id)) {
-                return i;
-            }
-        }
-
-        throw new IllegalArgumentException("id not found");
     }
 
     @Override

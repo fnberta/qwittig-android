@@ -5,16 +5,17 @@
 package ch.giantific.qwittig.presentation.purchases.addedit.edit;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
@@ -41,37 +42,21 @@ import timber.log.Timber;
  */
 public class PurchaseEditPresenter extends PurchaseAddPresenter {
 
-    private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
-
     final String editPurchaseId;
     Purchase editPurchase;
     private boolean deleteOldReceipt;
-    private boolean oldValuesSet;
 
-    @SuppressWarnings("SimplifiableIfStatement")
-    public PurchaseEditPresenter(@Nullable Bundle savedState,
-                                 @NonNull Navigator navigator,
+    @Inject
+    public PurchaseEditPresenter(@NonNull Navigator navigator,
+                                 @NonNull PurchaseAddEditViewModel viewModel,
                                  @NonNull UserRepository userRepo,
                                  @NonNull GroupRepository groupRepo,
                                  @NonNull PurchaseRepository purchaseRepo,
                                  @NonNull RemoteConfigHelper configHelper,
                                  @NonNull String editPurchaseId) {
-        super(savedState, navigator, userRepo, groupRepo, purchaseRepo, configHelper);
+        super(navigator, viewModel, userRepo, groupRepo, purchaseRepo, configHelper);
 
         this.editPurchaseId = editPurchaseId;
-
-        if (savedState != null) {
-            oldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
-        } else {
-            oldValuesSet = false;
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putBoolean(STATE_ITEMS_SET, oldValuesSet);
     }
 
     @Override
@@ -82,10 +67,10 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
-                        if (!oldValuesSet) {
+                        if (!viewModel.isDataSet()) {
                             setOldPurchase(purchase);
                             setOldArticles(purchase.getArticles());
-                            oldValuesSet = true;
+                            viewModel.setDataSet(true);
                         }
                     }
 
@@ -124,9 +109,9 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
             final PurchaseAddEditArticleItemViewModel articleItem =
                     new PurchaseAddEditArticleItemViewModel(article.getName(), priceFormatted,
                             price, getArticleIdentities(identities));
-            final int pos = getItemCount() - 2;
-            items.add(pos, articleItem);
-            listInteraction.notifyItemInserted(pos);
+            final int pos = viewModel.getItemCount() - 2;
+            viewModel.addItemAtPosition(pos, articleItem);
+            view.notifyItemAdded(pos);
         }
     }
 
@@ -168,37 +153,8 @@ public class PurchaseEditPresenter extends PurchaseAddPresenter {
             return true;
         }
 
-        final List<Article> oldArticles = editPurchase.getArticles();
-        for (int i = 0, size = getItemCount(), skipCount = 0; i < size; i++) {
-            final BasePurchaseAddEditItemViewModel addEditItem = getItemAtPosition(i);
-            if (addEditItem.getViewType() != ViewType.ARTICLE) {
-                skipCount++;
-                continue;
-            }
-
-            final Article articleOld;
-            try {
-                articleOld = oldArticles.get(i - skipCount);
-            } catch (IndexOutOfBoundsException e) {
-                return true;
-            }
-            final PurchaseAddEditArticleItemViewModel articleItem = (PurchaseAddEditArticleItemViewModel) addEditItem;
-            if (!Objects.equals(articleOld.getName(), articleItem.name.get())) {
-                return true;
-            }
-
-            final double oldPrice = articleOld.getPriceForeign(editPurchase.getExchangeRate());
-            final double newPrice = articleItem.getPriceParsed();
-            if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
-                return true;
-            }
-
-            final Set<String> identitiesOld = articleOld.getIdentitiesIds();
-            final List<String> identitiesNew = articleItem.getSelectedIdentitiesIds();
-            if (!identitiesNew.containsAll(identitiesOld) ||
-                    !identitiesOld.containsAll(identitiesNew)) {
-                return true;
-            }
+        if (viewModel.isItemsChanged(editPurchase.getArticles(), editPurchase.getExchangeRate())) {
+            return true;
         }
 
         if (deleteOldReceipt || !Objects.equals(viewModel.getReceipt(), editPurchase.getReceipt())) {

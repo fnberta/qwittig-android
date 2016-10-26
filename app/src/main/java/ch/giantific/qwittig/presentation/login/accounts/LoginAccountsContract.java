@@ -10,7 +10,7 @@ import android.view.View;
 
 import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.login.LoginWorkerListener;
 
 /**
@@ -22,10 +22,6 @@ public interface LoginAccountsContract {
             LoginWorkerListener,
             GoogleApiClientDelegate.GoogleLoginCallback {
 
-        LoginAccountsViewModel getViewModel();
-
-        void setInvitationIdentityId(@NonNull String identityId);
-
         void onFacebookSignedIn(@NonNull String idToken);
 
         void onFacebookLoginFailed();
@@ -35,7 +31,7 @@ public interface LoginAccountsContract {
         void onUseEmailClick(View view);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void loadFacebookLoginWorker(@NonNull String idToken);
 

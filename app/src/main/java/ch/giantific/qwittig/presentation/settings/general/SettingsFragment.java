@@ -155,26 +155,12 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        presenter.saveState(outState);
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         activity.getComponent().inject(this);
         presenter.attachView(this);
         presenter.onPreferencesLoaded();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        presenter.onViewVisible();
     }
 
     @Override
@@ -222,13 +208,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onPause();
 
         sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        presenter.onViewGone();
     }
 
     @Override

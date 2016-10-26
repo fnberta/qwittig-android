@@ -25,10 +25,11 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityAssignmentsBinding;
 import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditContract.AssignmentResult;
 import ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsContract.AssignmentDetailsResult;
-import ch.giantific.qwittig.presentation.assignments.list.di.AssignmentsPresenterModule;
 import ch.giantific.qwittig.presentation.assignments.list.di.AssignmentsSubcomponent;
 import ch.giantific.qwittig.presentation.assignments.list.models.AssignmentDeadline;
+import ch.giantific.qwittig.presentation.assignments.list.viewmodels.AssignmentsViewModel;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
@@ -46,8 +47,9 @@ public class AssignmentsActivity extends BaseNavDrawerActivity<AssignmentsSubcom
 
     @Inject
     AssignmentsContract.Presenter presenter;
+    @Inject
+    AssignmentsViewModel viewModel;
     private ActivityAssignmentsBinding binding;
-    private AssignmentDeadline[] deadlines;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,21 +75,20 @@ public class AssignmentsActivity extends BaseNavDrawerActivity<AssignmentsSubcom
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        deadlines = new AssignmentDeadline[]{
-                AssignmentDeadline.newAllInstance(getString(R.string.deadline_all)),
-                AssignmentDeadline.newTodayInstance(getString(R.string.deadline_today)),
-                AssignmentDeadline.newWeekInstance(getString(R.string.deadline_week)),
-                AssignmentDeadline.newMonthInstance(getString(R.string.deadline_month)),
-                AssignmentDeadline.newYearInstance(getString(R.string.deadline_year))
-        };
-
-        component = navComp.plus(new AssignmentsPresenterModule(savedInstanceState, deadlines[0]));
+        component = navComp.plus(new PersistentViewModelsModule(savedInstanceState));
         component.inject(this);
     }
 
     @Override
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(AssignmentsViewModel.TAG, viewModel);
     }
 
     private void showFab() {
@@ -109,7 +110,8 @@ public class AssignmentsActivity extends BaseNavDrawerActivity<AssignmentsSubcom
         final ActionBar actionBar = getSupportActionBar();
         final Context themedContext = actionBar.getThemedContext();
         final ArrayAdapter<AssignmentDeadline> adapter =
-                new ArrayAdapter<>(themedContext, R.layout.spinner_item_toolbar, deadlines);
+                new AssignmentsSpinnerAdapter(themedContext, R.layout.spinner_item_toolbar,
+                        presenter.getAssignmentDeadlines());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spTasksDeadline.setAdapter(adapter);
     }

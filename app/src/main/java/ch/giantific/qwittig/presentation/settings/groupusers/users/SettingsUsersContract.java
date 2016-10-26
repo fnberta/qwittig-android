@@ -8,11 +8,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.View;
 
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
+import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
+import ch.giantific.qwittig.presentation.common.views.SortedListView;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
 
 /**
@@ -21,20 +20,17 @@ import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.it
 public interface SettingsUsersContract {
 
     interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<SettingsUsersItemViewModel>,
+            SortedListPresenter<SettingsUsersItemViewModel>,
             SettingsUsersRecyclerAdapter.AdapterInteractionListener,
             NicknamePromptDialogFragment.DialogInteractionListener {
-
-        SettingsUsersViewModel getViewModel();
-
-        void setListInteraction(@NonNull ListInteraction listInteraction);
 
         void onNewAvatarTaken(@NonNull String avatarPath);
 
         void onAddUserClick(View view);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView,
+            SortedListView<SettingsUsersItemViewModel> {
 
         void startEnterTransition();
 

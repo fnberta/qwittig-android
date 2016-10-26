@@ -11,9 +11,8 @@ import android.widget.AdapterView;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.SpinnerInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 
 /**
  * Defines an observable view model for the navigation drawer.
@@ -21,12 +20,6 @@ import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
 public interface NavDrawerContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
-
-        NavDrawerViewModel getViewModel();
-
-        void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction);
-
-        List<Identity> getIdentities();
 
         boolean isUserLoggedIn();
 
@@ -37,7 +30,9 @@ public interface NavDrawerContract {
         void onAvatarClick(View view);
     }
 
-    interface ViewListener extends BaseViewListener {
-        // empty
+    interface ViewListener extends BaseView {
+        void clearHeaderIdentities();
+
+        void addHeaderIdentities(@NonNull List<Identity> identities);
     }
 }

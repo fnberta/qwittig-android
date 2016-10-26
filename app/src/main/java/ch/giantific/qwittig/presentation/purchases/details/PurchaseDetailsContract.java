@@ -9,12 +9,10 @@ import android.support.annotation.NonNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
-import ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsArticleItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsIdentityItemViewModel;
 
@@ -23,18 +21,7 @@ import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.Purc
  */
 public interface PurchaseDetailsContract {
 
-    interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<PurchaseDetailsArticleItemViewModel> {
-
-        PurchaseDetailsViewModel getViewModel();
-
-        void setListInteraction(@NonNull ListInteraction listInteraction);
-
-        void setIdentitiesListInteraction(@NonNull ListInteraction listInteraction);
-
-        PurchaseDetailsIdentityItemViewModel getIdentityAtPosition(int position);
-
-        int getIdentityCount();
+    interface Presenter extends BasePresenter<ViewListener> {
 
         void onEditPurchaseClick();
 
@@ -43,11 +30,25 @@ public interface PurchaseDetailsContract {
         void onShowExchangeRateClick();
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void startEnterTransition();
 
         void toggleMenuOptions(boolean showEditOptions, boolean showExchangeRateOption);
+
+        void addArticle(@NonNull PurchaseDetailsArticleItemViewModel item);
+
+        void clearArticles();
+
+        boolean isArticlesEmpty();
+
+        void notifyArticlesChanged();
+
+        void addIdentities(@NonNull List<PurchaseDetailsIdentityItemViewModel> items);
+
+        void clearIdentities();
+
+        void notifyIdentitiesChanged();
     }
 
     @IntDef({PurchaseDetailsResult.PURCHASE_DELETED})

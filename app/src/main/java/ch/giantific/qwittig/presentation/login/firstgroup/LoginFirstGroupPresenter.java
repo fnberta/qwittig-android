@@ -3,7 +3,6 @@ package ch.giantific.qwittig.presentation.login.firstgroup;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,6 +11,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
@@ -31,39 +32,22 @@ import rx.SingleSubscriber;
 public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupContract.ViewListener>
         implements LoginFirstGroupContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = LoginFirstGroupViewModel.class.getCanonicalName();
     private final LoginFirstGroupViewModel viewModel;
     private final GroupRepository groupRepo;
     private final List<Currency> currencies;
     private Identity identity;
 
-    public LoginFirstGroupPresenter(@Nullable Bundle savedState,
-                                    @NonNull Navigator navigator,
-                                    @NonNull RemoteConfigHelper configHelper,
+    @Inject
+    public LoginFirstGroupPresenter(@NonNull Navigator navigator,
+                                    @NonNull LoginFirstGroupViewModel viewModel,
                                     @NonNull UserRepository userRepo,
-                                    @Nullable GroupRepository groupRepo) {
-        super(savedState, navigator, userRepo);
+                                    @NonNull GroupRepository groupRepo,
+                                    @NonNull RemoteConfigHelper configHelper) {
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.groupRepo = groupRepo;
         currencies = configHelper.getSupportedCurrencies();
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new LoginFirstGroupViewModel(false);
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public LoginFirstGroupViewModel getViewModel() {
-        return viewModel;
     }
 
     @Override
@@ -109,7 +93,7 @@ public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupC
     }
 
     @Override
-    public void onDoneClick(View view) {
+    public void onDoneClick(View v) {
         final String groupName = viewModel.groupName.get();
         final String groupCurrency = viewModel.getGroupCurrency();
         if (!Objects.equals(groupName, identity.getGroupName()) ||
@@ -123,7 +107,7 @@ public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupC
 
                         @Override
                         public void onError(Throwable error) {
-                            LoginFirstGroupPresenter.this.view.showMessage(R.string.toast_error_profile);
+                            view.showMessage(R.string.toast_error_profile);
                         }
                     })
             );

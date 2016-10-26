@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentLoginEmailBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
@@ -26,6 +28,8 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailC
         implements LoginEmailContract.ViewListener {
 
     private static final String KEY_IDENTITY_ID = "IDENTITY_ID";
+    @Inject
+    LoginEmailViewModel viewModel;
     private FragmentLoginEmailBinding binding;
 
     public LoginEmailFragment() {
@@ -52,10 +56,10 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailC
         super.onActivityCreated(savedInstanceState);
 
         final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
-        presenter.setJoinIdentityId(identityId);
+        viewModel.setJoinIdentityId(identityId);
         presenter.attachView(this);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override

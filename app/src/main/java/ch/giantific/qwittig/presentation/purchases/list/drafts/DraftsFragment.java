@@ -18,10 +18,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomeDraftsBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseSortedListFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.DraftsViewModel;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.DraftItemViewModel;
 
 /**
  * Displays the currently open drafts of the current user in an {@link RecyclerView list.
@@ -29,9 +35,14 @@ import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
  * Long-click on a draft will start selection mode, allowing the user to select more drafts and
  * deleting them via the contextual {@link ActionBar}.
  */
-public class DraftsFragment extends BaseFragment<HomeSubcomponent, DraftsContract.Presenter, DraftsFragment.ActivityListener>
+public class DraftsFragment extends BaseSortedListFragment<HomeSubcomponent,
+        DraftsContract.Presenter,
+        DraftsFragment.ActivityListener,
+        DraftItemViewModel>
         implements ActionMode.Callback, DraftsContract.ViewListener {
 
+    @Inject
+    DraftsViewModel viewModel;
     private FragmentHomeDraftsBinding binding;
     private ActionMode actionMode;
 
@@ -50,11 +61,9 @@ public class DraftsFragment extends BaseFragment<HomeSubcomponent, DraftsContrac
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final DraftsRecyclerAdapter adapter = setupRecyclerView();
         presenter.attachView(this);
-        presenter.setListInteraction(adapter);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -62,13 +71,17 @@ public class DraftsFragment extends BaseFragment<HomeSubcomponent, DraftsContrac
         component.inject(this);
     }
 
-    private DraftsRecyclerAdapter setupRecyclerView() {
+    @Override
+    protected BaseSortedListRecyclerAdapter<DraftItemViewModel, DraftsContract.Presenter,
+            ? extends RecyclerView.ViewHolder> getRecyclerAdapter() {
+        return new DraftsRecyclerAdapter(presenter);
+    }
+
+    @Override
+    protected void setupRecyclerView() {
         binding.rvDrafts.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvDrafts.setHasFixedSize(true);
-        final DraftsRecyclerAdapter adapter = new DraftsRecyclerAdapter(presenter);
-        binding.rvDrafts.setAdapter(adapter);
-
-        return adapter;
+        binding.rvDrafts.setAdapter(recyclerAdapter);
     }
 
     @Override
@@ -117,6 +130,21 @@ public class DraftsFragment extends BaseFragment<HomeSubcomponent, DraftsContrac
     @Override
     public void setSelectionModeTitle(@StringRes int title, int draftsSelected) {
         actionMode.setTitle(getString(title, draftsSelected));
+    }
+
+    @Override
+    public int getItemCount() {
+        return recyclerAdapter.getItemCount();
+    }
+
+    @Override
+    public void notifyItemChanged(int position) {
+        recyclerAdapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public void scrollToItemPosition(int position) {
+        binding.rvDrafts.post(() -> binding.rvDrafts.scrollToPosition(position));
     }
 
     public interface ActivityListener extends BaseFragment.ActivityListener<HomeSubcomponent> {

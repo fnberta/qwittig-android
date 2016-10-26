@@ -18,7 +18,7 @@ import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegat
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
@@ -36,8 +36,6 @@ public interface SettingsProfileContract {
             DiscardChangesDialogFragment.DialogInteractionListener,
             EmailReAuthenticateDialogFragment.DialogInteractionListener,
             GoogleApiClientDelegate.GoogleLoginCallback {
-
-        SettingsProfileViewModel getViewModel();
 
         boolean showDeleteAvatar();
 
@@ -64,7 +62,7 @@ public interface SettingsProfileContract {
         void onExitClick();
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void startPostponedEnterTransition();
 

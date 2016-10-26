@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import ch.giantific.qwittig.databinding.RowPurchaseAddEditArticleIdentityBinding;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 
@@ -21,7 +20,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.Purc
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class PurchaseAddEditArticleIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchaseAddEditArticleIdentityBinding>> {
+public class PurchaseAddEditArticleIdentitiesRecyclerAdapter extends RecyclerView.Adapter<BindingRow<RowPurchaseAddEditArticleIdentityBinding>> {
 
     private final PurchaseAddEditContract.Presenter presenter;
     private final List<PurchaseAddEditArticleIdentityItemViewModel> identities;

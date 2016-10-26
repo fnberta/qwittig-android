@@ -12,10 +12,11 @@ import java.util.Date;
 
 import ch.giantific.qwittig.data.rest.StatsResult;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import rx.Observable;
+import rx.Single;
 
 /**
  * Created by fabio on 14.08.16.
@@ -23,8 +24,6 @@ import rx.Observable;
 public interface StatsContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
-
-        StatsViewModel getViewModel();
 
         void setType(@NonNull StatsTypeItem type);
 
@@ -34,14 +33,14 @@ public interface StatsContract {
 
         Date getEndDate();
 
-        void onDataLoaded(@Nullable Observable<StatsResult> data);
-
         void onTypeSelected(AdapterView<?> parent, View view, int position, long id);
 
         void onPeriodSelected(AdapterView<?> parent, View view, int position, long id);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
+
+        Single<StatsResult> getStatsResult();
 
         void reloadData();
 

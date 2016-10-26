@@ -13,7 +13,7 @@ import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.assignments.addedit.di.AssignmentEditComponent;
 
 /**
- * Provides an interface for the user to add a new task. Allows the selection of the time
+ * Provides an interface for the user to addItemAtPosition a new task. Allows the selection of the time
  * frame, the deadline and the users involved. The title of the task is set in the {@link Toolbar}
  * of the hosting {@link Activity}.
  * <p/>

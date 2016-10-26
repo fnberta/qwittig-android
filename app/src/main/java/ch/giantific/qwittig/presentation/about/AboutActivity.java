@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.about.di.AboutComponent;
-import ch.giantific.qwittig.presentation.about.di.AboutPresenterModule;
 import ch.giantific.qwittig.presentation.about.di.DaggerAboutComponent;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
@@ -39,7 +38,6 @@ public class AboutActivity extends BaseActivity<AboutComponent> {
         component = DaggerAboutComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .aboutPresenterModule(new AboutPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }

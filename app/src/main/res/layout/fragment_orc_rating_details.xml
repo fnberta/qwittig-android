@@ -11,6 +11,11 @@
         <import type="android.view.View"/>
 
         <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingViewModel"
+            />
+
+        <variable
             name="presenter"
             type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingContract.Presenter"
             />
@@ -75,7 +80,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{presenter::onRatingNamesChanged}"
+                        android:rating="@={viewModel.ratingNames}"
                         />
 
                     <TextView
@@ -123,7 +128,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{presenter::onRatingPricesChanged}"
+                        android:rating="@={viewModel.ratingPrices}"
                         />
 
                     <TextView
@@ -171,7 +176,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{presenter::onRatingMissingChanged}"
+                        android:rating="@={viewModel.ratingMissing}"
                         />
 
                     <TextView
@@ -219,7 +224,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{presenter::onRatingSpeedChanged}"
+                        android:rating="@={viewModel.ratingSpeed}"
                         />
 
                     <TextView

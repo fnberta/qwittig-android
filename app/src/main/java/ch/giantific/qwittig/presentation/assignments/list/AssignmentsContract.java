@@ -12,13 +12,13 @@ import android.widget.AdapterView;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.assignments.list.viewmodels.AssignmentsViewModel;
+import ch.giantific.qwittig.presentation.assignments.list.models.AssignmentDeadline;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
+import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
+import ch.giantific.qwittig.presentation.common.views.SortedListView;
 
 /**
  * Defines an observable view model for the task list screen.
@@ -26,11 +26,9 @@ import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
 public interface AssignmentsContract {
 
     interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<BaseAssignmentItemViewModel> {
+            SortedListPresenter<BaseAssignmentItemViewModel> {
 
-        AssignmentsViewModel getViewModel();
-
-        void setListInteraction(@NonNull ListInteraction listInteraction);
+        AssignmentDeadline[] getAssignmentDeadlines();
 
         void onAssignmentRowClick(@NonNull AssignmentItemViewModel itemViewModel);
 
@@ -45,7 +43,7 @@ public interface AssignmentsContract {
         void onAssignmentDeleted(@NonNull String assignmentId);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView, SortedListView<BaseAssignmentItemViewModel> {
         String buildUpNextString(@NonNull List<Identity> identities);
 
         String buildDeadlineString(@StringRes int res, Object... args);

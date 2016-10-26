@@ -1,9 +1,9 @@
 package ch.giantific.qwittig.presentation.login.invitation;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
@@ -16,42 +16,26 @@ import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 public class LoginInvitationPresenter extends BasePresenterImpl<LoginInvitationContract.ViewListener>
         implements LoginInvitationContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = LoginInvitationViewModel.class.getCanonicalName();
     private final LoginInvitationViewModel viewModel;
 
-    public LoginInvitationPresenter(@Nullable Bundle savedState,
-                                    @NonNull Navigator navigator,
+    @Inject
+    public LoginInvitationPresenter(@NonNull Navigator navigator,
+                                    @NonNull LoginInvitationViewModel viewModel,
                                     @NonNull UserRepository userRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new LoginInvitationViewModel();
-        }
+        this.viewModel = viewModel;
     }
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
+    public void onAcceptClick(View v) {
+        view.showAccountsLogin(true);
+        view.showMessage(R.string.toast_invitation_accept_login);
     }
 
     @Override
-    public LoginInvitationViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void onAcceptClick(View view) {
-        this.view.showAccountsLogin(true);
-        this.view.showMessage(R.string.toast_invitation_accept_login);
-    }
-
-    @Override
-    public void onDeclineClick(View view) {
-        this.view.showAccountsLogin(false);
-        this.view.showMessage(R.string.toast_invitation_ignore);
+    public void onDeclineClick(View v) {
+        view.showAccountsLogin(false);
+        view.showMessage(R.string.toast_invitation_ignore);
     }
 }

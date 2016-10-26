@@ -9,20 +9,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.transition.Slide;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsAddGroupBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.models.Currency;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersFragment;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Displays the settings screen that allows the user to create a new group and invite users to it.
@@ -33,7 +31,8 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
         implements SettingsAddGroupContract.ViewListener {
 
     public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
-
+    @Inject
+    SettingsAddGroupViewModel viewModel;
     private FragmentSettingsAddGroupBinding binding;
 
     public SettingsAddGroupFragment() {
@@ -53,7 +52,7 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
 
         presenter.attachView(this);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
         final ArrayAdapter<Currency> spinnerCurrencyAdapter = new ArrayAdapter<>(getActivity(),
                 R.layout.spinner_item, presenter.getSupportedCurrencies());
         spinnerCurrencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

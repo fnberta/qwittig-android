@@ -9,7 +9,7 @@ import android.databinding.Observable;
 import android.support.annotation.NonNull;
 
 /**
- * Defines the view model for a store row in the add or edit purchase screen.
+ * Defines the view model for a store row in the addItemAtPosition or edit purchase screen.
  */
 public interface PurchaseAddEditStoreItemViewModel extends Observable {
 

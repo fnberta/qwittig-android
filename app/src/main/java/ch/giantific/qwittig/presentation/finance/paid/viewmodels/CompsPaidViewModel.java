@@ -27,12 +27,13 @@ public class CompsPaidViewModel extends BaseObservable implements Parcelable,
             return new CompsPaidViewModel[size];
         }
     };
+    public static final String TAG = CompsPaidViewModel.class.getCanonicalName();
     private boolean empty;
     private boolean loading;
 
-    public CompsPaidViewModel(boolean loading) {
+    public CompsPaidViewModel() {
         this.empty = true;
-        this.loading = loading;
+        this.loading = true;
     }
 
     private CompsPaidViewModel(Parcel in) {

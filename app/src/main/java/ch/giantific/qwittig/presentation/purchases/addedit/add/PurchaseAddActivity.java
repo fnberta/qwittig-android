@@ -14,13 +14,13 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseAddComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
-import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddPresenterModule;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.rxwrapper.android.RxAndroidViews;
 
@@ -36,7 +36,7 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
         component = DaggerPurchaseAddComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .purchaseAddPresenterModule(new PurchaseAddPresenterModule(savedInstanceState))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .build();
         component.inject(this);
         final String ocrDataId = getOcrDataId();
@@ -87,6 +87,7 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
         return ocrDataId;
     }
 
+    @NonNull
     @Override
     protected BasePurchaseAddEditReceiptFragment getReceiptFragment() {
         return TextUtils.isEmpty(getOcrDataId())

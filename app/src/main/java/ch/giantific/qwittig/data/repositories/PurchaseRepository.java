@@ -27,13 +27,13 @@ import ch.giantific.qwittig.data.jobs.UploadReceiptJob;
 import ch.giantific.qwittig.data.queues.OcrQueue;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.data.rest.ExchangeRatesResult;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseDatabase;
-import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseStorage;
 import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.OcrRating;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseDatabase;
+import ch.giantific.qwittig.utils.rxwrapper.firebase.RxFirebaseStorage;
 import rx.Observable;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
@@ -72,8 +72,8 @@ public class PurchaseRepository {
                                                                       @NonNull final String currentIdentityId,
                                                                       final boolean getDrafts) {
         final Query query = getDrafts
-                ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId).orderByChild(Purchase.PATH_GROUP).equalTo(groupId)
-                : databaseRef.child(Purchase.BASE_PATH_PURCHASES).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
+                            ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId).orderByChild(Purchase.PATH_GROUP).equalTo(groupId)
+                            : databaseRef.child(Purchase.BASE_PATH_PURCHASES).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeChildren(query, Purchase.class)
                 .filter(event -> {
                     if (getDrafts) {
@@ -90,8 +90,8 @@ public class PurchaseRepository {
                                              @NonNull final String currentIdentityId,
                                              final boolean getDrafts) {
         final Query query = getDrafts
-                ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId).orderByChild(Purchase.PATH_GROUP).equalTo(groupId)
-                : databaseRef.child(Purchase.BASE_PATH_PURCHASES).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
+                            ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId).orderByChild(Purchase.PATH_GROUP).equalTo(groupId)
+                            : databaseRef.child(Purchase.BASE_PATH_PURCHASES).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeValueListOnce(query, Purchase.class)
                 .filter(purchase -> getDrafts
                         || Objects.equals(purchase.getBuyer(), currentIdentityId)
@@ -129,8 +129,8 @@ public class PurchaseRepository {
     public void saveDraft(@NonNull Purchase purchase, @Nullable String purchaseId) {
         final String buyerId = purchase.getBuyer();
         final String key = TextUtils.isEmpty(purchaseId)
-                ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(buyerId).push().getKey()
-                : purchaseId;
+                           ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(buyerId).push().getKey()
+                           : purchaseId;
         databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(buyerId).child(key).setValue(purchase);
 
         final String receipt = purchase.getReceipt();
@@ -142,8 +142,8 @@ public class PurchaseRepository {
     public void savePurchase(@NonNull Purchase purchase, @Nullable String purchaseId,
                              @NonNull String userId, boolean wasDraft) {
         final String key = TextUtils.isEmpty(purchaseId)
-                ? databaseRef.child(Purchase.BASE_PATH_PURCHASES).push().getKey()
-                : purchaseId;
+                           ? databaseRef.child(Purchase.BASE_PATH_PURCHASES).push().getKey()
+                           : purchaseId;
         final String buyerId = purchase.getBuyer();
 
         final Map<String, Object> childUpdates = new HashMap<>();
@@ -236,10 +236,10 @@ public class PurchaseRepository {
                         .setValue(uri.toString()));
     }
 
-    public void saveOcrRating(int satisfaction, int ratingNames, int ratingPrices,
-                              int ratingMissing, int ratingSpeed, @NonNull String ocrDataId) {
-        final OcrRating ocrRating = new OcrRating(satisfaction, ratingNames, ratingPrices,
-                ratingMissing, ratingSpeed, ocrDataId);
+    public void saveOcrRating(float satisfaction, float ratingNames, float ratingPrices,
+                              float ratingMissing, float ratingSpeed, @NonNull String ocrDataId) {
+        final OcrRating ocrRating = new OcrRating((int) satisfaction, (int) ratingNames,
+                (int) ratingPrices, (int) ratingMissing, (int) ratingSpeed, ocrDataId);
         databaseRef.child(OcrRating.BASE_PATH).push().setValue(ocrRating);
     }
 

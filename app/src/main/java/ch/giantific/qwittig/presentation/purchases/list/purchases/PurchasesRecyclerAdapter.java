@@ -5,12 +5,14 @@
 package ch.giantific.qwittig.presentation.purchases.list.purchases;
 
 import android.support.annotation.NonNull;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowPurchasesBinding;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.items.PurchaseItemViewModel;
 
@@ -19,9 +21,9 @@ import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.ite
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchasesBinding>> {
-
-    private final PurchasesContract.Presenter presenter;
+public class PurchasesRecyclerAdapter extends BaseSortedListRecyclerAdapter<PurchaseItemViewModel,
+        PurchasesContract.Presenter,
+        BindingRow<RowPurchasesBinding>> {
 
     /**
      * Constructs a new {@link PurchasesRecyclerAdapter}.
@@ -29,9 +31,13 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
      * @param presenter the view's model
      */
     public PurchasesRecyclerAdapter(@NonNull PurchasesContract.Presenter presenter) {
-        super();
+        super(presenter);
+    }
 
-        this.presenter = presenter;
+    @Override
+    protected SortedList<PurchaseItemViewModel> createList() {
+        return new SortedList<>(PurchaseItemViewModel.class,
+                new SortedListCallback<>(this, presenter));
     }
 
     @NonNull
@@ -45,19 +51,9 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
     @Override
     public void onBindViewHolder(BindingRow<RowPurchasesBinding> holder, int position) {
         final RowPurchasesBinding binding = holder.getBinding();
-        final PurchaseItemViewModel viewModel = presenter.getItemAtPosition(position);
+        final PurchaseItemViewModel viewModel = getItemAtPosition(position);
         binding.setPresenter(presenter);
         binding.setViewModel(viewModel);
         binding.executePendingBindings();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return presenter.getItemAtPosition(position).getViewType();
-    }
-
-    @Override
-    public int getItemCount() {
-        return presenter.getItemCount();
     }
 }

@@ -44,19 +44,19 @@ import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.PurchaseResult;
 import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsContract.PurchaseDetailsResult;
-import ch.giantific.qwittig.presentation.purchases.list.di.DraftsPresenterModule;
-import ch.giantific.qwittig.presentation.purchases.list.di.HomePresenterModule;
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
-import ch.giantific.qwittig.presentation.purchases.list.di.PurchasesPresenterModule;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsContract;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsFragment;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.DraftsViewModel;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesContract;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesFragment;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.PurchasesViewModel;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.Utils;
 import timber.log.Timber;
@@ -82,9 +82,15 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     @Inject
     HomeContract.Presenter homePresenter;
     @Inject
+    HomeViewModel homeViewModel;
+    @Inject
     PurchasesContract.Presenter purchasesPresenter;
     @Inject
+    PurchasesViewModel purchasesViewModel;
+    @Inject
     DraftsContract.Presenter draftsPresenter;
+    @Inject
+    DraftsViewModel draftsViewModel;
     @Inject
     GoogleApiClientDelegate googleApiDelegate;
     private NotificationManagerCompat notificationManager;
@@ -98,7 +104,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         binding.setPresenter(homePresenter);
-        binding.setViewModel(homePresenter.getViewModel());
+        binding.setViewModel(homeViewModel);
 
         checkNavDrawerItem(R.id.nav_home);
 
@@ -111,7 +117,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         notificationManager = NotificationManagerCompat.from(this);
 
         if (userLoggedIn) {
-            if (homePresenter.getViewModel().isDraftsAvailable()) {
+            if (homeViewModel.isDraftsAvailable()) {
                 final DraftsFragment draftsFragment = savedInstanceState != null
                                                       ? (DraftsFragment) getSupportFragmentManager().getFragment(savedInstanceState, STATE_DRAFTS_FRAGMENT)
                                                       : new DraftsFragment();
@@ -127,10 +133,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        component = navComp.plus(new HomePresenterModule(savedInstanceState),
-                new GoogleApiClientDelegateModule(this, null, this),
-                new PurchasesPresenterModule(savedInstanceState),
-                new DraftsPresenterModule(savedInstanceState));
+        component = navComp.plus(new PersistentViewModelsModule(savedInstanceState),
+                new GoogleApiClientDelegateModule(this, null, this));
         component.inject(this);
         homePresenter.attachView(this);
     }
@@ -145,7 +149,10 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (userLoggedIn && homePresenter.getViewModel().isDraftsAvailable()) {
+        outState.putParcelable(HomeViewModel.TAG, homeViewModel);
+        outState.putParcelable(PurchasesViewModel.TAG, purchasesViewModel);
+        outState.putParcelable(DraftsViewModel.TAG, draftsViewModel);
+        if (userLoggedIn && homeViewModel.isDraftsAvailable()) {
             getSupportFragmentManager().putFragment(outState, STATE_DRAFTS_FRAGMENT, draftsFragment);
         }
     }
@@ -282,7 +289,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     public void setupScreenAfterLogin() {
         super.setupScreenAfterLogin();
 
-        setupTabs(homePresenter.getViewModel().isDraftsAvailable() ? new DraftsFragment() : null);
+        setupTabs(homeViewModel.isDraftsAvailable() ? new DraftsFragment() : null);
     }
 
     @Override
@@ -297,6 +304,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                 toggleToolbarScrollFlags(true);
                 draftsFragment = new DraftsFragment();
                 tabsAdapter.addFragment(draftsFragment, getString(R.string.tab_drafts));
+                draftsPresenter.onViewVisible();
             }
         } else if (draftsFragment != null) {
             toggleToolbarScrollFlags(false);

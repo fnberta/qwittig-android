@@ -19,7 +19,7 @@ import java.util.Objects;
 import ch.giantific.qwittig.BR;
 
 /**
- * Provides a purchase list item in the add or edit purchase screen.
+ * Provides a purchase list item in the addItemAtPosition or edit purchase screen.
  */
 public class PurchaseAddEditArticleItemViewModel extends BaseObservable
         implements BasePurchaseAddEditItemViewModel {

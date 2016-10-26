@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
@@ -32,7 +32,7 @@ import rx.subscriptions.CompositeSubscription;
  * Subclass of {@link AppCompatActivity}.
  */
 public abstract class BaseActivity<T> extends AppCompatActivity
-        implements BaseFragment.ActivityListener<T>, BaseWorkerListener, BaseViewListener {
+        implements BaseFragment.ActivityListener<T>, BaseWorkerListener, BaseView {
 
     protected final CompositeSubscription subscriptions = new CompositeSubscription();
     protected Toolbar toolbar;
@@ -60,26 +60,11 @@ public abstract class BaseActivity<T> extends AppCompatActivity
 
     protected abstract List<BasePresenter> getPresenters();
 
-    protected void addPresenter(@NonNull BasePresenter presenter) {
-        presenters.add(presenter);
-    }
-
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
 
         setupToolbar();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        for (BasePresenter presenter : presenters) {
-            if (presenter != null) {
-                presenter.saveState(outState);
-            }
-        }
     }
 
     @Override

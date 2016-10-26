@@ -4,14 +4,14 @@
 
 package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
@@ -23,6 +23,7 @@ import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleItemViewModel;
 import rx.SingleSubscriber;
 import timber.log.Timber;
@@ -36,32 +37,17 @@ import timber.log.Timber;
 public class PurchaseAddOcrPresenter extends PurchaseAddPresenter
         implements PurchaseAddEditContract.AddOcrPresenter {
 
-    private static final String STATE_OCR_VALUES_SET = "STATE_OCR_VALUES_SET";
-
     private String ocrDataId;
-    private boolean ocrValuesSet;
     private String purchaseId;
 
-    public PurchaseAddOcrPresenter(@Nullable Bundle savedState,
-                                   @NonNull Navigator navigator,
+    @Inject
+    public PurchaseAddOcrPresenter(@NonNull Navigator navigator,
+                                   @NonNull PurchaseAddEditViewModel viewModel,
                                    @NonNull UserRepository userRepo,
                                    @NonNull GroupRepository groupRepo,
                                    @NonNull PurchaseRepository purchaseRepo,
                                    @NonNull RemoteConfigHelper configHelper) {
-        super(savedState, navigator, userRepo, groupRepo, purchaseRepo, configHelper);
-
-        if (savedState != null) {
-            ocrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);
-        } else {
-            ocrValuesSet = false;
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putBoolean(STATE_OCR_VALUES_SET, ocrValuesSet);
+        super(navigator, viewModel, userRepo, groupRepo, purchaseRepo, configHelper);
     }
 
     @Override
@@ -76,9 +62,9 @@ public class PurchaseAddOcrPresenter extends PurchaseAddPresenter
                 .subscribe(new SingleSubscriber<OcrData>() {
                     @Override
                     public void onSuccess(OcrData ocrData) {
-                        if (!ocrValuesSet) {
+                        if (!viewModel.isDataSet()) {
                             setOcrData(ocrData);
-                            ocrValuesSet = true;
+                            viewModel.setDataSet(true);
                         }
                     }
 
@@ -106,15 +92,15 @@ public class PurchaseAddOcrPresenter extends PurchaseAddPresenter
         final List<Map<String, Object>> articles = (List<Map<String, Object>>) data.get("items");
         if (articles != null && !articles.isEmpty()) {
             for (Map<String, Object> item : articles) {
-                final double price = (double) item.get("price");
+                final double price = Double.valueOf(item.get("price").toString());
                 final String priceFormatted = moneyFormatter.format(price);
-                final String name = (String) item.get("name");
+                final String name = String.valueOf(item.get("name"));
                 final PurchaseAddEditArticleItemViewModel articleItem =
                         new PurchaseAddEditArticleItemViewModel(name, priceFormatted,
                                 price, getArticleIdentities());
-                final int pos = getItemCount() - 2;
-                items.add(pos, articleItem);
-                listInteraction.notifyItemInserted(pos);
+                final int pos = viewModel.getItemCount() - 2;
+                viewModel.addItemAtPosition(pos, articleItem);
+                view.notifyItemAdded(pos);
             }
         }
     }

@@ -11,17 +11,15 @@ import android.widget.AdapterView;
 import java.util.List;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.models.Currency;
 
 /**
- * Defines an observable view model for the add new group settings screen.
+ * Defines an observable view model for the addItemAtPosition new group settings screen.
  */
 public interface SettingsAddGroupContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
-
-        SettingsAddGroupViewModel getViewModel();
 
         List<Currency> getSupportedCurrencies();
 
@@ -30,7 +28,7 @@ public interface SettingsAddGroupContract {
         void onCreateClick(View view);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void setScreenResult(@NonNull String name);
 

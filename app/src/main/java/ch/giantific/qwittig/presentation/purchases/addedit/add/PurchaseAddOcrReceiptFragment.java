@@ -16,7 +16,8 @@ import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddCompone
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class PurchaseAddOcrReceiptFragment extends BasePurchaseAddEditReceiptFragment<PurchaseAddComponent, PurchaseAddEditContract.AddOcrPresenter> {
+public class PurchaseAddOcrReceiptFragment extends BasePurchaseAddEditReceiptFragment<PurchaseAddComponent,
+        PurchaseAddEditContract.AddOcrPresenter> {
 
     public PurchaseAddOcrReceiptFragment() {
         // required empty constructor

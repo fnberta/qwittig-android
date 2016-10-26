@@ -27,23 +27,27 @@ public class CompsUnpaidViewModel extends BaseObservable implements Parcelable,
             return new CompsUnpaidViewModel[size];
         }
     };
+    public static final String TAG = CompsUnpaidViewModel.class.getCanonicalName();
     private boolean empty;
     private boolean loading;
+    private String confirmingId;
 
-    public CompsUnpaidViewModel(boolean loading) {
+    public CompsUnpaidViewModel() {
         this.empty = true;
-        this.loading = loading;
+        this.loading = true;
     }
 
     private CompsUnpaidViewModel(Parcel in) {
         empty = in.readByte() != 0;
         loading = in.readByte() != 0;
+        confirmingId = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte((byte) (empty ? 1 : 0));
         dest.writeByte((byte) (loading ? 1 : 0));
+        dest.writeString(confirmingId);
     }
 
     @Override
@@ -75,4 +79,11 @@ public class CompsUnpaidViewModel extends BaseObservable implements Parcelable,
         notifyPropertyChanged(BR.loading);
     }
 
+    public String getConfirmingId() {
+        return confirmingId;
+    }
+
+    public void setConfirmingId(String confirmingId) {
+        this.confirmingId = confirmingId;
+    }
 }

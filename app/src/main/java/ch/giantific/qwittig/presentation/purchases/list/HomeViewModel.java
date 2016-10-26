@@ -30,6 +30,7 @@ public class HomeViewModel extends BaseObservable
             return new HomeViewModel[size];
         }
     };
+    public static final String TAG = HomeViewModel.class.getCanonicalName();
     private boolean draftsAvailable;
     private String ocrPurchaseId;
 

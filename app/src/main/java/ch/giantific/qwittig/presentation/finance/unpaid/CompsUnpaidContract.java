@@ -8,11 +8,10 @@ import android.support.annotation.NonNull;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
-import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.CompsUnpaidViewModel;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
+import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
+import ch.giantific.qwittig.presentation.common.views.SortedListView;
 import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel;
 
 /**
@@ -21,22 +20,20 @@ import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnp
 public interface CompsUnpaidContract {
 
     interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<CompUnpaidItemViewModel>,
+            SortedListPresenter<CompUnpaidItemViewModel>,
             CompConfirmAmountDialogFragment.DialogInteractionListener {
-
-        CompsUnpaidViewModel getViewModel();
-
-        void setListInteraction(@NonNull ListInteraction listInteraction);
 
         void onConfirmButtonClick(@NonNull CompUnpaidItemViewModel itemViewModel);
 
         void onRemindButtonClick(@NonNull CompUnpaidItemViewModel itemViewModel);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView, SortedListView<CompUnpaidItemViewModel> {
 
-        void showCompensationAmountConfirmDialog(@NonNull BigFraction amount,
-                                                 @NonNull String debtorNickname,
-                                                 @NonNull String currency);
+        void showConfirmAmountDialog(@NonNull BigFraction amount,
+                                     @NonNull String debtorNickname,
+                                     @NonNull String currency);
+
+        CompUnpaidItemViewModel getItemForId(@NonNull String id);
     }
 }

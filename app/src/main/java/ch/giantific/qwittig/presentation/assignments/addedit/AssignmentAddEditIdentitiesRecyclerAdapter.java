@@ -11,9 +11,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import ch.giantific.qwittig.databinding.RowAssignmentAddEditIdentityBinding;
 import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 
 
@@ -23,17 +25,26 @@ import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
  * <p>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class AssignmentAddEditIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<AssignmentAddEditIdentitiesRecyclerAdapter.AssignmentIdentityRow> {
+public class AssignmentAddEditIdentitiesRecyclerAdapter extends
+        RecyclerView.Adapter<AssignmentAddEditIdentitiesRecyclerAdapter.AssignmentIdentityRow> {
 
+    protected final ArrayList<AssignmentAddEditIdentityItemViewModel> items;
     private final AssignmentAddEditContract.Presenter presenter;
 
     /**
      * Constructs a new {@link AssignmentAddEditIdentitiesRecyclerAdapter}.
      *
      * @param presenter the view model for the view
+     * @param items
      */
-    public AssignmentAddEditIdentitiesRecyclerAdapter(@NonNull AssignmentAddEditContract.Presenter presenter) {
+    public AssignmentAddEditIdentitiesRecyclerAdapter(@NonNull AssignmentAddEditContract.Presenter presenter,
+                                                      @NonNull ArrayList<AssignmentAddEditIdentityItemViewModel> items) {
         this.presenter = presenter;
+        this.items = items;
+    }
+
+    public ArrayList<AssignmentAddEditIdentityItemViewModel> getItems() {
+        return items;
     }
 
     @NonNull
@@ -48,7 +59,7 @@ public class AssignmentAddEditIdentitiesRecyclerAdapter extends BaseRecyclerAdap
     @Override
     public void onBindViewHolder(AssignmentIdentityRow holder, int position) {
         final RowAssignmentAddEditIdentityBinding binding = holder.getBinding();
-        final AssignmentAddEditIdentityItemViewModel viewModel = presenter.getItemAtPosition(position);
+        final AssignmentAddEditIdentityItemViewModel viewModel = items.get(position);
 
         binding.setPresenter(presenter);
         binding.setViewModel(viewModel);
@@ -57,7 +68,26 @@ public class AssignmentAddEditIdentitiesRecyclerAdapter extends BaseRecyclerAdap
 
     @Override
     public int getItemCount() {
-        return presenter.getItemCount();
+        return items.size();
+    }
+
+    public void addItem(AssignmentAddEditIdentityItemViewModel item) {
+        items.add(item);
+        notifyItemInserted(items.indexOf(item));
+    }
+
+    public void swapItem(int fromPosition, int toPosition) {
+        Collections.swap(items, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    public void removeItemAtPosition(int position) {
+        items.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public int getPositionForItem(@NonNull AssignmentAddEditIdentityItemViewModel item) {
+        return items.indexOf(item);
     }
 
     /**

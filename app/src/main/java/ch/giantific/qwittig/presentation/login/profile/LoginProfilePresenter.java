@@ -1,13 +1,13 @@
 package ch.giantific.qwittig.presentation.login.profile;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseUser;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
@@ -25,32 +25,16 @@ import timber.log.Timber;
 public class LoginProfilePresenter extends BasePresenterImpl<LoginProfileContract.ViewListener>
         implements LoginProfileContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = LoginProfileViewModel.class.getCanonicalName();
     private final LoginProfileViewModel viewModel;
     private boolean withInvitation;
 
-    public LoginProfilePresenter(@Nullable Bundle savedState,
-                                 @NonNull Navigator navigator,
+    @Inject
+    public LoginProfilePresenter(@NonNull Navigator navigator,
+                                 LoginProfileViewModel viewModel,
                                  @NonNull UserRepository userRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new LoginProfileViewModel();
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public LoginProfileViewModel getViewModel() {
-        return viewModel;
+        this.viewModel = viewModel;
     }
 
     @Override

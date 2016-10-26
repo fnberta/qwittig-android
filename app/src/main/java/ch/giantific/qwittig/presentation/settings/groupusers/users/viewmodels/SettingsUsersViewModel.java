@@ -34,10 +34,12 @@ public class SettingsUsersViewModel extends BaseObservable
             return new SettingsUsersViewModel[size];
         }
     };
+    public static final String TAG = SettingsUsersViewModel.class.getCanonicalName();
     public final ObservableField<String> nickname = new ObservableField<>();
     private boolean empty;
     private String groupName;
     private boolean validate;
+    private String avatarIdentityId;
 
     public SettingsUsersViewModel() {
         this.empty = true;
@@ -50,6 +52,7 @@ public class SettingsUsersViewModel extends BaseObservable
         groupName = in.readString();
         nickname.set(in.readString());
         validate = in.readByte() != 0;
+        avatarIdentityId = in.readString();
 
         addChangedListeners();
     }
@@ -60,6 +63,7 @@ public class SettingsUsersViewModel extends BaseObservable
         dest.writeString(groupName);
         dest.writeString(nickname.get());
         dest.writeByte((byte) (validate ? 1 : 0));
+        dest.writeString(avatarIdentityId);
     }
 
     @Override
@@ -120,4 +124,11 @@ public class SettingsUsersViewModel extends BaseObservable
         return isNicknameComplete();
     }
 
+    public String getAvatarIdentityId() {
+        return avatarIdentityId;
+    }
+
+    public void setAvatarIdentityId(String avatarIdentityId) {
+        this.avatarIdentityId = avatarIdentityId;
+    }
 }

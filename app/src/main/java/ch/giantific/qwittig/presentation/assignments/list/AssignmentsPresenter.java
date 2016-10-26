@@ -4,10 +4,7 @@
 
 package ch.giantific.qwittig.presentation.assignments.list;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.SortedList;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -16,6 +13,8 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.AssignmentRepository;
@@ -26,17 +25,17 @@ import ch.giantific.qwittig.domain.models.AssignmentHistory;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.assignments.list.models.AssignmentDeadline;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.AssignmentsViewModel;
+import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentHeaderViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel.ViewType;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
 import ch.giantific.qwittig.presentation.common.subscribers.ChildEventSubscriber;
 import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link AssignmentsContract} interface.
@@ -44,62 +43,66 @@ import rx.Observable;
 public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.ViewListener>
         implements AssignmentsContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = AssignmentsViewModel.class.getCanonicalName();
+    private static final AssignmentDeadline[] DEADLINES = new AssignmentDeadline[]{
+            AssignmentDeadline.newAllInstance(R.string.deadline_all),
+            AssignmentDeadline.newTodayInstance(R.string.deadline_today),
+            AssignmentDeadline.newWeekInstance(R.string.deadline_week),
+            AssignmentDeadline.newMonthInstance(R.string.deadline_month),
+            AssignmentDeadline.newYearInstance(R.string.deadline_year)
+    };
     private final AssignmentsViewModel viewModel;
-    private final SortedList<BaseAssignmentItemViewModel> items;
-    private final SortedListCallback<BaseAssignmentItemViewModel> listCallback;
-    private final ChildEventSubscriber<BaseAssignmentItemViewModel, AssignmentsViewModel> subscriber;
     private final AssignmentRepository assignmentRepo;
     private String currentGroupId;
     private String currentIdentityId;
 
-    public AssignmentsPresenter(@Nullable Bundle savedState,
-                                @NonNull Navigator navigator,
+    @Inject
+    public AssignmentsPresenter(@NonNull Navigator navigator,
+                                @NonNull AssignmentsViewModel viewModel,
                                 @NonNull UserRepository userRepo,
-                                @NonNull AssignmentRepository assignmentRepo,
-                                @NonNull AssignmentDeadline deadline) {
-        super(savedState, navigator, userRepo);
+                                @NonNull AssignmentRepository assignmentRepo) {
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.assignmentRepo = assignmentRepo;
 
-        listCallback = new SortedListCallback<BaseAssignmentItemViewModel>() {
-            @Override
-            public int compare(BaseAssignmentItemViewModel o1, BaseAssignmentItemViewModel o2) {
-                if (o1.getViewType() == ViewType.ASSIGNMENT && o2.getViewType() == ViewType.ASSIGNMENT) {
-                    return ((AssignmentItemViewModel) o1).compareTo((AssignmentItemViewModel) o2);
-                }
+        if (this.viewModel.getDeadline() == null) {
+            this.viewModel.setDeadline(DEADLINES[0]);
+        }
+    }
 
-                return 0;
-            }
-        };
-        items = new SortedList<>(BaseAssignmentItemViewModel.class, listCallback);
+    @Override
+    public int compareItemViewModels(@NonNull BaseAssignmentItemViewModel item1,
+                                     @NonNull BaseAssignmentItemViewModel item2) {
+        final int item1Type = item1.getViewType();
+        final int item2Type = item2.getViewType();
 
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new AssignmentsViewModel(true, deadline);
+        if (item1Type == ViewType.HEADER_MY && item2Type == ViewType.HEADER_GROUP) {
+            return -1;
         }
 
-        //noinspection ConstantConditions
-        subscriber = new ChildEventSubscriber<>(items, viewModel, e ->
-                view.showMessage(R.string.toast_error_assignments_load));
+        if (item1Type == ViewType.HEADER_MY && item2Type == ViewType.ASSIGNMENT) {
+            return -1;
+        }
+
+        if (item1Type == ViewType.HEADER_GROUP && item2Type == ViewType.ASSIGNMENT) {
+            if (((AssignmentItemViewModel) item2).isResponsible()) {
+                return 1;
+            }
+
+            return -1;
+        }
+
+        if (item1.getViewType() == ViewType.ASSIGNMENT
+                && item2.getViewType() == ViewType.ASSIGNMENT) {
+            return ((AssignmentItemViewModel) item1).compareTo((AssignmentItemViewModel) item2);
+        }
+
+        return 0;
     }
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public AssignmentsViewModel getViewModel() {
-        return viewModel;
-    }
-
-    @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        listCallback.setListInteraction(listInteraction);
+    public AssignmentDeadline[] getAssignmentDeadlines() {
+        return DEADLINES;
     }
 
     @Override
@@ -114,7 +117,7 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
                         currentIdentityId = identity.getId();
                         final String groupId = identity.getGroup();
                         if (!Objects.equals(currentGroupId, groupId)) {
-                            items.clear();
+                            view.clearItems();
                         }
                         currentGroupId = groupId;
                         addDataListener();
@@ -128,17 +131,18 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
                 .flatMap(assignment -> getItemViewModel(assignment, EventType.NONE, currentIdentityId))
                 .toList()
                 .doOnNext(itemViewModels -> {
-//                    items.add(new AssignmentHeaderItem(R.string.assignment_header_my, Type.HEADER_MY));
-//                    items.add(new AssignmentHeaderItem(R.string.assignment_header_group, Type.HEADER_GROUP));
-                    items.addAll(itemViewModels);
-                    viewModel.setEmpty(getItemCount() == 0);
+                    view.addItem(new AssignmentHeaderViewModel(R.string.assignment_header_my, ViewType.HEADER_MY));
+                    view.addItem(new AssignmentHeaderViewModel(R.string.assignment_header_group, ViewType.HEADER_GROUP));
+                    view.addItems(itemViewModels);
+                    viewModel.setEmpty(view.isItemsEmpty());
                     viewModel.setLoading(false);
                 });
         subscriptions.add(assignmentRepo.observeAssignmentChildren(currentGroupId, currentIdentityId, viewModel.getDeadline().getDate())
                 .skipUntil(initialData)
                 .takeWhile(childEvent -> Objects.equals(childEvent.getValue().getGroup(), currentGroupId))
                 .flatMap(event -> getItemViewModel(event.getValue(), event.getEventType(), currentIdentityId))
-                .subscribe(subscriber)
+                .subscribe(new ChildEventSubscriber<>(view, viewModel, e ->
+                        view.showMessage(R.string.toast_error_assignments_load)))
         );
     }
 
@@ -175,16 +179,6 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
     }
 
     @Override
-    public BaseAssignmentItemViewModel getItemAtPosition(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
-    }
-
-    @Override
     public void onAddAssignmentClick(View view) {
         navigator.startAssignmentAdd();
     }
@@ -192,8 +186,8 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
     @Override
     public void onAssignmentDeleted(@NonNull String assignmentId) {
         view.showMessage(R.string.toast_assignment_deleted);
-        items.removeItemAt(subscriber.getPositionForId(assignmentId));
-        viewModel.setEmpty(getItemCount() == 0);
+        view.removeItemAtPosition(view.getItemPositionForId(assignmentId));
+        viewModel.setEmpty(view.isItemsEmpty());
     }
 
     @Override
@@ -206,7 +200,7 @@ public class AssignmentsPresenter extends BasePresenterImpl<AssignmentsContract.
     }
 
     private void reloadData() {
-        items.clear();
+        view.clearItems();
         viewModel.setEmpty(true);
         viewModel.setLoading(true);
         addDataListener();

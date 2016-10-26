@@ -33,6 +33,7 @@ public class StatsViewModel extends BaseObservable
             return new StatsViewModel[size];
         }
     };
+    public static final String TAG = StatsViewModel.class.getCanonicalName();
     private boolean loading;
     private boolean empty;
     private PieData storesData;
@@ -43,9 +44,9 @@ public class StatsViewModel extends BaseObservable
     private ChartCurrencyFormatter chartCurrencyFormatter;
     private AxisValueFormatter barXAxisFormatter;
 
-    public StatsViewModel(boolean loading) {
+    public StatsViewModel() {
         this.empty = true;
-        this.loading = loading;
+        this.loading = true;
     }
 
     private StatsViewModel(Parcel in) {

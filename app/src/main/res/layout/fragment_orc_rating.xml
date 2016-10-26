@@ -11,6 +11,11 @@
         <import type="android.view.View"/>
 
         <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingViewModel"
+            />
+
+        <variable
             name="presenter"
             type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingContract.Presenter"
             />
@@ -58,7 +63,7 @@
                     android:layout_marginEnd="@dimen/key_line_1"
                     android:layout_marginStart="@dimen/key_line_1"
                     android:numStars="4"
-                    android:onRatingChanged="@{presenter::onSatisfactionChanged}"
+                    android:rating="@={viewModel.satisfaction}"
                     android:stepSize="1"
                     />
             </LinearLayout>

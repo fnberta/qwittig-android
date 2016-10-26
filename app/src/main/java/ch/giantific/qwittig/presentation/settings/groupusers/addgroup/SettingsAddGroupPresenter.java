@@ -1,8 +1,6 @@
 package ch.giantific.qwittig.presentation.settings.groupusers.addgroup;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -10,6 +8,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
@@ -29,41 +29,24 @@ import rx.Observable;
 public class SettingsAddGroupPresenter extends BasePresenterImpl<SettingsAddGroupContract.ViewListener>
         implements SettingsAddGroupContract.Presenter {
 
-    private static final String STATE_VIEW_MODEL = SettingsAddGroupViewModel.class.getCanonicalName();
     private final SettingsAddGroupViewModel viewModel;
     private final RemoteConfigHelper configHelper;
     private final GroupRepository groupRepo;
     private final List<String> groupNames;
     private Identity currentIdentity;
 
-    public SettingsAddGroupPresenter(@Nullable Bundle savedState,
-                                     @NonNull Navigator navigator,
+    @Inject
+    public SettingsAddGroupPresenter(@NonNull Navigator navigator,
+                                     @NonNull SettingsAddGroupViewModel viewModel,
                                      @NonNull UserRepository userRepo,
                                      @NonNull GroupRepository groupRepo,
                                      @NonNull RemoteConfigHelper configHelper) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.groupRepo = groupRepo;
         this.configHelper = configHelper;
         groupNames = new ArrayList<>();
-
-        if (savedState != null) {
-            viewModel = savedState.getParcelable(STATE_VIEW_MODEL);
-        } else {
-            viewModel = new SettingsAddGroupViewModel();
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelable(STATE_VIEW_MODEL, viewModel);
-    }
-
-    @Override
-    public SettingsAddGroupViewModel getViewModel() {
-        return viewModel;
     }
 
     @Override
@@ -97,7 +80,7 @@ public class SettingsAddGroupPresenter extends BasePresenterImpl<SettingsAddGrou
     }
 
     @Override
-    public void onCreateClick(View view) {
+    public void onCreateClick(View v) {
         if (!viewModel.isInputValid()) {
             return;
         }
@@ -112,10 +95,10 @@ public class SettingsAddGroupPresenter extends BasePresenterImpl<SettingsAddGrou
         if (newGroup) {
             groupRepo.createGroup(currentIdentity.getUser(), name, viewModel.getCurrency(),
                     currentIdentity.getNickname(), currentIdentity.getAvatar());
-            this.view.setScreenResult(name);
-            this.view.showAddUsers();
+            view.setScreenResult(name);
+            view.showAddUsers();
         } else {
-            this.view.showMessage(R.string.toast_group_already_in_list);
+            view.showMessage(R.string.toast_group_already_in_list);
         }
     }
 }

@@ -8,6 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -21,10 +22,10 @@ import ch.giantific.qwittig.utils.DateUtils;
  */
 public class AssignmentDeadline implements Parcelable {
 
-    public static final Parcelable.Creator<AssignmentDeadline> CREATOR = new Parcelable.Creator<AssignmentDeadline>() {
+    public static final Creator<AssignmentDeadline> CREATOR = new Creator<AssignmentDeadline>() {
         @Override
-        public AssignmentDeadline createFromParcel(Parcel source) {
-            return new AssignmentDeadline(source);
+        public AssignmentDeadline createFromParcel(Parcel in) {
+            return new AssignmentDeadline(in);
         }
 
         @Override
@@ -32,35 +33,35 @@ public class AssignmentDeadline implements Parcelable {
             return new AssignmentDeadline[size];
         }
     };
-    private final String title;
+    @StringRes
+    private final int title;
     private final int type;
     private final Date date;
 
-    private AssignmentDeadline(@NonNull String title, @DeadlineType int type, @NonNull Date date) {
+    private AssignmentDeadline(@StringRes int title, @DeadlineType int type, @NonNull Date date) {
         this.title = title;
         this.type = type;
         this.date = date;
     }
 
     private AssignmentDeadline(Parcel in) {
-        title = in.readString();
+        title = in.readInt();
         type = in.readInt();
-        long tmpMDate = in.readLong();
-        date = tmpMDate == -1 ? null : new Date(tmpMDate);
+        date = new Date(in.readLong());
     }
 
-    public static AssignmentDeadline newAllInstance(@NonNull String title) {
+    public static AssignmentDeadline newAllInstance(@StringRes int title) {
         return new AssignmentDeadline(title, DeadlineType.ALL, new Date(Long.MAX_VALUE));
     }
 
-    public static AssignmentDeadline newTodayInstance(@NonNull String title) {
+    public static AssignmentDeadline newTodayInstance(@StringRes int title) {
         final Calendar cal = DateUtils.getCalendarInstanceUTC();
         cal.add(Calendar.DAY_OF_YEAR, 1);
         DateUtils.resetToMidnight(cal);
         return new AssignmentDeadline(title, DeadlineType.TODAY, cal.getTime());
     }
 
-    public static AssignmentDeadline newWeekInstance(@NonNull String title) {
+    public static AssignmentDeadline newWeekInstance(@StringRes int title) {
         final Calendar cal = DateUtils.getCalendarInstanceUTC();
         int firstDayOfWeek = cal.getFirstDayOfWeek();
         cal.set(Calendar.DAY_OF_WEEK, firstDayOfWeek);
@@ -69,7 +70,7 @@ public class AssignmentDeadline implements Parcelable {
         return new AssignmentDeadline(title, DeadlineType.WEEK, cal.getTime());
     }
 
-    public static AssignmentDeadline newMonthInstance(@NonNull String title) {
+    public static AssignmentDeadline newMonthInstance(@StringRes int title) {
         final Calendar cal = DateUtils.getCalendarInstanceUTC();
         cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.add(Calendar.MONTH, 1);
@@ -77,12 +78,29 @@ public class AssignmentDeadline implements Parcelable {
         return new AssignmentDeadline(title, DeadlineType.MONTH, cal.getTime());
     }
 
-    public static AssignmentDeadline newYearInstance(@NonNull String title) {
+    public static AssignmentDeadline newYearInstance(@StringRes int title) {
         final Calendar cal = DateUtils.getCalendarInstanceUTC();
         cal.set(Calendar.DAY_OF_YEAR, 1);
         cal.add(Calendar.YEAR, 1);
         DateUtils.resetToMidnight(cal);
         return new AssignmentDeadline(title, DeadlineType.YEAR, cal.getTime());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(title);
+        dest.writeInt(type);
+        dest.writeLong(date.getTime());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @StringRes
+    public int getTitle() {
+        return title;
     }
 
     @DeadlineType
@@ -92,41 +110,6 @@ public class AssignmentDeadline implements Parcelable {
 
     public Date getDate() {
         return date;
-    }
-
-    @Override
-    public String toString() {
-        return title;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        final AssignmentDeadline that = (AssignmentDeadline) o;
-        return type == that.getType();
-    }
-
-    @Override
-    public int hashCode() {
-        return type;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(title);
-        dest.writeInt(type);
-        dest.writeLong(date != null ? date.getTime() : -1);
     }
 
     @IntDef({DeadlineType.ALL, DeadlineType.TODAY, DeadlineType.WEEK, DeadlineType.MONTH,

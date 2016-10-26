@@ -1,10 +1,9 @@
 package ch.giantific.qwittig.presentation.purchases.ocrrating;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
-import android.widget.RatingBar;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
@@ -19,89 +18,38 @@ import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContra
 public class OcrRatingPresenter extends BasePresenterImpl<OcrRatingContract.ViewListener>
         implements OcrRatingContract.Presenter {
 
-    private static final String STATE_SATISFACTION = "STATE_SATISFACTION";
-    private static final String STATE_RATING_NAMES = "STATE_RATING_NAMES";
-    private static final String STATE_RATING_PRICES = "STATE_RATING_PRICES";
-    private static final String STATE_RATING_MISSING = "STATE_RATING_MISSING";
-    private static final String STATE_RATING_SPEED = "STATE_RATING_SPEED";
-
+    private final OcrRatingViewModel viewModel;
     private final PurchaseRepository purchaseRepo;
     private final String ocrDataId;
-    private int satisfaction;
-    private int ratingNames;
-    private int ratingPrices;
-    private int ratingMissing;
-    private int ratingSpeed;
 
-    public OcrRatingPresenter(@Nullable Bundle savedState,
-                              @NonNull Navigator navigator,
+    @Inject
+    public OcrRatingPresenter(@NonNull Navigator navigator,
+                              @NonNull OcrRatingViewModel viewModel,
                               @NonNull UserRepository userRepo,
                               @NonNull PurchaseRepository purchaseRepo,
                               @NonNull String ocrDataId) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.purchaseRepo = purchaseRepo;
         this.ocrDataId = ocrDataId;
-
-        if (savedState != null) {
-            satisfaction = savedState.getInt(STATE_SATISFACTION);
-            ratingNames = savedState.getInt(STATE_RATING_NAMES);
-            ratingPrices = savedState.getInt(STATE_RATING_PRICES);
-            ratingMissing = savedState.getInt(STATE_RATING_MISSING);
-            ratingSpeed = savedState.getInt(STATE_RATING_SPEED);
-        }
     }
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putInt(STATE_SATISFACTION, satisfaction);
-        outState.putInt(STATE_RATING_NAMES, ratingNames);
-        outState.putInt(STATE_RATING_PRICES, ratingPrices);
-        outState.putInt(STATE_RATING_MISSING, ratingMissing);
-        outState.putInt(STATE_RATING_SPEED, ratingSpeed);
-    }
-
-    @Override
-    public void onDoneClick(View view) {
-        if (satisfaction == 0) {
-            this.view.showMessage(R.string.toast_ocr_rating_satisfaction);
+    public void onDoneClick(View v) {
+        if (viewModel.getSatisfaction() == 0f) {
+            view.showMessage(R.string.toast_ocr_rating_satisfaction);
             return;
         }
 
-        this.view.showRatingDetails();
+        view.showRatingDetails();
     }
 
     @Override
     public void onDetailsDoneClick(View view) {
-        purchaseRepo.saveOcrRating(satisfaction, ratingNames, ratingPrices, ratingMissing,
-                ratingSpeed, ocrDataId);
+        purchaseRepo.saveOcrRating(viewModel.getSatisfaction(), viewModel.getRatingNames(),
+                viewModel.getRatingPrices(), viewModel.getRatingMissing(),
+                viewModel.getRatingSpeed(), ocrDataId);
         navigator.finish(PurchaseResult.PURCHASE_SAVED);
-    }
-
-    @Override
-    public void onSatisfactionChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-        satisfaction = (int) rating;
-    }
-
-    @Override
-    public void onRatingNamesChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-        ratingNames = (int) rating;
-    }
-
-    @Override
-    public void onRatingPricesChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-        ratingPrices = (int) rating;
-    }
-
-    @Override
-    public void onRatingMissingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-        ratingMissing = (int) rating;
-    }
-
-    @Override
-    public void onRatingSpeedChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-        ratingSpeed = (int) rating;
     }
 }

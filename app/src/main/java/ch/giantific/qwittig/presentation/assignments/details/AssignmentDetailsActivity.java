@@ -25,7 +25,9 @@ import ch.giantific.qwittig.databinding.ActivityAssignmentDetailsBinding;
 import ch.giantific.qwittig.presentation.assignments.addedit.AssignmentAddEditContract.AssignmentResult;
 import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsPresenterModule;
 import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.assignments.details.viewmodels.AssignmentDetailsViewModel;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
@@ -43,6 +45,8 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
 
     @Inject
     AssignmentDetailsContract.Presenter presenter;
+    @Inject
+    AssignmentDetailsViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,7 +54,7 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
         final ActivityAssignmentDetailsBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_assignment_details);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
 
         // disable default actionBar title
         ActionBar actionBar = getSupportActionBar();
@@ -70,8 +74,8 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
 
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
-        component = navComp.plus(new AssignmentDetailsPresenterModule(savedInstanceState,
-                getAssignmentId()));
+        component = navComp.plus(new AssignmentDetailsPresenterModule(getAssignmentId()),
+                new PersistentViewModelsModule(savedInstanceState));
         component.inject(this);
     }
 
@@ -90,6 +94,13 @@ public class AssignmentDetailsActivity extends BaseNavDrawerActivity<AssignmentD
     @Override
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(AssignmentDetailsViewModel.TAG, viewModel);
     }
 
     private void setUpNavigation() {

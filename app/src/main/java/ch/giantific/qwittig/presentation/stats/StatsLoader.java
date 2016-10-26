@@ -45,7 +45,7 @@ public class StatsLoader extends BaseRxLoader<StatsResult> {
         this.endDAte = endDAte;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Observable<StatsResult> getObservable() {
         return userRepo.getAuthToken()

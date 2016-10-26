@@ -5,13 +5,15 @@
 package ch.giantific.qwittig.presentation.finance.unpaid;
 
 import android.support.annotation.NonNull;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowCompUnpaidCreditBinding;
 import ch.giantific.qwittig.databinding.RowCompUnpaidDebtBinding;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel;
 import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel.ViewType;
@@ -22,9 +24,9 @@ import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnp
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
-
-    private final CompsUnpaidContract.Presenter presenter;
+public class CompsUnpaidRecyclerAdapter extends BaseSortedListRecyclerAdapter<CompUnpaidItemViewModel,
+        CompsUnpaidContract.Presenter,
+        RecyclerView.ViewHolder> {
 
     /**
      * Constructs a new {@link CompsUnpaidRecyclerAdapter}.
@@ -32,9 +34,13 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
      * @param presenter the view's presenter
      */
     public CompsUnpaidRecyclerAdapter(@NonNull CompsUnpaidContract.Presenter presenter) {
-        super();
+        super(presenter);
+    }
 
-        this.presenter = presenter;
+    @Override
+    protected SortedList<CompUnpaidItemViewModel> createList() {
+        return new SortedList<>(CompUnpaidItemViewModel.class,
+                new SortedListCallback<>(this, presenter));
     }
 
     @NonNull
@@ -60,7 +66,7 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        final CompUnpaidItemViewModel viewModel = presenter.getItemAtPosition(position);
+        final CompUnpaidItemViewModel viewModel = getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case ViewType.CREDIT: {
@@ -82,15 +88,5 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
                 break;
             }
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return presenter.getItemAtPosition(position).getViewType();
-    }
-
-    @Override
-    public int getItemCount() {
-        return presenter.getItemCount();
     }
 }

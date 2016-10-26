@@ -4,18 +4,17 @@
 
 package ch.giantific.qwittig.presentation.settings.general;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.firebase.auth.FirebaseUser;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
@@ -37,42 +36,20 @@ import timber.log.Timber;
 public class SettingsPresenter extends BasePresenterImpl<SettingsContract.ViewListener>
         implements SettingsContract.Presenter {
 
-    private static final String STATE_IDENTITIES_IDS = "STATE_IDENTITIES_IDS";
-    private static final String STATE_GROUP_NAMES = "STATE_GROUP_NAMES";
-    private static final String STATE_CURRENT_IDENTITY_ID = "STATE_CURRENT_IDENTITY_ID";
-
+    private final SettingsViewModel viewModel;
     private final GroupRepository groupRepo;
-    private final ArrayList<String> identityIds;
-    private final ArrayList<String> groupNames;
     private FirebaseUser firebaseUser;
     private Identity currentIdentity;
-    private String currentIdentityId;
 
-    public SettingsPresenter(@Nullable Bundle savedState,
-                             @NonNull Navigator navigator,
+    @Inject
+    public SettingsPresenter(@NonNull Navigator navigator,
+                             @NonNull SettingsViewModel viewModel,
                              @NonNull UserRepository userRepo,
                              @NonNull GroupRepository groupRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.groupRepo = groupRepo;
-
-        if (savedState != null) {
-            identityIds = savedState.getStringArrayList(STATE_IDENTITIES_IDS);
-            groupNames = savedState.getStringArrayList(STATE_GROUP_NAMES);
-            currentIdentityId = savedState.getString(STATE_CURRENT_IDENTITY_ID);
-        } else {
-            identityIds = new ArrayList<>();
-            groupNames = new ArrayList<>();
-        }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putStringArrayList(STATE_IDENTITIES_IDS, identityIds);
-        outState.putStringArrayList(STATE_GROUP_NAMES, groupNames);
-        outState.putString(STATE_CURRENT_IDENTITY_ID, currentIdentityId);
     }
 
     @Override
@@ -81,7 +58,7 @@ public class SettingsPresenter extends BasePresenterImpl<SettingsContract.ViewLi
 
         firebaseUser = currentUser;
         subscriptions.add(userRepo.observeCurrentIdentityId(currentUser.getUid())
-                .doOnNext(currentIdentityId -> this.currentIdentityId = currentIdentityId)
+                .doOnNext(viewModel::setCurrentIdentityId)
                 .flatMap(userRepo::observeIdentity)
                 .doOnNext(identity -> {
                     currentIdentity = identity;
@@ -101,14 +78,7 @@ public class SettingsPresenter extends BasePresenterImpl<SettingsContract.ViewLi
 
                     @Override
                     public void onNext(List<Identity> identities) {
-                        identityIds.clear();
-                        groupNames.clear();
-                        for (Identity identity : identities) {
-                            final String identityId = identity.getId();
-                            identityIds.add(identityId);
-                            final String groupName = identity.getGroupName();
-                            groupNames.add(groupName);
-                        }
+                        viewModel.setIdentityIdsGroupNames(identities);
                         setIdentitySelection();
                         view.startEnterTransition();
                     }
@@ -132,17 +102,17 @@ public class SettingsPresenter extends BasePresenterImpl<SettingsContract.ViewLi
 
     @Override
     public void onPreferencesLoaded() {
-        if (!identityIds.isEmpty() && !groupNames.isEmpty()) {
+        if (!viewModel.getIdentityIds().isEmpty() && !viewModel.getGroupNames().isEmpty()) {
             setIdentitySelection();
         }
     }
 
     private void setIdentitySelection() {
+        final List<String> groupNames = viewModel.getGroupNames();
         final int size = groupNames.size();
         final CharSequence[] entries = groupNames.toArray(new CharSequence[size]);
-        final CharSequence[] values = identityIds.toArray(new CharSequence[size]);
-        final String selectedValue = currentIdentityId;
-        view.setupGroupSelection(entries, values, selectedValue);
+        final CharSequence[] values = viewModel.getIdentityIds().toArray(new CharSequence[size]);
+        view.setupGroupSelection(entries, values, viewModel.getCurrentIdentityId());
     }
 
     @Override
@@ -195,7 +165,7 @@ public class SettingsPresenter extends BasePresenterImpl<SettingsContract.ViewLi
             return;
         }
 
-        if (identityIds.size() < 2) {
+        if (viewModel.getIdentityIds().size() < 2) {
             view.showMessage(R.string.toast_settings_min_one_group);
             return;
         }

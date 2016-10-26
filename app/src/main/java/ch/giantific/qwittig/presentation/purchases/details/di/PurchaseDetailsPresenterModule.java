@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.purchases.details.di;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -12,9 +11,9 @@ import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.di.BasePresenterModule;
 import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsContract;
 import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsPresenter;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel;
 import dagger.Module;
 import dagger.Provides;
 
@@ -23,15 +22,13 @@ import dagger.Provides;
  * instantiate it.
  */
 @Module
-public class PurchaseDetailsPresenterModule extends BasePresenterModule {
+public class PurchaseDetailsPresenterModule {
 
     private final String purchaseId;
     private final String purchaseGroupId;
 
-    public PurchaseDetailsPresenterModule(@Nullable Bundle savedState, @NonNull String purchaseId,
+    public PurchaseDetailsPresenterModule(@NonNull String purchaseId,
                                           @Nullable String purchaseGroupId) {
-        super(savedState);
-
         this.purchaseId = purchaseId;
         this.purchaseGroupId = purchaseGroupId;
     }
@@ -39,9 +36,10 @@ public class PurchaseDetailsPresenterModule extends BasePresenterModule {
     @PerActivity
     @Provides
     PurchaseDetailsContract.Presenter providesPurchaseDetailsPresenter(@NonNull Navigator navigator,
+                                                                       @NonNull PurchaseDetailsViewModel viewModel,
                                                                        @NonNull UserRepository userRepo,
                                                                        @NonNull PurchaseRepository purchaseRepo) {
-        return new PurchaseDetailsPresenter(savedState, navigator, userRepo, purchaseRepo,
+        return new PurchaseDetailsPresenter(navigator, viewModel, userRepo, purchaseRepo,
                 purchaseId, purchaseGroupId);
     }
 }

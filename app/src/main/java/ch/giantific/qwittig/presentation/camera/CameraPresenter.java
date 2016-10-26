@@ -1,14 +1,14 @@
 package ch.giantific.qwittig.presentation.camera;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
 import java.io.FileOutputStream;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helper.SharedPrefsHelper;
@@ -35,19 +35,15 @@ public class CameraPresenter extends BasePresenterImpl<CameraContract.ViewListen
     private final SharedPrefsHelper prefsHelper;
     private byte[] takenData;
 
-    public CameraPresenter(@Nullable Bundle savedState,
-                           @NonNull Navigator navigator,
+    @Inject
+    public CameraPresenter(@NonNull Navigator navigator,
+                           @NonNull CameraViewModel viewModel,
                            @NonNull SharedPrefsHelper prefsHelper,
                            @NonNull UserRepository userRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
 
+        this.viewModel = viewModel;
         this.prefsHelper = prefsHelper;
-        viewModel = new CameraViewModel();
-    }
-
-    @Override
-    public CameraViewModel getViewModel() {
-        return viewModel;
     }
 
     @Override

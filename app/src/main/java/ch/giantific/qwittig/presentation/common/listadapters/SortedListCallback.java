@@ -1,52 +1,32 @@
 package ch.giantific.qwittig.presentation.common.listadapters;
 
-import android.support.v7.util.SortedList;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.util.SortedListAdapterCallback;
 
 import java.util.Objects;
 
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.viewmodels.items.ChildItemViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
 
 /**
- * Created by fabio on 22.07.16.
+ * Created by fabio on 06.10.16.
  */
-public abstract class SortedListCallback<T extends ChildItemViewModel> extends SortedList.Callback<T> {
 
-    private ListInteraction listInteraction;
+public class SortedListCallback<T extends ChildItemViewModel> extends SortedListAdapterCallback<T> {
 
-    public SortedListCallback() {
-    }
+    private final SortedListPresenter<T> presenter;
 
-    public void setListInteraction(ListInteraction listInteraction) {
-        this.listInteraction = listInteraction;
-    }
+    public SortedListCallback(@NonNull RecyclerView.Adapter adapter,
+                              @NonNull SortedListPresenter<T> presenter) {
+        super(adapter);
 
-    @Override
-    public void onInserted(int position, int count) {
-        if (listInteraction != null) {
-            listInteraction.notifyItemRangeInserted(position, count);
-        }
+        this.presenter = presenter;
     }
 
     @Override
-    public void onRemoved(int position, int count) {
-        if (listInteraction != null) {
-            listInteraction.notifyItemRangeRemoved(position, count);
-        }
-    }
-
-    @Override
-    public void onMoved(int fromPosition, int toPosition) {
-        if (listInteraction != null) {
-            listInteraction.notifyItemMoved(fromPosition, toPosition);
-        }
-    }
-
-    @Override
-    public void onChanged(int position, int count) {
-        if (listInteraction != null) {
-            listInteraction.notifyItemRangeChanged(position, count);
-        }
+    public int compare(T o1, T o2) {
+        return presenter.compareItemViewModels(o1, o2);
     }
 
     @Override

@@ -31,6 +31,7 @@ public class SettingsAddGroupViewModel extends BaseObservable
             return new SettingsAddGroupViewModel[size];
         }
     };
+    public static final String TAG = SettingsAddGroupViewModel.class.getCanonicalName();
     public final ObservableField<String> name = new ObservableField<>();
     private boolean validate;
     private String currency;

@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentLoginInvitationBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.login.di.LoginComponent;
@@ -25,6 +27,8 @@ public class LoginInvitationFragment extends BaseFragment<LoginComponent, LoginI
     private static final String KEY_GROUP_NAME = "GROUP_NAME";
     private static final String KEY_INVITER_NICKNAME = "INVITER_NICKNAME";
 
+    @Inject
+    LoginInvitationViewModel viewModel;
     private FragmentLoginInvitationBinding binding;
 
     public LoginInvitationFragment() {
@@ -53,7 +57,6 @@ public class LoginInvitationFragment extends BaseFragment<LoginComponent, LoginI
         super.onActivityCreated(savedInstanceState);
 
         final Bundle args = getArguments();
-        final LoginInvitationViewModel viewModel = presenter.getViewModel();
         viewModel.setGroupName(args.getString(KEY_GROUP_NAME, ""));
         viewModel.setInviterNickname(args.getString(KEY_INVITER_NICKNAME, ""));
         presenter.attachView(this);

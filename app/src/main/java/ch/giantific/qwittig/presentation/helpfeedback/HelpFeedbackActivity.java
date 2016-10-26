@@ -19,7 +19,6 @@ import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.helpfeedback.di.DaggerHelpFeedbackComponent;
 import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackComponent;
-import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackPresenterModule;
 
 /**
  * Hosts {@link HelpFeedbackFragment} that shows the user a list of help and feedback actions.
@@ -48,7 +47,6 @@ public class HelpFeedbackActivity extends BaseActivity<HelpFeedbackComponent> {
         component = DaggerHelpFeedbackComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .helpFeedbackPresenterModule(new HelpFeedbackPresenterModule(savedInstanceState))
                 .build();
         component.inject(this);
     }

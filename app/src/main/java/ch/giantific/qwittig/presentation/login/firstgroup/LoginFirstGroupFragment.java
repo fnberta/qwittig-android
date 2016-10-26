@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginFirstGroupBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
@@ -25,6 +27,8 @@ import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.models.Cur
 public class LoginFirstGroupFragment extends BaseFragment<LoginComponent, LoginFirstGroupContract.Presenter, BaseFragment.ActivityListener<LoginComponent>>
         implements LoginFirstGroupContract.ViewListener {
 
+    @Inject
+    LoginFirstGroupViewModel viewModel;
     private FragmentLoginFirstGroupBinding binding;
 
     public LoginFirstGroupFragment() {
@@ -44,7 +48,7 @@ public class LoginFirstGroupFragment extends BaseFragment<LoginComponent, LoginF
 
         presenter.attachView(this);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
         final ArrayAdapter<Currency> spinnerCurrencyAdapter = new ArrayAdapter<>(getActivity(),
                 R.layout.spinner_item, presenter.getSupportedCurrencies());
         spinnerCurrencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

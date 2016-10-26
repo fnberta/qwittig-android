@@ -10,9 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentPurchaseShowReceiptBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel;
 
 
 /**
@@ -20,8 +23,12 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSub
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetailsSubcomponent, PurchaseDetailsContract.Presenter, BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
+public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetailsSubcomponent,
+        PurchaseDetailsContract.Presenter,
+        BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
 
+    @Inject
+    PurchaseDetailsViewModel viewModel;
     private FragmentPurchaseShowReceiptBinding binding;
 
     public PurchaseDetailsReceiptFragment() {
@@ -39,7 +46,7 @@ public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetails
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override

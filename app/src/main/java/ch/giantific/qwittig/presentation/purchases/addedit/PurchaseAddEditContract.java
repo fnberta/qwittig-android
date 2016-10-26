@@ -13,11 +13,9 @@ import java.util.Date;
 
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.ExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.NoteDialogFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleItemViewModel;
@@ -33,15 +31,10 @@ public interface PurchaseAddEditContract {
 
     interface Presenter extends
             BasePresenter<ViewListener>,
-            ListPresenter<BasePurchaseAddEditItemViewModel>,
             NoteDialogFragment.DialogInteractionListener,
             DiscardChangesDialogFragment.DialogInteractionListener,
             ExchangeRateDialogFragment.DialogInteractionListener,
             RatesWorkerListener {
-
-        PurchaseAddEditViewModel getViewModel();
-
-        void setListInteraction(@NonNull PurchaseAddEditListInteraction listInteraction);
 
         void onDateClick(View view);
 
@@ -93,7 +86,7 @@ public interface PurchaseAddEditContract {
         void onDeleteDraftMenuClick();
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         Observable<TransitionEvent> getEnterTransition();
 
@@ -114,6 +107,17 @@ public interface PurchaseAddEditContract {
         void captureImage();
 
         void reloadOptionsMenu();
+
+        void scrollToPosition(int position);
+
+        void notifyItemAdded(int position);
+
+        void notifyItemIdentityChanged(int position,
+                                       @NonNull PurchaseAddEditArticleIdentityItemViewModel identityViewModel);
+
+        void notifyItemRemoved(int position);
+
+        void notifyItemRangeRemoved(int start, int end);
     }
 
     @IntDef({PurchaseResult.PURCHASE_SAVED, PurchaseResult.PURCHASE_SAVED_AUTO,

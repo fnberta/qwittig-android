@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.settings.groupusers.users;
 
 import android.support.annotation.NonNull;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -14,7 +15,8 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowSettingsUsersUserBinding;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
 
@@ -24,12 +26,18 @@ import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.it
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUsersRecyclerAdapter.GroupUserRow> {
-
-    private final SettingsUsersContract.Presenter presenter;
+public class SettingsUsersRecyclerAdapter extends BaseSortedListRecyclerAdapter<SettingsUsersItemViewModel,
+        SettingsUsersContract.Presenter,
+        SettingsUsersRecyclerAdapter.GroupUserRow> {
 
     public SettingsUsersRecyclerAdapter(@NonNull SettingsUsersContract.Presenter presenter) {
-        this.presenter = presenter;
+        super(presenter);
+    }
+
+    @Override
+    protected SortedList<SettingsUsersItemViewModel> createList() {
+        return new SortedList<>(SettingsUsersItemViewModel.class,
+                new SortedListCallback<>(this, presenter));
     }
 
     @Override
@@ -43,16 +51,11 @@ public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUs
     @Override
     public void onBindViewHolder(GroupUserRow holder, int position) {
         final RowSettingsUsersUserBinding binding = holder.getBinding();
-        final SettingsUsersItemViewModel viewModel = presenter.getItemAtPosition(position);
+        final SettingsUsersItemViewModel viewModel = getItemAtPosition(position);
 
         holder.setMenuVisibility(viewModel.isPending());
         binding.setViewModel(viewModel);
         binding.executePendingBindings();
-    }
-
-    @Override
-    public int getItemCount() {
-        return presenter.getItemCount();
     }
 
     public interface AdapterInteractionListener {

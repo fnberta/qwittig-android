@@ -27,12 +27,13 @@ public class PurchasesViewModel extends BaseObservable
             return new PurchasesViewModel[size];
         }
     };
+    public static final String TAG = PurchasesViewModel.class.getCanonicalName();
     private boolean empty;
     private boolean loading;
 
-    public PurchasesViewModel(boolean loading) {
+    public PurchasesViewModel() {
         this.empty = true;
-        this.loading = loading;
+        this.loading = true;
     }
 
     private PurchasesViewModel(Parcel in) {

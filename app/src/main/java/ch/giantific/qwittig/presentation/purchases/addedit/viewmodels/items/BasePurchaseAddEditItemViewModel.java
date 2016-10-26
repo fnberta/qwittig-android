@@ -11,7 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Defines a list item in the add or edit purchase screen.
+ * Defines a list item in the addItemAtPosition or edit purchase screen.
  */
 public interface BasePurchaseAddEditItemViewModel extends Parcelable {
 

@@ -41,6 +41,8 @@ import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragme
 import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.DiscardPurchaseDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.ExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.NoteDialogFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -48,7 +50,6 @@ import ch.giantific.qwittig.utils.rxwrapper.android.RxAndroidViews;
 import ch.giantific.qwittig.utils.rxwrapper.android.transitions.TransitionEvent;
 import rx.Observable;
 import rx.Single;
-import rx.Subscription;
 import rx.subjects.ReplaySubject;
 
 /**
@@ -64,12 +65,16 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         ExchangeRateDialogFragment.DialogInteractionListener,
         DiscardPurchaseDialogFragment.DialogInteractionListener {
 
+    private static final String STATE_ADD_EDIT_FRAGMENT = "STATE_ADD_EDIT_FRAGMENT";
     private static final int RC_CAPTURE_IMAGES = 12;
     protected final ReplaySubject<TransitionEvent> transitionSubject = ReplaySubject.create();
     protected PurchaseAddEditContract.Presenter presenter;
     @Inject
+    protected PurchaseAddEditViewModel viewModel;
+    @Inject
     protected Navigator navigator;
     private ActivityPurchaseAddEditBinding binding;
+    private BasePurchaseAddEditFragment addEditFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +82,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         binding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_add_edit);
         binding.setPresenter(presenter);
 
-        setupTabs();
+        setupTabs(savedInstanceState);
         handleEnterTransition(savedInstanceState);
     }
 
@@ -86,9 +91,12 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         return Arrays.asList(new BasePresenter[]{presenter});
     }
 
-    private void setupTabs() {
+    private void setupTabs(@Nullable Bundle savedInstanceState) {
         final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
-        tabsAdapter.addInitialFragment(getPurchaseAddEditFragment(), getString(R.string.tab_details_purchase));
+        addEditFragment = savedInstanceState == null
+                          ? getPurchaseAddEditFragment()
+                          : (BasePurchaseAddEditFragment) getSupportFragmentManager().getFragment(savedInstanceState, STATE_ADD_EDIT_FRAGMENT);
+        tabsAdapter.addInitialFragment(addEditFragment, getString(R.string.tab_details_purchase));
         tabsAdapter.addInitialFragment(getReceiptFragment(), getString(R.string.tab_details_receipt));
         binding.viewpager.setAdapter(tabsAdapter);
     }
@@ -99,10 +107,18 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     protected abstract BasePurchaseAddEditFragment getPurchaseAddEditFragment();
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(PurchaseAddEditViewModel.TAG, viewModel);
+        getSupportFragmentManager().putFragment(outState, STATE_ADD_EDIT_FRAGMENT, addEditFragment);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu_purchase_add_edit, menu);
 
-        if (presenter.getViewModel().isNoteAvailable()) {
+        if (viewModel.isNoteAvailable()) {
             menu.findItem(R.id.action_purchase_add_edit_note_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_add_edit_note_add).setVisible(false);
         }
@@ -236,6 +252,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         DiscardChangesDialogFragment.display(getSupportFragmentManager());
     }
 
+    @NonNull
     protected abstract BasePurchaseAddEditReceiptFragment getReceiptFragment();
 
     @Override
@@ -279,6 +296,32 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     @Override
     public void reloadOptionsMenu() {
         invalidateOptionsMenu();
+    }
+
+    @Override
+    public void scrollToPosition(int position) {
+        addEditFragment.scrollToPosition(position);
+    }
+
+    @Override
+    public void notifyItemAdded(int position) {
+        addEditFragment.getRecyclerAdapter().notifyItemInserted(position);
+    }
+
+    @Override
+    public void notifyItemIdentityChanged(int position,
+                                          @NonNull PurchaseAddEditArticleIdentityItemViewModel identityViewModel) {
+        addEditFragment.notifyItemIdentityChanged(position, identityViewModel);
+    }
+
+    @Override
+    public void notifyItemRemoved(int position) {
+        addEditFragment.getRecyclerAdapter().notifyItemRemoved(position);
+    }
+
+    @Override
+    public void notifyItemRangeRemoved(int start, int end) {
+        addEditFragment.getRecyclerAdapter().notifyItemRangeRemoved(start, end);
     }
 
     @Override

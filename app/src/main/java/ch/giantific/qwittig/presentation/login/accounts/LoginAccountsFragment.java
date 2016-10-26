@@ -17,6 +17,8 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentLoginAccountsBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.login.LoginWorker;
@@ -30,6 +32,8 @@ import ch.giantific.qwittig.presentation.login.di.LoginComponent;
 public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAccountsContract.Presenter, LoginAccountsFragment.ActivityListener>
         implements LoginAccountsContract.ViewListener {
 
+    @Inject
+    LoginAccountsViewModel viewModel;
     private FragmentLoginAccountsBinding binding;
     private CallbackManager facebookCallbackManager;
 
@@ -81,7 +85,7 @@ public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAcc
 
         presenter.attachView(this);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override

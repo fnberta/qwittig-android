@@ -27,6 +27,8 @@ import com.facebook.login.LoginResult;
 
 import java.util.Arrays;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsProfileBinding;
 import ch.giantific.qwittig.presentation.common.BaseFragment;
@@ -46,6 +48,8 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         SettingsProfileContract.ViewListener,
         EmailReAuthenticateDialogFragment.DialogInteractionListener {
 
+    @Inject
+    SettingsProfileViewModel viewModel;
     private FragmentSettingsProfileBinding binding;
     private Snackbar snackbarSetPassword;
     private ProgressDialog progressDialog;
@@ -91,7 +95,7 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         super.onActivityCreated(savedInstanceState);
 
         presenter.attachView(this);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
     }
 
     @Override

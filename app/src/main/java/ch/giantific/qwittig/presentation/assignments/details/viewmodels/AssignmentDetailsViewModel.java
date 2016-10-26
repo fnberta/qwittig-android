@@ -34,6 +34,7 @@ public class AssignmentDetailsViewModel extends BaseObservable
             return new AssignmentDetailsViewModel[size];
         }
     };
+    public static final String TAG = AssignmentDetailsViewModel.class.getCanonicalName();
     private boolean loading;
     private boolean empty;
     private String title;
@@ -42,9 +43,9 @@ public class AssignmentDetailsViewModel extends BaseObservable
     private SpannableStringBuilder identitiesText;
     private boolean responsible;
 
-    public AssignmentDetailsViewModel(boolean loading) {
+    public AssignmentDetailsViewModel() {
         this.empty = true;
-        this.loading = loading;
+        this.loading = true;
     }
 
     private AssignmentDetailsViewModel(Parcel in) {

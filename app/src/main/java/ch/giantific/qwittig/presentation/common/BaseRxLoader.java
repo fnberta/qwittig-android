@@ -6,12 +6,11 @@ package ch.giantific.qwittig.presentation.common;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 
 import rx.Observable;
 import rx.Subscription;
-import rx.subjects.ReplaySubject;
+import rx.subjects.BehaviorSubject;
 
 /**
  * Provides an abstract base class for a loader that returns a RxJava {@link Observable} as a
@@ -20,7 +19,7 @@ import rx.subjects.ReplaySubject;
 public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
 
     private Subscription subscription;
-    private ReplaySubject<T> subject = ReplaySubject.create();
+    private BehaviorSubject<T> subject = BehaviorSubject.create();
 
     public BaseRxLoader(@NonNull Context context) {
         super(context);
@@ -30,7 +29,7 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
     protected void onStartLoading() {
         super.onStartLoading();
 
-        if (takeContentChanged() || !subject.hasAnyValue()) {
+        if (takeContentChanged() || !subject.hasValue()) {
             forceLoad();
         } else {
             deliverResult(subject.asObservable());
@@ -42,15 +41,11 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
         super.onForceLoad();
 
         final Observable<T> observable = getObservable();
-        if (observable != null) {
-            subscription = observable.subscribe(subject);
-            deliverResult(subject.asObservable());
-        } else {
-            deliverResult(null);
-        }
+        subscription = observable.subscribe(subject);
+        deliverResult(subject.asObservable());
     }
 
-    @Nullable
+    @NonNull
     protected abstract Observable<T> getObservable();
 
     @Override
@@ -84,9 +79,8 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
         super.onReset();
 
         onStopLoading();
-
         if (subject != null) {
-            subject = ReplaySubject.create();
+            subject = BehaviorSubject.create();
         }
     }
 }

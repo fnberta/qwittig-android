@@ -1,10 +1,9 @@
 package ch.giantific.qwittig.presentation.purchases.ocrrating;
 
 import android.view.View;
-import android.widget.RatingBar;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 
 /**
  * Created by fabio on 22.06.16.
@@ -15,19 +14,9 @@ public interface OcrRatingContract {
         void onDoneClick(View view);
 
         void onDetailsDoneClick(View view);
-
-        void onSatisfactionChanged(RatingBar ratingBar, float rating, boolean fromUser);
-
-        void onRatingNamesChanged(RatingBar ratingBar, float rating, boolean fromUser);
-
-        void onRatingPricesChanged(RatingBar ratingBar, float rating, boolean fromUser);
-
-        void onRatingMissingChanged(RatingBar ratingBar, float rating, boolean fromUser);
-
-        void onRatingSpeedChanged(RatingBar ratingBar, float rating, boolean fromUser);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
 
         void showRatingDetails();
     }

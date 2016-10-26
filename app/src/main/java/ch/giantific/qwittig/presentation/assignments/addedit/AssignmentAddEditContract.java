@@ -8,37 +8,27 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.AssignmentAddEditViewModel;
 import ch.giantific.qwittig.presentation.assignments.addedit.viewmodels.items.AssignmentAddEditIdentityItemViewModel;
 import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListDragInteraction;
-import ch.giantific.qwittig.presentation.common.listadapters.interactions.ListInteraction;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
-import ch.giantific.qwittig.presentation.common.presenters.ListPresenter;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 
 /**
- * Defines an observable view model for the add or edit assignment screen.
+ * Defines an observable view model for the addItemAtPosition or edit assignment screen.
  */
 public interface AssignmentAddEditContract {
 
     interface Presenter extends BasePresenter<ViewListener>,
-            ListPresenter<AssignmentAddEditIdentityItemViewModel>,
             DiscardChangesDialogFragment.DialogInteractionListener,
             DatePickerDialog.OnDateSetListener,
             AssignmentAddEditIdentitiesRecyclerAdapter.AdapterInteractionListener {
-
-        AssignmentAddEditViewModel getViewModel();
-
-        void setListInteraction(@NonNull ListInteraction listInteraction);
-
-        void setListDragInteraction(@NonNull ListDragInteraction listDragInteraction);
 
         /**
          * Checks whether the user has made an changes to the data on the screen. If yes shows a
@@ -53,15 +43,14 @@ public interface AssignmentAddEditContract {
          * @param fromPosition the start position of the moved item
          * @param toPosition   the end position of the moved item
          */
-        void onItemMove(int fromPosition, int toPosition);
-
+        void onIdentityMove(int fromPosition, int toPosition);
 
         /**
          * Called when an item has been dismissed by a swipe.
          *
          * @param position the position of the item dismissed
          */
-        void onItemDismiss(int position);
+        void onIdentityDismiss(int position);
 
         void onDeadlineClicked(View view);
 
@@ -76,10 +65,22 @@ public interface AssignmentAddEditContract {
         void onIdentitiesRowItemClick(@NonNull AssignmentAddEditIdentityItemViewModel itemViewModel);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
         void showDiscardChangesDialog();
 
         void showDatePickerDialog();
+
+        boolean isIdentitiesEmpty();
+
+        void addIdentity(@NonNull AssignmentAddEditIdentityItemViewModel item);
+
+        void startDragIdentity(@NonNull RecyclerView.ViewHolder viewHolder);
+
+        void swapIdentity(int fromPosition, int toPosition);
+
+        void removeIdentityAtPosition(int position);
+
+        void notifyIdentityChanged(@NonNull AssignmentAddEditIdentityItemViewModel item);
     }
 
     @IntDef({AssignmentResult.SAVED,

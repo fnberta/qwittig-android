@@ -8,7 +8,7 @@ import android.databinding.BaseObservable;
 import android.os.Parcel;
 
 /**
- * Provides a list item with no content for the add or edit purchase screen. The content is
+ * Provides a list item with no content for the addItemAtPosition or edit purchase screen. The content is
  * delivered through the screen's main view model.
  */
 public class PurchaseAddEditGenericItemViewModel extends BaseObservable

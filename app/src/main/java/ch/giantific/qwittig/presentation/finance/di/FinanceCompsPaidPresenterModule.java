@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.finance.di;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -12,9 +11,9 @@ import ch.giantific.qwittig.data.repositories.CompensationRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.di.BasePresenterModule;
 import ch.giantific.qwittig.presentation.finance.paid.CompsPaidContract;
 import ch.giantific.qwittig.presentation.finance.paid.CompsPaidPresenter;
+import ch.giantific.qwittig.presentation.finance.paid.viewmodels.CompsPaidViewModel;
 import dagger.Module;
 import dagger.Provides;
 
@@ -23,22 +22,20 @@ import dagger.Provides;
  * it.
  */
 @Module
-public class FinanceCompsPaidPresenterModule extends BasePresenterModule {
+public class FinanceCompsPaidPresenterModule {
 
     private final String compGroupId;
 
-    public FinanceCompsPaidPresenterModule(@Nullable Bundle savedState,
-                                           @Nullable String compGroupId) {
-        super(savedState);
-
+    public FinanceCompsPaidPresenterModule(@Nullable String compGroupId) {
         this.compGroupId = compGroupId;
     }
 
     @PerActivity
     @Provides
     CompsPaidContract.Presenter providesFinanceCompsPaidPresenter(@NonNull Navigator navigator,
+                                                                  @NonNull CompsPaidViewModel viewModel,
                                                                   @NonNull UserRepository userRepo,
                                                                   @NonNull CompensationRepository compsRepo) {
-        return new CompsPaidPresenter(savedState, navigator, userRepo, compsRepo, compGroupId);
+        return new CompsPaidPresenter(navigator, viewModel, userRepo, compsRepo, compGroupId);
     }
 }

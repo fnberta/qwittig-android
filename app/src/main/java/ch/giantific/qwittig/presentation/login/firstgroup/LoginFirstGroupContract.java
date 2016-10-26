@@ -11,7 +11,7 @@ import android.widget.AdapterView;
 import java.util.List;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.presenters.BaseViewListener;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.models.Currency;
 
 /**
@@ -21,8 +21,6 @@ public interface LoginFirstGroupContract {
 
     interface Presenter extends BasePresenter<ViewListener> {
 
-        LoginFirstGroupViewModel getViewModel();
-
         List<Currency> getSupportedCurrencies();
 
         void onGroupCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
@@ -30,7 +28,7 @@ public interface LoginFirstGroupContract {
         void onDoneClick(View view);
     }
 
-    interface ViewListener extends BaseViewListener {
+    interface ViewListener extends BaseView {
         // empty
     }
 }

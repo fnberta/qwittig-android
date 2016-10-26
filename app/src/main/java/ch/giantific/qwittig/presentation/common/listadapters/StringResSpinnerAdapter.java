@@ -70,6 +70,12 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
     }
 
     @Nullable
+    @Override
+    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+        return getCustomView(position, convertView, parent, true);
+    }
+
+    @Nullable
     private View getCustomView(int position, @Nullable View convertView, @NonNull ViewGroup parent,
                                boolean isDropDown) {
         final TypeRow typeRow;
@@ -87,12 +93,6 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
         typeRow.setTitle(title);
 
         return convertView;
-    }
-
-    @Nullable
-    @Override
-    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
-        return getCustomView(position, convertView, parent, true);
     }
 
     /**

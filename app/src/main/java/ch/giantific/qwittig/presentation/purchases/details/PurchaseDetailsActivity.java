@@ -26,6 +26,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
@@ -33,6 +34,9 @@ import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.PurchaseResult;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsPresenterModule;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsArticleItemViewModel;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsIdentityItemViewModel;
 
 /**
  * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and
@@ -45,8 +49,12 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSub
 public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetailsSubcomponent>
         implements PurchaseDetailsContract.ViewListener {
 
+    private static final String STATE_DETAILS_FRAGMENT = "STATE_DETAILS_FRAGMENT";
     @Inject
     PurchaseDetailsContract.Presenter presenter;
+    @Inject
+    PurchaseDetailsViewModel viewModel;
+    private PurchaseDetailsFragment detailsFragment;
     private boolean showEditOptions;
     private boolean showExchangeRate;
     private ActivityPurchaseDetailsBinding binding;
@@ -55,7 +63,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_details);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
 
         // disable default actionBar title
         final ActionBar actionBar = getSupportActionBar();
@@ -70,15 +78,16 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         toolbar.setNavigationOnClickListener(v -> NavUtils.navigateUpFromSameTask(this));
 
         if (userLoggedIn) {
-            setupTabs();
+            setupTabs(savedInstanceState);
         }
     }
 
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        component = navComp.plus(new PurchaseDetailsPresenterModule(savedInstanceState,
-                getPurchaseId(), getIntent().getStringExtra(FcmMessagingService.PUSH_GROUP_ID)));
+        component = navComp.plus(new PurchaseDetailsPresenterModule(getPurchaseId(),
+                        getIntent().getStringExtra(FcmMessagingService.PUSH_GROUP_ID)),
+                new PersistentViewModelsModule(savedInstanceState));
         component.inject(this);
         presenter.attachView(this);
     }
@@ -100,9 +109,20 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
     }
 
-    private void setupTabs() {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(PurchaseDetailsViewModel.TAG, viewModel);
+        getSupportFragmentManager().putFragment(outState, STATE_DETAILS_FRAGMENT, detailsFragment);
+    }
+
+    private void setupTabs(@Nullable Bundle savedInstanceState) {
         final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
-        tabsAdapter.addInitialFragment(new PurchaseDetailsFragment(), getString(R.string.tab_details_purchase));
+        detailsFragment = savedInstanceState == null
+                          ? new PurchaseDetailsFragment()
+                          : (PurchaseDetailsFragment) getSupportFragmentManager().getFragment(savedInstanceState, STATE_DETAILS_FRAGMENT);
+        tabsAdapter.addInitialFragment(detailsFragment, getString(R.string.tab_details_purchase));
         tabsAdapter.addInitialFragment(new PurchaseDetailsReceiptFragment(), getString(R.string.tab_details_receipt));
         binding.viewpager.setAdapter(tabsAdapter);
     }
@@ -160,7 +180,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     public void setupScreenAfterLogin() {
         super.setupScreenAfterLogin();
 
-        setupTabs();
+        setupTabs(null);
     }
 
     @Override
@@ -173,5 +193,40 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         this.showEditOptions = showEditOptions;
         showExchangeRate = showExchangeRateOption;
         invalidateOptionsMenu();
+    }
+
+    @Override
+    public void addArticle(@NonNull PurchaseDetailsArticleItemViewModel item) {
+        detailsFragment.getArticlesRecyclerAdapter().addItem(item);
+    }
+
+    @Override
+    public void clearArticles() {
+        detailsFragment.getArticlesRecyclerAdapter().clearItems();
+    }
+
+    @Override
+    public boolean isArticlesEmpty() {
+        return detailsFragment.getArticlesRecyclerAdapter().getItemCount() == 0;
+    }
+
+    @Override
+    public void notifyArticlesChanged() {
+        detailsFragment.getArticlesRecyclerAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void addIdentities(@NonNull List<PurchaseDetailsIdentityItemViewModel> items) {
+        detailsFragment.getIdentitiesRecyclerAdapter().addItems(items);
+    }
+
+    @Override
+    public void clearIdentities() {
+        detailsFragment.getIdentitiesRecyclerAdapter().clearItems();
+    }
+
+    @Override
+    public void notifyIdentitiesChanged() {
+        detailsFragment.getIdentitiesRecyclerAdapter().notifyDataSetChanged();
     }
 }

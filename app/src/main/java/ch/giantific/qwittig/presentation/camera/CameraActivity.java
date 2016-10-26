@@ -25,7 +25,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityCameraBinding;
 import ch.giantific.qwittig.databinding.TutorialOverlayCameraBinding;
 import ch.giantific.qwittig.presentation.camera.di.CameraComponent;
-import ch.giantific.qwittig.presentation.camera.di.CameraPresenterModule;
 import ch.giantific.qwittig.presentation.camera.di.DaggerCameraComponent;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -60,6 +59,8 @@ public class CameraActivity extends BaseActivity<CameraComponent>
             presenter.onPictureTaken(data);
         }
     };
+    @Inject
+    CameraViewModel viewModel;
     private ActivityCameraBinding binding;
     private TutorialOverlayCameraBinding tutBinding;
     private Camera camera;
@@ -70,7 +71,7 @@ public class CameraActivity extends BaseActivity<CameraComponent>
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_camera);
         binding.setPresenter(presenter);
-        binding.setViewModel(presenter.getViewModel());
+        binding.setViewModel(viewModel);
         presenter.attachView(this);
 
         try {
@@ -88,7 +89,6 @@ public class CameraActivity extends BaseActivity<CameraComponent>
         DaggerCameraComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .cameraPresenterModule(new CameraPresenterModule(savedInstanceState))
                 .build()
                 .inject(this);
     }

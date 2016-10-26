@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.assignments.list;
 
 import android.support.annotation.NonNull;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -15,7 +16,8 @@ import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.Assig
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.AssignmentItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel;
 import ch.giantific.qwittig.presentation.assignments.list.viewmodels.items.BaseAssignmentItemViewModel.ViewType;
-import ch.giantific.qwittig.presentation.common.listadapters.BaseRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.SortedListCallback;
 import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
 
 /**
@@ -23,9 +25,9 @@ import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class AssignmentsRecyclerAdapter extends BaseRecyclerAdapter {
-
-    private final AssignmentsContract.Presenter presenter;
+public class AssignmentsRecyclerAdapter extends BaseSortedListRecyclerAdapter<BaseAssignmentItemViewModel,
+        AssignmentsContract.Presenter,
+        RecyclerView.ViewHolder> {
 
     /**
      * Constructs a new {@link AssignmentsRecyclerAdapter}.
@@ -33,9 +35,13 @@ public class AssignmentsRecyclerAdapter extends BaseRecyclerAdapter {
      * @param presenter the main view's model
      */
     public AssignmentsRecyclerAdapter(@NonNull AssignmentsContract.Presenter presenter) {
-        super();
+        super(presenter);
+    }
 
-        this.presenter = presenter;
+    @Override
+    protected SortedList<BaseAssignmentItemViewModel> createList() {
+        return new SortedList<>(BaseAssignmentItemViewModel.class,
+                new SortedListCallback<>(this, presenter));
     }
 
     @NonNull
@@ -61,7 +67,7 @@ public class AssignmentsRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, @ViewType int position) {
-        final BaseAssignmentItemViewModel viewModel = presenter.getItemAtPosition(position);
+        final BaseAssignmentItemViewModel viewModel = getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case ViewType.ASSIGNMENT: {
@@ -88,15 +94,5 @@ public class AssignmentsRecyclerAdapter extends BaseRecyclerAdapter {
                 break;
             }
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return presenter.getItemAtPosition(position).getViewType();
-    }
-
-    @Override
-    public int getItemCount() {
-        return presenter.getItemCount();
     }
 }

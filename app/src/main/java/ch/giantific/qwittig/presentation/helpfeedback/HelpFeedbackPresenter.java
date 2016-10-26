@@ -4,17 +4,17 @@
 
 package ch.giantific.qwittig.presentation.helpfeedback;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
+import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.BaseHelpFeedbackItemViewModel;
 import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.HelpFeedbackHeaderViewModel;
 import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.HelpFeedbackItemViewModel;
-import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.BaseHelpFeedbackItemViewModel;
 
 /**
  * Provides an implementation of the {@link HelpFeedbackContract}.
@@ -36,20 +36,15 @@ public class HelpFeedbackPresenter extends BasePresenterImpl<HelpFeedbackContrac
     private static final String EMAIL_FEEDBACK = "feedback@qwittig.ch";
     private static final String FAQ_URL = "http://www.qwittig.ch/faq";
 
-    public HelpFeedbackPresenter(@Nullable Bundle savedState,
-                                 @NonNull Navigator navigator,
+    @Inject
+    public HelpFeedbackPresenter(@NonNull Navigator navigator,
                                  @NonNull UserRepository userRepo) {
-        super(savedState, navigator, userRepo);
+        super(navigator, userRepo);
     }
 
     @Override
-    public BaseHelpFeedbackItemViewModel getItemAtPosition(int position) {
-        return HELP_ITEMS[position];
-    }
-
-    @Override
-    public int getItemCount() {
-        return HELP_ITEMS.length;
+    public BaseHelpFeedbackItemViewModel[] getHelpFeedbackItems() {
+        return HELP_ITEMS;
     }
 
     @Override

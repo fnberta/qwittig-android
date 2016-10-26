@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.rest.StatsResult;
 import ch.giantific.qwittig.databinding.ActivityStatsBinding;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
@@ -30,11 +31,12 @@ import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.stats.StatsContract.StatsPeriod;
 import ch.giantific.qwittig.presentation.stats.StatsContract.StatsType;
 import ch.giantific.qwittig.presentation.stats.di.StatsLoaderModule;
-import ch.giantific.qwittig.presentation.stats.di.StatsPresenterModule;
 import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import rx.Observable;
+import rx.Single;
+import rx.subjects.BehaviorSubject;
 
 /**
  * Hosts the different stats fragments, {@link StatsPieFragment} and
@@ -51,7 +53,10 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
 
     @Inject
     StatsContract.Presenter presenter;
+    @Inject
+    StatsViewModel viewModel;
     private ActivityStatsBinding binding;
+    private BehaviorSubject<StatsResult> loaderSubject = BehaviorSubject.create();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,7 +121,7 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        component = navComp.plus(new StatsPresenterModule(savedInstanceState),
+        component = navComp.plus(new PersistentViewModelsModule(savedInstanceState),
                 new StatsLoaderModule(this));
         component.inject(this);
         presenter.attachView(this);
@@ -125,6 +130,13 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
     @Override
     protected List<BasePresenter> getPresenters() {
         return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(StatsViewModel.TAG, viewModel);
     }
 
     @Override
@@ -138,7 +150,7 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
     @Override
     public void onLoadFinished(Loader<Observable<StatsResult>> loader,
                                Observable<StatsResult> data) {
-        presenter.onDataLoaded(data);
+        data.subscribe(loaderSubject);
     }
 
     @Override
@@ -152,6 +164,11 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
 
         setupTabs();
         getSupportLoaderManager().initLoader(0, null, this);
+    }
+
+    @Override
+    public Single<StatsResult> getStatsResult() {
+        return loaderSubject.asObservable().toSingle();
     }
 
     @Override

@@ -1,24 +1,17 @@
 package ch.giantific.qwittig.presentation.common.presenters;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 
 /**
  * Created by fabio on 28.09.16.
  */
 
-public interface BasePresenter<T extends BaseViewListener> extends BaseWorkerListener {
+public interface BasePresenter<T extends BaseView> extends BaseWorkerListener {
 
     void attachView(@NonNull T view);
-
-    /**
-     * Saves the state of the view model in a bundle before recreation.
-     *
-     * @param outState the bundle to save the state in
-     */
-    void saveState(@NonNull Bundle outState);
 
     /**
      * Sets up RxJava composite subscriptions and loads the data for the view.

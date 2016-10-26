@@ -28,6 +28,7 @@ public class LoginProfileViewModel extends BaseObservable
             return new LoginProfileViewModel[size];
         }
     };
+    public static final String TAG = LoginProfileViewModel.class.getCanonicalName();
     public final ObservableField<String> nickname = new ObservableField<>();
     private String avatar;
     private boolean validate;
