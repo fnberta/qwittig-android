@@ -77,7 +77,7 @@ public class CompPaidItemViewModel extends BaseChildItemViewModel
 
     @Override
     public int compareTo(@NonNull CompPaidItemViewModel compPaidItemViewModel) {
-        return compPaidItemViewModel.getDate().compareTo(date);
+        return date.compareTo(compPaidItemViewModel.getDate());
     }
 
     @Override

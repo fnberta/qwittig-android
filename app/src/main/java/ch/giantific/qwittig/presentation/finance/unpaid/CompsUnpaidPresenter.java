@@ -136,10 +136,6 @@ public class CompsUnpaidPresenter extends BasePresenterImpl<CompsUnpaidContract.
                     @Override
                     public void onSuccess(Compensation compensation) {
                         view.showMessage(R.string.toast_compensation_accepted);
-                        if (amountChanged) {
-                            // new compensations are calculated on the server
-                            viewModel.setLoading(true);
-                        }
                     }
 
                     @Override

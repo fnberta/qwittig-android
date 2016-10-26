@@ -54,7 +54,8 @@ public class CompsPaidPresenter extends BasePresenterImpl<CompsPaidContract.View
     }
 
     @Override
-    public int compareItemViewModels(@NonNull CompPaidItemViewModel item1, @NonNull CompPaidItemViewModel item2) {
+    public int compareItemViewModels(@NonNull CompPaidItemViewModel item1,
+                                     @NonNull CompPaidItemViewModel item2) {
         return item1.compareTo(item2);
     }
 

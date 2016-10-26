@@ -63,7 +63,8 @@ public class CompsPaidFragment extends BaseSortedListFragment<FinanceSubcomponen
     }
 
     @Override
-    protected BaseSortedListRecyclerAdapter<CompPaidItemViewModel, CompsPaidContract.Presenter, ? extends RecyclerView.ViewHolder> getRecyclerAdapter() {
+    protected BaseSortedListRecyclerAdapter<CompPaidItemViewModel, CompsPaidContract.Presenter,
+            ? extends RecyclerView.ViewHolder> getRecyclerAdapter() {
         return new CompsPaidRecyclerAdapter(presenter);
     }
 
