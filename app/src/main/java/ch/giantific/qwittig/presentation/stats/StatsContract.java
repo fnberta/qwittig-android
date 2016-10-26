@@ -16,6 +16,7 @@ import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import rx.Observable;
+import rx.Single;
 
 /**
  * Created by fabio on 14.08.16.
@@ -32,14 +33,14 @@ public interface StatsContract {
 
         Date getEndDate();
 
-        void onDataLoaded(@Nullable Observable<StatsResult> data);
-
         void onTypeSelected(AdapterView<?> parent, View view, int position, long id);
 
         void onPeriodSelected(AdapterView<?> parent, View view, int position, long id);
     }
 
     interface ViewListener extends BaseView {
+
+        Single<StatsResult> getStatsResult();
 
         void reloadData();
 

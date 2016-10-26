@@ -86,13 +86,8 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
     }
 
     @Override
-    public void onDataLoaded(@Nullable final Observable<StatsResult> data) {
-        final FirebaseUser currentUser = userRepo.getCurrentUser();
-        if (data == null || currentUser == null) {
-            viewModel.setLoading(false);
-            viewModel.setEmpty(true);
-            return;
-        }
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
 
         subscriptions.add(userRepo.getUser(currentUser.getUid())
                 .flatMap(user -> userRepo.getIdentity(user.getCurrentIdentity()))
@@ -100,7 +95,7 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
                     currencyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(), true, false);
                     viewModel.setChartCurrencyFormatter(new ChartCurrencyFormatter(currencyFormatter));
                 })
-                .flatMap(identity -> data.toSingle())
+                .flatMap(identity -> view.getStatsResult())
                 .subscribe(new SingleSubscriber<StatsResult>() {
                     @Override
                     public void onSuccess(StatsResult statsResult) {

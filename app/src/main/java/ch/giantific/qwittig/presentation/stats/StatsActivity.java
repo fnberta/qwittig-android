@@ -35,6 +35,8 @@ import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import rx.Observable;
+import rx.Single;
+import rx.subjects.BehaviorSubject;
 
 /**
  * Hosts the different stats fragments, {@link StatsPieFragment} and
@@ -54,6 +56,7 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
     @Inject
     StatsViewModel viewModel;
     private ActivityStatsBinding binding;
+    private BehaviorSubject<StatsResult> loaderSubject = BehaviorSubject.create();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -147,7 +150,7 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
     @Override
     public void onLoadFinished(Loader<Observable<StatsResult>> loader,
                                Observable<StatsResult> data) {
-        presenter.onDataLoaded(data);
+        data.subscribe(loaderSubject);
     }
 
     @Override
@@ -161,6 +164,11 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
 
         setupTabs();
         getSupportLoaderManager().initLoader(0, null, this);
+    }
+
+    @Override
+    public Single<StatsResult> getStatsResult() {
+        return loaderSubject.asObservable().toSingle();
     }
 
     @Override
