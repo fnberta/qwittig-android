@@ -21,9 +21,12 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.queues.GroupJoinQueue;
-import ch.giantific.qwittig.data.rest.UrlShortener;
-import ch.giantific.qwittig.data.rest.UrlShortenerRequest;
-import ch.giantific.qwittig.data.rest.UrlShortenerResult;
+import ch.giantific.qwittig.data.rest.dynamiclinks.AndroidInfo;
+import ch.giantific.qwittig.data.rest.dynamiclinks.DynamicLink;
+import ch.giantific.qwittig.data.rest.dynamiclinks.IosInfo;
+import ch.giantific.qwittig.data.rest.dynamiclinks.LinkInfo;
+import ch.giantific.qwittig.data.rest.dynamiclinks.LinkRequest;
+import ch.giantific.qwittig.data.rest.dynamiclinks.LinkResult;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
@@ -48,15 +51,15 @@ public class GroupRepository {
 
     private final DatabaseReference databaseRef;
     private final FirebaseMessaging messaging;
-    private final UrlShortener urlShortener;
+    private final DynamicLink dynamicLink;
 
     @Inject
     public GroupRepository(@NonNull FirebaseDatabase firebaseDatabase,
                            @NonNull FirebaseMessaging messaging,
-                           @NonNull UrlShortener urlShortener) {
+                           @NonNull DynamicLink dynamicLink) {
         databaseRef = firebaseDatabase.getReference();
         this.messaging = messaging;
-        this.urlShortener = urlShortener;
+        this.dynamicLink = dynamicLink;
     }
 
     public Observable<Group> observeGroup(@NonNull String groupId) {
@@ -222,9 +225,10 @@ public class GroupRepository {
                 });
     }
 
-    public String getInvitationLink(@NonNull final String identityId,
-                                    @NonNull String groupName,
-                                    @NonNull String inviterNickname) {
+    public Single<String> getInvitationLink(@NonNull final String identityId,
+                                            @NonNull String groupName,
+                                            @NonNull String inviterNickname,
+                                            @NonNull String apiKey) {
         final Uri link = new Uri.Builder()
                 .scheme("https")
                 .authority(QWITTIG_AUTHORITY)
@@ -233,22 +237,14 @@ public class GroupRepository {
                 .appendQueryParameter(INVITATION_GROUP, groupName)
                 .appendQueryParameter(INVITATION_INVITER, inviterNickname)
                 .build();
-        final Uri uri = new Uri.Builder()
-                .scheme("https")
-                .authority(FIREBASE_APP_CODE + ".app.goo.gl")
-                .path("/")
-                .appendQueryParameter("link", link.toString())
-                .appendQueryParameter("apn", BuildConfig.APPLICATION_ID)
-                .appendQueryParameter("ibi", BuildConfig.APPLICATION_ID)
-                .build();
 
-        return uri.toString();
-    }
+        final LinkInfo info = new LinkInfo(FIREBASE_APP_CODE + ".app.goo.gl", link.toString(),
+                new AndroidInfo(BuildConfig.APPLICATION_ID),
+                new IosInfo(BuildConfig.APPLICATION_ID));
 
-    public Single<String> shortenUrl(@NonNull String link, @NonNull String apiKey) {
-        return urlShortener.shortenUrl(apiKey, new UrlShortenerRequest(link))
+        return dynamicLink.getDynamicLink(apiKey, new LinkRequest(info))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(UrlShortenerResult::getId);
+                .map(LinkResult::getShortLink);
     }
 }

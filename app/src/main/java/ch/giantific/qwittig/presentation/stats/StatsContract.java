@@ -2,7 +2,6 @@ package ch.giantific.qwittig.presentation.stats;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -10,12 +9,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 
-import ch.giantific.qwittig.data.rest.StatsResult;
+import ch.giantific.qwittig.data.rest.stats.StatsResult;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
-import rx.Observable;
 import rx.Single;
 
 /**

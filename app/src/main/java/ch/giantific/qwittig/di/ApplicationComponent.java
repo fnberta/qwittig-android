@@ -18,10 +18,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import javax.inject.Singleton;
 
 import ch.giantific.qwittig.Qwittig;
-import ch.giantific.qwittig.data.rest.UrlShortener;
-import ch.giantific.qwittig.data.rest.UserDataDeletion;
-import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.data.rest.Stats;
+import ch.giantific.qwittig.data.rest.dynamiclinks.DynamicLink;
+import ch.giantific.qwittig.data.rest.userdata.UserDataDeletion;
+import ch.giantific.qwittig.data.rest.exchangerates.ExchangeRates;
+import ch.giantific.qwittig.data.rest.stats.Stats;
 import dagger.Component;
 
 /**
@@ -45,7 +45,7 @@ public interface ApplicationComponent {
 
     Stats providesStats();
 
-    UrlShortener providesUrlShortener();
+    DynamicLink providesDynamicLink();
 
     FirebaseAuth getFirebaseAuth();
 

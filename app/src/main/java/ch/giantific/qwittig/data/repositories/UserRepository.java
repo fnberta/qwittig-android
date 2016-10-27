@@ -34,8 +34,8 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.jobs.UploadAvatarJob;
-import ch.giantific.qwittig.data.rest.UserDataDeletion;
-import ch.giantific.qwittig.data.rest.UserIdToken;
+import ch.giantific.qwittig.data.rest.userdata.UserDataDeletion;
+import ch.giantific.qwittig.data.rest.userdata.UserIdToken;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.utils.Utils;

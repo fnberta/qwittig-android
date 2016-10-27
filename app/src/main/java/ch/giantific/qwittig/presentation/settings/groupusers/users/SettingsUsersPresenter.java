@@ -103,10 +103,8 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
     @Override
     public void onInviteClick(int position) {
         final SettingsUsersItemViewModel userItem = view.getItemAtPosition(position);
-        final String invitationLink = groupRepo.getInvitationLink(userItem.getId(),
-                userItem.getGroupName(), currentIdentity.getNickname());
-        final String googleApiKey = view.getGoogleApiKey();
-        subscriptions.add(groupRepo.shortenUrl(invitationLink, googleApiKey)
+        subscriptions.add(groupRepo.getInvitationLink(userItem.getId(),
+                userItem.getGroupName(), currentIdentity.getNickname(), view.getGoogleApiKey())
                 .subscribe(new SingleSubscriber<String>() {
                     @Override
                     public void onSuccess(String shortUrl) {

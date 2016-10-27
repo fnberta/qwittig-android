@@ -21,7 +21,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.rest.StatsResult;
+import ch.giantific.qwittig.data.rest.stats.StatsResult;
 import ch.giantific.qwittig.databinding.ActivityStatsBinding;
 import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;

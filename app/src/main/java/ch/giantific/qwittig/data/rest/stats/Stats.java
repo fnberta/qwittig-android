@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.rest;
+package ch.giantific.qwittig.data.rest.stats;
 
 import retrofit2.http.Body;
 import retrofit2.http.POST;

@@ -6,13 +6,12 @@ package ch.giantific.qwittig.presentation.stats;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.Date;
 
 import ch.giantific.qwittig.data.repositories.StatsRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.data.rest.StatsResult;
+import ch.giantific.qwittig.data.rest.stats.StatsResult;
 import ch.giantific.qwittig.presentation.common.BaseRxLoader;
 import rx.Observable;
 

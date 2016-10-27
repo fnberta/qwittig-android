@@ -6,9 +6,9 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.data.rest.Stats;
-import ch.giantific.qwittig.data.rest.StatsRequest;
-import ch.giantific.qwittig.data.rest.StatsResult;
+import ch.giantific.qwittig.data.rest.stats.Stats;
+import ch.giantific.qwittig.data.rest.stats.StatsRequest;
+import ch.giantific.qwittig.data.rest.stats.StatsResult;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;

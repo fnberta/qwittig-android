@@ -1,4 +1,4 @@
-package ch.giantific.qwittig.data.rest;
+package ch.giantific.qwittig.data.rest.userdata;
 
 import android.support.annotation.NonNull;
 

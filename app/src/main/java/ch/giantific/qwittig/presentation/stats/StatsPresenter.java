@@ -1,10 +1,8 @@
 package ch.giantific.qwittig.presentation.stats;
 
 import android.graphics.Color;
-import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -28,7 +26,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import ch.giantific.qwittig.data.rest.StatsResult;
+import ch.giantific.qwittig.data.rest.stats.StatsResult;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
@@ -38,7 +36,6 @@ import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import rx.Observable;
 import rx.SingleSubscriber;
 import timber.log.Timber;
 

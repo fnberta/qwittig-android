@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.rest;
+package ch.giantific.qwittig.data.rest.exchangerates;
 
 import java.util.Map;
 
