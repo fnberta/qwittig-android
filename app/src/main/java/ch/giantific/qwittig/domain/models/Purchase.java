@@ -32,7 +32,7 @@ public class Purchase implements FirebaseModel {
     public static final String PATH_EXCHANGE_RATE = "exchangeRate";
     public static final String PATH_RECEIPT = "receipt";
     public static final String PATH_NOTE = "note";
-    public static final String PATH_IS_DRAFT = "isDraft";
+    public static final String PATH_DRAFT = "draft";
     public static final String PATH_OCR_DATA = "ocrData";
     public static final String PATH_IDENTITIES = "identities";
     public static final String PATH_ARTICLES = "articles";
@@ -233,7 +233,7 @@ public class Purchase implements FirebaseModel {
         result.put(PATH_EXCHANGE_RATE, exchangeRate);
         result.put(PATH_RECEIPT, receipt);
         result.put(PATH_NOTE, note);
-        result.put(PATH_IS_DRAFT, draft);
+        result.put(PATH_DRAFT, draft);
         result.put(PATH_OCR_DATA, ocrData);
         result.put(PATH_IDENTITIES, identities);
         final List<Map<String, Object>> articles = new ArrayList<>();

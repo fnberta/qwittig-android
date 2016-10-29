@@ -149,12 +149,12 @@ public class PurchaseRepository {
         final Map<String, Object> childUpdates = new HashMap<>();
         final String ocrDataId = purchase.getOcrData();
         if (!TextUtils.isEmpty(ocrDataId)) {
-            childUpdates.put(String.format("%s/%s/%s/%s", OcrData.BASE_PATH, userId, ocrDataId, OcrData.PATH_IS_PROCESSED), true);
+            childUpdates.put(String.format("%s/%s/%s/%s", OcrData.BASE_PATH, userId, ocrDataId, OcrData.PATH_PROCESSED), true);
         }
         final Map<String, Object> purchaseMap = purchase.toMap();
         if (wasDraft) {
             childUpdates.put(String.format("%s/%s/%s", Purchase.BASE_PATH_DRAFTS, buyerId, key), null);
-            purchaseMap.put(Purchase.PATH_IS_DRAFT, false);
+            purchaseMap.put(Purchase.PATH_DRAFT, false);
         }
         childUpdates.put(String.format("%s/%s", Purchase.BASE_PATH_PURCHASES, key), purchaseMap);
         databaseRef.updateChildren(childUpdates);
@@ -206,7 +206,7 @@ public class PurchaseRepository {
     }
 
     public Observable<List<OcrData>> observeOcrData(@NonNull String currentUserId, boolean processed) {
-        final Query query = databaseRef.child(OcrData.BASE_PATH).child(currentUserId).orderByChild(OcrData.PATH_IS_PROCESSED).equalTo(processed);
+        final Query query = databaseRef.child(OcrData.BASE_PATH).child(currentUserId).orderByChild(OcrData.PATH_PROCESSED).equalTo(processed);
         return RxFirebaseDatabase.observeValueList(query, OcrData.class);
     }
 
@@ -217,7 +217,7 @@ public class PurchaseRepository {
 
     public void discardOcrData(@NonNull String currentUserId, @NonNull String ocrDataId) {
         final Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(String.format("%s/%s/%s/%s", OcrData.BASE_PATH, currentUserId, ocrDataId, OcrData.PATH_IS_PROCESSED), true);
+        childUpdates.put(String.format("%s/%s/%s/%s", OcrData.BASE_PATH, currentUserId, ocrDataId, OcrData.PATH_PROCESSED), true);
         childUpdates.put(String.format("%s/%s/%s/%s", OcrData.BASE_PATH, currentUserId, ocrDataId, OcrData.PATH_PURCHASE), null);
         databaseRef.updateChildren(childUpdates);
     }

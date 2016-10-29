@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.firebase.database.Exclude;
-import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.ServerValue;
 
 import org.apache.commons.math3.fraction.BigFraction;
@@ -17,14 +16,14 @@ import java.util.Map;
 /**
  * Created by fabio on 02.07.16.
  */
-@IgnoreExtraProperties
+//@IgnoreExtraProperties
 public class Identity implements FirebaseModel, Comparable<Identity> {
 
     public static final String BASE_PATH = "identities";
     public static final String BASE_PATH_ACTIVE = "active";
     public static final String BASE_PATH_INACTIVE = "inactive";
 
-    public static final String PATH_IS_ACTIVE = "isActive";
+    public static final String PATH_ACTIVE = "active";
     public static final String PATH_GROUP = "group";
     public static final String PATH_GROUP_NAME = "groupName";
     public static final String PATH_GROUP_CURRENCY = "groupCurrency";
@@ -130,7 +129,7 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
     public Map<String, Object> toMap() {
         final Map<String, Object> result = new HashMap<>();
         result.put(PATH_CREATED_AT, ServerValue.TIMESTAMP);
-        result.put(PATH_IS_ACTIVE, active);
+        result.put(PATH_ACTIVE, active);
         result.put(PATH_GROUP, group);
         result.put(PATH_GROUP_NAME, groupName);
         result.put(PATH_GROUP_CURRENCY, groupCurrency);
