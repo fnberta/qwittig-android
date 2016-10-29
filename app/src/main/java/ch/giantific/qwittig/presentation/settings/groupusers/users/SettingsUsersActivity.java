@@ -30,6 +30,7 @@ import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGr
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
 import ch.giantific.qwittig.utils.AvatarUtils;
+import rx.Single;
 
 /**
  * Hosts {@link SettingsUsersFragment} that allows the user to addItemAtPosition users to his/her current
@@ -38,7 +39,8 @@ import ch.giantific.qwittig.utils.AvatarUtils;
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersComponent>
-        implements NicknamePromptDialogFragment.DialogInteractionListener {
+        implements NicknamePromptDialogFragment.DialogInteractionListener,
+        InvitationLinkWorkerListener {
 
     @Inject
     SettingsUsersContract.Presenter presenter;
@@ -114,5 +116,10 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
     @Override
     public void onValidNicknameEntered(@NonNull String nickname, int position) {
         presenter.onValidNicknameEntered(nickname, position);
+    }
+
+    @Override
+    public void setInvitationLinkStream(@NonNull Single<String> single, @NonNull String workerTag) {
+        presenter.setInvitationLinkStream(single, workerTag);
     }
 }

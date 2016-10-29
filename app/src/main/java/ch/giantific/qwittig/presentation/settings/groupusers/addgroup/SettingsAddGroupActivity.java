@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -31,11 +32,13 @@ import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGroupUsersComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.InvitationLinkWorkerListener;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersContract;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersFragment;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.Utils;
+import rx.Single;
 
 /**
  * Hosts {@link SettingsAddGroupFragment} that allows to user to create a new group.
@@ -46,7 +49,7 @@ import ch.giantific.qwittig.utils.Utils;
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersComponent> implements
-        SettingsAddGroupFragment.ActivityListener {
+        SettingsAddGroupFragment.ActivityListener, InvitationLinkWorkerListener {
 
     public static final String ADD_USERS_FRAGMENT = "ADD_USERS_FRAGMENT";
     public static final String ADD_GROUP_FRAGMENT = "ADD_GROUP_FRAGMENT";
@@ -145,5 +148,10 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
         }
+    }
+
+    @Override
+    public void setInvitationLinkStream(@NonNull Single<String> single, @NonNull String workerTag) {
+        usersPresenter.setInvitationLinkStream(single, workerTag);
     }
 }

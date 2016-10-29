@@ -387,5 +387,6 @@
     <string name="header_stats_pie_identities">Divided by buyers</string>
     <string name="toast_remind_pending">%1$s cannot be reminded as he/she does not belong to a real user</string>
     <string name="camera_image_save_failed">Failed to capture the image. Please try again</string>
+    <string name="progress_invitation_link">Creating invitation link…</string>
 
 </resources>

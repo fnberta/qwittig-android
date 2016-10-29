@@ -116,7 +116,9 @@ public class SettingsUsersFragment extends BaseSortedListFragment<SettingsGroupU
     }
 
     @Override
-    public String getGoogleApiKey() {
-        return getString(R.string.google_api_key);
+    public void loadInvitationLinkWorker(@NonNull String identityId,
+                                         @NonNull String groupName,
+                                         @NonNull String inviterNickname) {
+        InvitationLinkWorker.attach(getFragmentManager(), identityId, groupName, inviterNickname);
     }
 }

@@ -11,6 +11,7 @@ import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.login.LoginWorker;
 import ch.giantific.qwittig.presentation.purchases.addedit.RatesWorker;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.InvitationLinkWorker;
 import dagger.Component;
 
 /**
@@ -29,4 +30,6 @@ public interface WorkerComponent {
     void inject(GoogleUserWorker googleUserWorker);
 
     void inject(FacebookUserWorker facebookUserWorker);
+
+    void inject(InvitationLinkWorker invitationLinkWorker);
 }

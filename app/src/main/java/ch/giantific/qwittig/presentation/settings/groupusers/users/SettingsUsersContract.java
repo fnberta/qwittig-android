@@ -9,8 +9,8 @@ import android.support.annotation.StringRes;
 import android.view.View;
 
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
-import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.presenters.SortedListPresenter;
+import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.common.views.SortedListView;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
 
@@ -22,7 +22,8 @@ public interface SettingsUsersContract {
     interface Presenter extends BasePresenter<ViewListener>,
             SortedListPresenter<SettingsUsersItemViewModel>,
             SettingsUsersRecyclerAdapter.AdapterInteractionListener,
-            NicknamePromptDialogFragment.DialogInteractionListener {
+            NicknamePromptDialogFragment.DialogInteractionListener,
+            InvitationLinkWorkerListener {
 
         void onNewAvatarTaken(@NonNull String avatarPath);
 
@@ -42,6 +43,8 @@ public interface SettingsUsersContract {
 
         void showChangeNicknameDialog(@NonNull String nickname, int position);
 
-        String getGoogleApiKey();
+        void loadInvitationLinkWorker(@NonNull final String identityId,
+                                      @NonNull String groupName,
+                                      @NonNull String inviterNickname);
     }
 }

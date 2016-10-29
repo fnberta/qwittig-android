@@ -28,6 +28,7 @@ import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.Se
 import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.items.SettingsUsersItemViewModel;
 import ch.giantific.qwittig.utils.rxwrapper.firebase.RxChildEvent.EventType;
 import rx.Observable;
+import rx.Single;
 import rx.SingleSubscriber;
 import timber.log.Timber;
 
@@ -103,22 +104,31 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
     @Override
     public void onInviteClick(int position) {
         final SettingsUsersItemViewModel userItem = view.getItemAtPosition(position);
-        subscriptions.add(groupRepo.getInvitationLink(userItem.getId(),
-                userItem.getGroupName(), currentIdentity.getNickname(), view.getGoogleApiKey())
+        view.showProgressDialog(R.string.progress_invitation_link);
+        view.loadInvitationLinkWorker(userItem.getId(),
+                userItem.getGroupName(), currentIdentity.getNickname());
+    }
+
+    @Override
+    public void setInvitationLinkStream(@NonNull Single<String> single, @NonNull String workerTag) {
+        subscriptions.add(single
                 .subscribe(new SingleSubscriber<String>() {
                     @Override
                     public void onSuccess(String shortUrl) {
+                        view.removeWorker(workerTag);
+                        view.hideProgressDialog();
+
                         view.loadLinkShareOptions(shortUrl);
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         Timber.e(error, "failed to get short URL with error:");
+                        view.removeWorker(workerTag);
+                        view.hideProgressDialog();
                     }
                 })
         );
-
-        // TODO: protect against configuration changes
     }
 
     @Override
