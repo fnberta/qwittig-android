@@ -75,9 +75,9 @@ public class CompensationRepository {
                     amountMap.put(Compensation.DENOMINATOR, amount.getDenominator().intValue());
                     compMap.put(Compensation.PATH_AMOUNT, amountMap);
 
-                    compMap.put(Compensation.PATH_PAID, true);
+                    compMap.put(Compensation.PATH_IS_PAID, true);
                     compMap.put(Compensation.PATH_PAID_AT, ServerValue.TIMESTAMP);
-                    compMap.put(Compensation.PATH_AMOUNT_CHANGED, amountChanged);
+                    compMap.put(Compensation.PATH_IS_AMOUNT_CHANGED, amountChanged);
 
                     childUpdates.put(String.format("%s/%s/%s", Compensation.BASE_PATH, Compensation.BASE_PATH_PAID, compensationId), compMap);
                     databaseRef.updateChildren(childUpdates);

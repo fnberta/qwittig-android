@@ -22,11 +22,11 @@ public class Compensation implements FirebaseModel {
     public static final String BASE_PATH_PAID = "paid";
     public static final String BASE_PATH_UNPAID = "unpaid";
 
-    public static final String PATH_PAID = "paid";
+    public static final String PATH_IS_PAID = "isPaid";
     public static final String PATH_GROUP = "group";
     public static final String PATH_PAID_AT = "paidAt";
     public static final String PATH_AMOUNT = "amount";
-    public static final String PATH_AMOUNT_CHANGED = "amountChanged";
+    public static final String PATH_IS_AMOUNT_CHANGED = "isAmountChanged";
     public static final String PATH_DEBTOR = "debtor";
     public static final String PATH_CREDITOR = "creditor";
     public static final String NUMERATOR = "num";
@@ -121,7 +121,7 @@ public class Compensation implements FirebaseModel {
         final Map<String, Object> result = new HashMap<>();
         result.put(PATH_CREATED_AT, ServerValue.TIMESTAMP);
         result.put(PATH_GROUP, group);
-        result.put(PATH_PAID, paid);
+        result.put(PATH_IS_PAID, paid);
         result.put(PATH_PAID_AT, paidAt);
         result.put(PATH_DEBTOR, debtor);
         result.put(PATH_CREDITOR, creditor);

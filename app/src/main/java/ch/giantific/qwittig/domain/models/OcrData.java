@@ -21,7 +21,7 @@ public class OcrData implements FirebaseModel {
     public static final String PATH_USER = "user";
     public static final String PATH_DATA = "data";
     public static final String PATH_RECEIPT = "receipt";
-    public static final String PATH_PROCESSED = "processed";
+    public static final String PATH_IS_PROCESSED = "isProcessed";
 
     private String id;
     private long createdAt;

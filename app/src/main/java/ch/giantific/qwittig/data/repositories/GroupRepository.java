@@ -182,7 +182,7 @@ public class GroupRepository {
                     final Map<String, Object> childUpdates = new HashMap<>();
                     childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), null);
                     final Map<String, Object> identityMap = identity.toMap();
-                    identityMap.put(Identity.PATH_ACTIVE, false);
+                    identityMap.put(Identity.PATH_IS_ACTIVE, false);
                     childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_INACTIVE, identityId), identityMap);
                     childUpdates.put(String.format("%s/%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_IDENTITIES, identityId), null);
                     childUpdates.put(String.format("%s/%s/%s/%s", User.BASE_PATH, userId, User.PATH_IDENTITIES, identityId), null);
@@ -218,7 +218,7 @@ public class GroupRepository {
                     final Map<String, Object> childUpdates = new HashMap<>();
                     childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_ACTIVE, identityId), null);
                     final Map<String, Object> identityMap = identity.toMap();
-                    identityMap.put(Identity.PATH_ACTIVE, false);
+                    identityMap.put(Identity.PATH_IS_ACTIVE, false);
                     childUpdates.put(String.format("%s/%s/%s", Identity.BASE_PATH, Identity.BASE_PATH_INACTIVE, identityId), identityMap);
                     childUpdates.put(String.format("%s/%s/%s/%s", Group.BASE_PATH, groupId, Group.PATH_IDENTITIES, identityId), null);
                     databaseRef.updateChildren(childUpdates);
