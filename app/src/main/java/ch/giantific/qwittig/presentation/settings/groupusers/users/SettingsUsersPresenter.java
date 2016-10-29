@@ -53,7 +53,8 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
     }
 
     @Override
-    public int compareItemViewModels(@NonNull SettingsUsersItemViewModel item1, @NonNull SettingsUsersItemViewModel item2) {
+    public int compareItemViewModels(@NonNull SettingsUsersItemViewModel item1,
+                                     @NonNull SettingsUsersItemViewModel item2) {
         return item1.compareTo(item2);
     }
 
@@ -70,8 +71,7 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
                         viewModel.setGroupName(identity.getGroupName());
                         view.clearItems();
 
-                        final String groupId = identity.getGroup();
-                        addDataListener(groupId);
+                        addDataListener(identity.getGroup());
                     }
                 })
         );
@@ -81,8 +81,8 @@ public class SettingsUsersPresenter extends BasePresenterImpl<SettingsUsersContr
         final Observable<List<SettingsUsersItemViewModel>> initialData = groupRepo.getGroupIdentities(groupId, true)
                 .flatMap((identity) -> getItemViewModel(EventType.NONE, identity))
                 .toList()
-                .doOnNext(settingsUsersItemViewModels -> {
-                    view.addItems(settingsUsersItemViewModels);
+                .doOnNext(itemViewModels -> {
+                    view.addItems(itemViewModels);
                     viewModel.setEmpty(view.isItemsEmpty());
                     view.startEnterTransition();
                 });
