@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.AxisValueFormatter;
-import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.text.NumberFormat;
@@ -13,7 +13,7 @@ import java.text.NumberFormat;
 /**
  * Created by fabio on 16.08.16.
  */
-public class ChartCurrencyFormatter implements ValueFormatter, AxisValueFormatter {
+public class ChartCurrencyFormatter implements IValueFormatter, IAxisValueFormatter {
 
     private final NumberFormat currencyFormatter;
 

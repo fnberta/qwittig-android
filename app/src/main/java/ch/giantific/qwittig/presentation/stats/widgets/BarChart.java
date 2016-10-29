@@ -35,7 +35,7 @@ public class BarChart extends com.github.mikephil.charting.charts.BarChart {
 
     private void setDefaultValues() {
         setNoDataText("");
-        setDescription("");
+//        setDescription("");
         setFitBars(true);
 
         final XAxis xAxis = getXAxis();

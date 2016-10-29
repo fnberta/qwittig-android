@@ -34,7 +34,7 @@ public class PieChart extends com.github.mikephil.charting.charts.PieChart {
         setNoDataText("");
         setDrawHoleEnabled(false);
         setDrawCenterText(false);
-        setDescription("");
+//        setDescription("");
 
         getLegend().setEnabled(false);
     }

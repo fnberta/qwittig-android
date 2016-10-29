@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.presentation.login.firstgroup;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
@@ -35,7 +34,7 @@ public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupC
     private final LoginFirstGroupViewModel viewModel;
     private final GroupRepository groupRepo;
     private final List<Currency> currencies;
-    private Identity identity;
+    private Identity currentIdentity;
 
     @Inject
     public LoginFirstGroupPresenter(@NonNull Navigator navigator,
@@ -64,7 +63,7 @@ public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupC
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
-                        LoginFirstGroupPresenter.this.identity = identity;
+                        currentIdentity = identity;
 
                         if (TextUtils.isEmpty(viewModel.groupName.get())) {
                             viewModel.groupName.set(identity.getGroupName());
@@ -96,9 +95,9 @@ public class LoginFirstGroupPresenter extends BasePresenterImpl<LoginFirstGroupC
     public void onDoneClick(View v) {
         final String groupName = viewModel.groupName.get();
         final String groupCurrency = viewModel.getGroupCurrency();
-        if (!Objects.equals(groupName, identity.getGroupName()) ||
-                !Objects.equals(groupCurrency, identity.getGroupCurrency())) {
-            subscriptions.add(groupRepo.updateGroupDetails(identity.getGroup(), groupName, groupCurrency)
+        if (!Objects.equals(groupName, currentIdentity.getGroupName()) ||
+                !Objects.equals(groupCurrency, currentIdentity.getGroupCurrency())) {
+            subscriptions.add(groupRepo.updateGroupDetails(currentIdentity.getGroup(), groupName, groupCurrency)
                     .subscribe(new SingleSubscriber<Group>() {
                         @Override
                         public void onSuccess(Group value) {

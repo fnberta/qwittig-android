@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.formatter.AxisValueFormatter;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
@@ -42,7 +42,7 @@ public class StatsViewModel extends BaseObservable
     private String pieTotal;
     private String barAverage;
     private ChartCurrencyFormatter chartCurrencyFormatter;
-    private AxisValueFormatter barXAxisFormatter;
+    private IAxisValueFormatter barXAxisFormatter;
 
     public StatsViewModel() {
         this.empty = true;
@@ -142,7 +142,7 @@ public class StatsViewModel extends BaseObservable
     }
 
     @Bindable
-    public AxisValueFormatter getBarXAxisFormatter() {
+    public IAxisValueFormatter getBarXAxisFormatter() {
         return barXAxisFormatter;
     }
 

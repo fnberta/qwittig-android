@@ -3,7 +3,7 @@ package ch.giantific.qwittig.presentation.stats.formatters;
 import android.support.annotation.NonNull;
 
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.formatter.AxisValueFormatter;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -13,7 +13,7 @@ import ch.giantific.qwittig.utils.DateUtils;
 /**
  * Created by fabio on 16.08.16.
  */
-public class DateAxisFormatter implements AxisValueFormatter {
+public class DateAxisFormatter implements IAxisValueFormatter {
 
     private final String unit;
     private final Date date;

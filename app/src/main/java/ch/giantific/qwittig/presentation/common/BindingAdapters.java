@@ -27,7 +27,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.formatter.AxisValueFormatter;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.R;
@@ -308,14 +308,14 @@ public class BindingAdapters {
     }
 
     @BindingAdapter({"xAxisFormatter"})
-    public static void setBarChartXAxisFormatter(BarChart view, AxisValueFormatter formatter) {
+    public static void setBarChartXAxisFormatter(BarChart view, IAxisValueFormatter formatter) {
         if (formatter != null) {
             view.getXAxis().setValueFormatter(formatter);
         }
     }
 
     @BindingAdapter({"yAxisFormatter"})
-    public static void setBarChartYAxisFormatter(BarChart view, AxisValueFormatter formatter) {
+    public static void setBarChartYAxisFormatter(BarChart view, IAxisValueFormatter formatter) {
         if (formatter != null) {
             view.getAxisLeft().setValueFormatter(formatter);
         }

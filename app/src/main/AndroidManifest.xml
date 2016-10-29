@@ -170,11 +170,6 @@
             android:name=".presentation.intro.AppIntroActivity"
             android:theme="@style/Theme.Intro"/>
         <activity
-            android:name="com.facebook.FacebookActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-        <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">
             <intent-filter>
