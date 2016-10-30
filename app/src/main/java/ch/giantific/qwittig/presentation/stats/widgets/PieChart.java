@@ -7,6 +7,8 @@ package ch.giantific.qwittig.presentation.stats.widgets;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import com.github.mikephil.charting.components.Description;
+
 /**
  * Provides a pie char with sensible default settings already set.
  * <p/>
@@ -34,7 +36,9 @@ public class PieChart extends com.github.mikephil.charting.charts.PieChart {
         setNoDataText("");
         setDrawHoleEnabled(false);
         setDrawCenterText(false);
-//        setDescription("");
+        final Description desc = new Description();
+        desc.setText("");
+        setDescription(desc);
 
         getLegend().setEnabled(false);
     }

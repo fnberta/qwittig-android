@@ -1,38 +1,87 @@
 package ch.giantific.qwittig.data.rest.stats;
 
+import android.support.annotation.StringDef;
+
 import com.google.gson.annotations.SerializedName;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Map;
 
 /**
  * Created by fabio on 14.08.16.
  */
 public class StatsResult {
-    @SerializedName("pie")
-    private PieStats pieStats;
-    @SerializedName("bar")
-    private BarStats barStats;
 
-    public StatsResult(PieStats pieStats, BarStats barStats) {
-        this.pieStats = pieStats;
-        this.barStats = barStats;
+    @SerializedName("group")
+    private GroupStats groupStats;
+    @SerializedName("user")
+    private UserStats userStats;
+
+    public StatsResult(GroupStats groupStats, UserStats userStats) {
+        this.groupStats = groupStats;
+        this.userStats = userStats;
     }
 
-    public PieStats getPieStats() {
-        return pieStats;
+    public GroupStats getGroupStats() {
+        return groupStats;
     }
 
-    public BarStats getBarStats() {
-        return barStats;
+    public UserStats getUserStats() {
+        return userStats;
     }
 
-    public static class PieStats {
+    @StringDef({UnitType.DAYS, UnitType.MONTHS, UnitType.YEARS})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface UnitType {
+        String DAYS = "days";
+        String MONTHS = "months";
+        String YEARS = "years";
+    }
+
+    public static class GroupStats {
+        private Pie pie;
+        private Bar bar;
+
+        public GroupStats(Pie pie, Bar bar) {
+            this.pie = pie;
+            this.bar = bar;
+        }
+
+        public Pie getPie() {
+            return pie;
+        }
+
+        public Bar getBar() {
+            return bar;
+        }
+    }
+
+    public static class UserStats {
+        private Pie pie;
+        private Bar bar;
+
+        public UserStats(Pie pie, Bar bar) {
+            this.pie = pie;
+            this.bar = bar;
+        }
+
+        public Pie getPie() {
+            return pie;
+        }
+
+        public Bar getBar() {
+            return bar;
+        }
+    }
+
+    public static class Pie {
 
         private Map<String, Float> stores;
         private Map<String, IdentityTotal> identities;
         private float total;
 
-        public PieStats(Map<String, Float> stores, Map<String, IdentityTotal> identities, float total) {
+        public Pie(Map<String, Float> stores, Map<String, IdentityTotal> identities, float total) {
             this.stores = stores;
             this.identities = identities;
             this.total = total;
@@ -69,12 +118,12 @@ public class StatsResult {
         }
     }
 
-    public static class BarStats {
+    public static class Bar {
         private Map<Long, Float> data;
         private String unit;
         private float average;
 
-        public BarStats(Map<Long, Float> data, String unit, float average) {
+        public Bar(Map<Long, Float> data, String unit, float average) {
             this.data = data;
             this.unit = unit;
             this.average = average;

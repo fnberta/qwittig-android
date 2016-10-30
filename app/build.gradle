@@ -94,6 +94,7 @@ dependencies {
     compile 'io.reactivex:rxjava:1.2.0'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.artemzin.rxjava:proguard-rules:1.2.0.0'
+    compile 'com.jakewharton.rxrelay:rxrelay:1.2.0'
     compile 'com.facebook.android:facebook-android-sdk:4.17.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.apache.commons:commons-math3:3.6.1'

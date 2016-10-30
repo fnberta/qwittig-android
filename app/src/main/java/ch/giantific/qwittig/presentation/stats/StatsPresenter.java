@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.presentation.stats;
 
 import android.graphics.Color;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,17 +26,17 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.data.rest.stats.StatsResult;
+import ch.giantific.qwittig.data.rest.stats.StatsResult.UnitType;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.presenters.BasePresenterImpl;
+import ch.giantific.qwittig.presentation.common.subscribers.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.stats.StatsContract.StatsPeriod;
 import ch.giantific.qwittig.presentation.stats.formatters.ChartCurrencyFormatter;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import rx.SingleSubscriber;
-import timber.log.Timber;
 
 /**
  * Created by fabio on 14.08.16.
@@ -92,43 +91,42 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
                     currencyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(), true, false);
                     viewModel.setChartCurrencyFormatter(new ChartCurrencyFormatter(currencyFormatter));
                 })
-                .flatMap(identity -> view.getStatsResult())
-                .subscribe(new SingleSubscriber<StatsResult>() {
+                .flatMapObservable(identity -> view.getStatsResult())
+                .subscribe(new IndefiniteSubscriber<StatsResult>() {
                     @Override
-                    public void onSuccess(StatsResult statsResult) {
-                        final StatsResult.PieStats pieStats = statsResult.getPieStats();
-                        final StatsResult.BarStats barStats = statsResult.getBarStats();
-                        final float total = pieStats.getTotal();
-                        if (total > 0) {
-                            viewModel.setEmpty(false);
+                    public void onNext(StatsResult statsResult) {
+                        final StatsResult.GroupStats groupStats = statsResult.getGroupStats();
+                        final StatsResult.Pie pie = groupStats.getPie();
+                        final StatsResult.Bar bar = groupStats.getBar();
+                        final float total = pie.getTotal();
+                        final boolean hasData = total > 0;
+                        if (hasData) {
                             viewModel.setPieTotal(currencyFormatter.format(total));
-                            setStoresChartData(pieStats);
-                            setIdentitiesChartData(pieStats);
+                            setStoresChartData(pie);
+                            setIdentitiesChartData(pie);
 
-                            viewModel.setBarAverage(currencyFormatter.format(barStats.getAverage()));
-                            viewModel.setBarXAxisFormatter(barStats.getUnit());
-                            setTimeChartData(barStats);
-                        } else {
-                            viewModel.setEmpty(true);
+                            viewModel.setBarAverage(currencyFormatter.format(bar.getAverage()));
+                            viewModel.setBarXAxisFormatter(bar.getUnit());
+                            setTimeChartData(bar);
                         }
 
-                        viewModel.setLoading(false);
+                        viewModel.finishLoading(!hasData);
                     }
 
                     @Override
-                    public void onError(Throwable error) {
-                        Timber.e(error, "failed to load stats data with error:");
-                        viewModel.setEmpty(true);
-                        viewModel.setLoading(false);
+                    public void onError(Throwable e) {
+                        super.onError(e);
+
+                        viewModel.finishLoading(true);
                     }
                 })
         );
     }
 
-    private void setStoresChartData(@NonNull StatsResult.PieStats pieStats) {
+    private void setStoresChartData(@NonNull StatsResult.Pie pie) {
         final List<PieEntry> entries = new ArrayList<>();
 
-        final Map<String, Float> stores = pieStats.getStores();
+        final Map<String, Float> stores = pie.getStores();
         for (Map.Entry<String, Float> entry : stores.entrySet()) {
             final Float value = entry.getValue();
             entries.add(new PieEntry(value, entry.getKey()));
@@ -138,12 +136,12 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
         viewModel.setStoresData(pieData);
     }
 
-    private void setIdentitiesChartData(@NonNull StatsResult.PieStats pieStats) {
+    private void setIdentitiesChartData(@NonNull StatsResult.Pie pie) {
         final List<PieEntry> entries = new ArrayList<>();
 
-        final Map<String, StatsResult.PieStats.IdentityTotal> stores = pieStats.getIdentities();
-        for (Map.Entry<String, StatsResult.PieStats.IdentityTotal> entry : stores.entrySet()) {
-            final StatsResult.PieStats.IdentityTotal identityTotal = entry.getValue();
+        final Map<String, StatsResult.Pie.IdentityTotal> stores = pie.getIdentities();
+        for (Map.Entry<String, StatsResult.Pie.IdentityTotal> entry : stores.entrySet()) {
+            final StatsResult.Pie.IdentityTotal identityTotal = entry.getValue();
             entries.add(new PieEntry(identityTotal.getTotal(), identityTotal.getNickname()));
         }
 
@@ -155,7 +153,7 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
     private PieData getPieData(@NonNull List<PieEntry> entries) {
         final PieDataSet pieDataSet = new PieDataSet(entries, "");
         pieDataSet.setValueFormatter(viewModel.getChartCurrencyFormatter());
-        pieDataSet.setColors(getColors());
+        pieDataSet.setColors(view.getStatsColors());
         pieDataSet.setSliceSpace(4);
 
         final PieData pieData = new PieData(pieDataSet);
@@ -164,43 +162,41 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
         return pieData;
     }
 
-    private void setTimeChartData(@NonNull StatsResult.BarStats barStats) {
+    private void setTimeChartData(@NonNull StatsResult.Bar bar) {
         final List<BarEntry> entries = new ArrayList<>();
 
-        final Map<Long, Float> data = barStats.getData();
+        final Map<Long, Float> data = bar.getData();
+        final Date date = new Date();
+        final Calendar calendar = Calendar.getInstance();
+        final String unit = bar.getUnit();
         for (Map.Entry<Long, Float> entry : data.entrySet()) {
-            entries.add(new BarEntry(entry.getKey(), entry.getValue()));
+            date.setTime(entry.getKey());
+            calendar.setTime(date);
+            float dateValue = 0;
+            switch (unit) {
+                case UnitType.DAYS:
+                    dateValue = calendar.get(Calendar.DAY_OF_MONTH);
+                    break;
+                case UnitType.MONTHS:
+                    dateValue = calendar.get(Calendar.MONTH);
+                    break;
+                case UnitType.YEARS:
+                    dateValue = calendar.get(Calendar.YEAR);
+                    break;
+            }
+
+            entries.add(new BarEntry(dateValue, entry.getValue()));
         }
 
-        final BarDataSet barDataSet = new BarDataSet(entries, "");
-        barDataSet.setColors(getColors());
+        final BarDataSet barDataSet = new BarDataSet(entries, view.getSpendingLabel());
+        final int[] statsColors = view.getStatsColors();
+        barDataSet.setColors(statsColors[0]);
         barDataSet.setValueFormatter(viewModel.getChartCurrencyFormatter());
 
         final BarData barData = new BarData(barDataSet);
         barData.setHighlightEnabled(true);
+
         viewModel.setTimeData(barData);
-    }
-
-    @NonNull
-    private List<Integer> getColors() {
-        final List<Integer> colors = new ArrayList<>();
-        for (int i = 0; i <= 4; i++) {
-            colors.add(getColor(i));
-        }
-
-        return colors;
-    }
-
-    @ColorInt
-    private int getColor(int position) {
-        final int[] colors = view.getStatsColors();
-        if (position >= 0 && position < colors.length) {
-            return colors[position];
-        } else if (position >= colors.length) {
-            return getColor(position - colors.length);
-        }
-
-        return -1;
     }
 
     @Override
@@ -215,17 +211,16 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
     @Override
     public void onPeriodSelected(AdapterView<?> parent, View view, int position, long id) {
         final StatsPeriodItem period = (StatsPeriodItem) parent.getItemAtPosition(position);
-        if (Objects.equals(period, this.period)) {
-            return;
+        if (!Objects.equals(period, this.period)) {
+            this.period = period;
+            final boolean reload = updateStartEndDate();
+            if (reload) {
+                reloadData();
+            }
         }
-
-        this.period = period;
-        updateStartEndDate();
-        // TODO: don't reload if custom period
-        reloadData();
     }
 
-    private void updateStartEndDate() {
+    private boolean updateStartEndDate() {
         final int type = period.getType();
         switch (type) {
             case StatsPeriod.THIS_MONTH: {
@@ -235,7 +230,7 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
                 calendar.set(Calendar.DAY_OF_MONTH, 1);
                 DateUtils.resetToMidnight(calendar);
                 startDate = calendar.getTime();
-                break;
+                return true;
             }
             case StatsPeriod.LAST_MONTH: {
                 final Calendar calendar = Calendar.getInstance();
@@ -246,7 +241,7 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
                 calendar.set(Calendar.DAY_OF_MONTH, 1);
                 DateUtils.resetToMidnight(calendar);
                 startDate = calendar.getTime();
-                break;
+                return true;
             }
             case StatsPeriod.THIS_YEAR: {
                 endDate = new Date();
@@ -255,12 +250,14 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
                 calendar.set(Calendar.DAY_OF_YEAR, 1);
                 DateUtils.resetToMidnight(calendar);
                 startDate = calendar.getTime();
-                break;
+                return true;
             }
             case StatsPeriod.CUSTOM:
                 // TODO: show date picker
-                break;
+                return false;
         }
+
+        return false;
     }
 
     private void reloadData() {
@@ -272,12 +269,11 @@ public class StatsPresenter extends BasePresenterImpl<StatsContract.ViewListener
                             reloadData();
                         }
                     });
-            viewModel.setLoading(false);
             return;
         }
 
-        viewModel.setEmpty(false);
         viewModel.setLoading(true);
+        viewModel.setEmpty(false);
         view.reloadData();
     }
 }

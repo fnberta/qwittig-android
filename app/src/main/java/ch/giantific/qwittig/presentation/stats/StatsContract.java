@@ -14,6 +14,7 @@ import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.common.views.BaseView;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
+import rx.Observable;
 import rx.Single;
 
 /**
@@ -38,11 +39,13 @@ public interface StatsContract {
 
     interface ViewListener extends BaseView {
 
-        Single<StatsResult> getStatsResult();
+        Observable<StatsResult> getStatsResult();
 
         void reloadData();
 
         int[] getStatsColors();
+
+        String getSpendingLabel();
     }
 
     @IntDef({StatsType.GROUP, StatsType.USER})

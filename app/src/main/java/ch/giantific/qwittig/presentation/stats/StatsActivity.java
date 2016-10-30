@@ -15,6 +15,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.widget.ArrayAdapter;
 
+import com.jakewharton.rxrelay.ReplayRelay;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,8 +37,7 @@ import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 import ch.giantific.qwittig.presentation.stats.models.StatsPeriodItem;
 import ch.giantific.qwittig.presentation.stats.models.StatsTypeItem;
 import rx.Observable;
-import rx.Single;
-import rx.subjects.BehaviorSubject;
+import rx.subjects.ReplaySubject;
 
 /**
  * Hosts the different stats fragments, {@link StatsPieFragment} and
@@ -56,7 +57,7 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
     @Inject
     StatsViewModel viewModel;
     private ActivityStatsBinding binding;
-    private BehaviorSubject<StatsResult> loaderSubject = BehaviorSubject.create();
+    private ReplayRelay<StatsResult> loaderSubject = ReplayRelay.create();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,8 +168,8 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
     }
 
     @Override
-    public Single<StatsResult> getStatsResult() {
-        return loaderSubject.asObservable().toSingle();
+    public Observable<StatsResult> getStatsResult() {
+        return loaderSubject.asObservable();
     }
 
     @Override
@@ -179,5 +180,10 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent>
     @Override
     public int[] getStatsColors() {
         return getResources().getIntArray(R.array.stats_colors);
+    }
+
+    @Override
+    public String getSpendingLabel() {
+        return getString(R.string.tab_stats_spending);
     }
 }

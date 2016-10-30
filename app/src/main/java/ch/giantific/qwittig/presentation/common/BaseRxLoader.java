@@ -11,6 +11,7 @@ import android.support.v4.content.Loader;
 import rx.Observable;
 import rx.Subscription;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.ReplaySubject;
 
 /**
  * Provides an abstract base class for a loader that returns a RxJava {@link Observable} as a
@@ -19,7 +20,7 @@ import rx.subjects.BehaviorSubject;
 public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
 
     private Subscription subscription;
-    private BehaviorSubject<T> subject = BehaviorSubject.create();
+    private ReplaySubject<T> subject = ReplaySubject.create();
 
     public BaseRxLoader(@NonNull Context context) {
         super(context);
@@ -80,7 +81,7 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
 
         onStopLoading();
         if (subject != null) {
-            subject = BehaviorSubject.create();
+            subject = ReplaySubject.create();
         }
     }
 }

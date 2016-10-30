@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.stats.widgets;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 
@@ -35,21 +36,24 @@ public class BarChart extends com.github.mikephil.charting.charts.BarChart {
 
     private void setDefaultValues() {
         setNoDataText("");
-//        setDescription("");
+        final Description desc = new Description();
+        desc.setText("");
+        setDescription(desc);
         setFitBars(true);
 
         final XAxis xAxis = getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
 
         final YAxis yAxisRight = getAxisRight();
-        yAxisRight.setAxisMinValue(1f);
+        yAxisRight.setAxisMinimum(1f);
         yAxisRight.setGranularity(1f);
         yAxisRight.setDrawLabels(false);
         yAxisRight.setDrawGridLines(false);
 
         final YAxis yAxisLeft = getAxisLeft();
-        yAxisLeft.setAxisMinValue(1f);
+        yAxisLeft.setAxisMinimum(1f);
         yAxisLeft.setGranularity(1f);
     }
 

@@ -81,6 +81,11 @@ public class StatsViewModel extends BaseObservable
         notifyPropertyChanged(BR.loading);
     }
 
+    public void finishLoading(boolean empty) {
+        this.empty = empty;
+        setLoading(false);
+    }
+
     @Bindable
     public boolean isEmpty() {
         return empty;
