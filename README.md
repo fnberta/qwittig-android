@@ -1,0 +1,7 @@
+# Qwittig
+
+Qwittig is an application that allows users to collect shopping receipts and split the costs within a group. The idea is that you take a picture of the receipt and everyone in the groups gets notified of the new purchase and how it affects the everyone's balance. It did so by performing OCR on the image (on the server) and picking the relevant information.
+
+This repository contains the code for the Android client. It uses kind of a Model-View-Presenter architecture but with the addon of ViewModels. These contain all the view state and are bound via DataBinding. RxJava is used heavily across the app, it basically glues everything together. As a backend datastore, we used the firebase real-time database. On top of that we had a small node.js backend that performed OCR on the receipt images and calculated the balances, see [qwittig-node](https://github.com/fnberta/qwittig-node). 
+
+The name Qwittig comes from the Swiss-German word for receipt. This was also the region we focused on intially regarding the types of receipts the system was able to identify. Unfortunately, we shut down the project before it reached a 1.0 release due to various reasons. Although the app never saw the light of day, it was not wasted time at all. It was the first bigger real-life Android application I developed. As such, it tought me a lot about the Android platform and how to work with all its tricky details.  By today's standards, the code is probably dated and could use some refactoring. If you to want to pick up development, PRs are very welcome of course :).
