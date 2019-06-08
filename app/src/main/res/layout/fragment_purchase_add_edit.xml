@@ -9,11 +9,6 @@
     <data>
 
         <import type="android.view.View"/>
-
-        <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel"
-            />
     </data>
 
     <android.support.v7.widget.RecyclerView

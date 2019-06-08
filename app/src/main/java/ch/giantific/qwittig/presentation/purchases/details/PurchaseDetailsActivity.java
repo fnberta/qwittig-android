@@ -16,10 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,17 +23,20 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
-import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
+import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract.PurchaseResult;
+import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsPresenterModule;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
-import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsViewModelModule;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsArticleItemViewModel;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.items.PurchaseDetailsIdentityItemViewModel;
 
 /**
  * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and
@@ -48,31 +47,23 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsVie
  * Subclass of {@link BaseNavDrawerActivity}.
  */
 public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetailsSubcomponent>
-        implements PurchaseDetailsViewModel.ViewListener {
+        implements PurchaseDetailsContract.ViewListener {
 
+    private static final String STATE_DETAILS_FRAGMENT = "STATE_DETAILS_FRAGMENT";
     @Inject
-    PurchaseDetailsViewModel mPurchaseDetailsViewModel;
-    private boolean mShowEditOptions;
-    private boolean mShowExchangeRate;
-    private ActivityPurchaseDetailsBinding mBinding;
-
-    @Override
-    protected void handleLocalBroadcast(Intent intent, int dataType) {
-        super.handleLocalBroadcast(intent, dataType);
-
-        if (dataType == LocalBroadcast.DataType.PURCHASES_UPDATED) {
-            final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-            if (successful) {
-                mPurchaseDetailsViewModel.loadData();
-            }
-        }
-    }
+    PurchaseDetailsContract.Presenter presenter;
+    @Inject
+    PurchaseDetailsViewModel viewModel;
+    private PurchaseDetailsFragment detailsFragment;
+    private boolean showEditOptions;
+    private boolean showExchangeRate;
+    private ActivityPurchaseDetailsBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_details);
-        mBinding.setViewModel(mPurchaseDetailsViewModel);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_details);
+        binding.setViewModel(viewModel);
 
         // disable default actionBar title
         final ActionBar actionBar = getSupportActionBar();
@@ -84,65 +75,67 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         unCheckNavDrawerItems();
         supportPostponeEnterTransition();
 
-        final PurchaseDetailsActivity activity = this;
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavUtils.navigateUpFromSameTask(activity);
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> NavUtils.navigateUpFromSameTask(this));
 
-
-        if (mUserLoggedIn) {
-            setupTabs();
+        if (userLoggedIn) {
+            setupTabs(savedInstanceState);
         }
     }
 
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        mComponent = navComp.plus(new PurchaseDetailsViewModelModule(savedInstanceState, getPurchaseId()));
-        mComponent.inject(this);
-        mPurchaseDetailsViewModel.attachView(this);
+        component = navComp.plus(new PurchaseDetailsPresenterModule(getPurchaseId(),
+                        getIntent().getStringExtra(FcmMessagingService.PUSH_GROUP_ID)),
+                new PersistentViewModelsModule(savedInstanceState));
+        component.inject(this);
+        presenter.attachView(this);
     }
 
     private String getPurchaseId() {
         final Intent intent = getIntent();
-        String purchaseId = intent.getStringExtra(Navigator.INTENT_PURCHASE_ID); // started from HomeActivity
-
-        if (TextUtils.isEmpty(purchaseId)) { // started via push notification
-            try {
-                JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-                purchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_PURCHASE_ID);
-            } catch (JSONException e) {
-                showMessage(R.string.toast_error_purchase_details_load);
-            }
+        // started from HomeActivity
+        String purchaseId = intent.getStringExtra(Navigator.EXTRA_PURCHASE_ID);
+        if (TextUtils.isEmpty(purchaseId)) {
+            // started via push notification
+            purchaseId = intent.getStringExtra(FcmMessagingService.PUSH_PURCHASE_ID);
         }
 
         return purchaseId;
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mPurchaseDetailsViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{navPresenter, presenter});
     }
 
-    private void setupTabs() {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(PurchaseDetailsViewModel.TAG, viewModel);
+        getSupportFragmentManager().putFragment(outState, STATE_DETAILS_FRAGMENT, detailsFragment);
+    }
+
+    private void setupTabs(@Nullable Bundle savedInstanceState) {
         final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
-        tabsAdapter.addInitialFragment(new PurchaseDetailsFragment(), getString(R.string.tab_details_purchase));
+        detailsFragment = savedInstanceState == null
+                          ? new PurchaseDetailsFragment()
+                          : (PurchaseDetailsFragment) getSupportFragmentManager().getFragment(savedInstanceState, STATE_DETAILS_FRAGMENT);
+        tabsAdapter.addInitialFragment(detailsFragment, getString(R.string.tab_details_purchase));
         tabsAdapter.addInitialFragment(new PurchaseDetailsReceiptFragment(), getString(R.string.tab_details_receipt));
-        mBinding.viewpager.setAdapter(tabsAdapter);
+        binding.viewpager.setAdapter(tabsAdapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_purchase_details, menu);
 
-        if (mShowEditOptions) {
+        if (showEditOptions) {
             menu.findItem(R.id.action_purchase_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_delete).setVisible(true);
         }
-        if (mShowExchangeRate) {
+        if (showExchangeRate) {
             menu.findItem(R.id.action_purchase_show_exchange_rate).setVisible(true);
         }
 
@@ -154,13 +147,13 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         int id = item.getItemId();
         switch (id) {
             case R.id.action_purchase_edit:
-                mPurchaseDetailsViewModel.onEditPurchaseClick();
+                presenter.onEditPurchaseClick();
                 return true;
             case R.id.action_purchase_delete:
-                mPurchaseDetailsViewModel.onDeletePurchaseClick();
+                presenter.onDeletePurchaseClick();
                 return true;
             case R.id.action_purchase_show_exchange_rate:
-                mPurchaseDetailsViewModel.onShowExchangeRateClick();
+                presenter.onShowExchangeRateClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -171,12 +164,12 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == Navigator.INTENT_REQUEST_PURCHASE_MODIFY) {
+        if (requestCode == Navigator.RC_PURCHASE_MODIFY) {
             switch (resultCode) {
-                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_SAVED:
+                case PurchaseResult.PURCHASE_SAVED:
                     showMessage(R.string.toast_changes_saved);
                     break;
-                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DISCARDED:
+                case PurchaseResult.PURCHASE_DISCARDED:
                     showMessage(R.string.toast_changes_discarded);
                     break;
             }
@@ -187,7 +180,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     public void setupScreenAfterLogin() {
         super.setupScreenAfterLogin();
 
-        setupTabs();
+        setupTabs(null);
     }
 
     @Override
@@ -196,9 +189,44 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     }
 
     @Override
-    public void toggleMenuOptions(boolean showEditOptions, boolean hasForeignCurrency) {
-        mShowEditOptions = showEditOptions;
-        mShowExchangeRate = hasForeignCurrency;
+    public void toggleMenuOptions(boolean showEditOptions, boolean showExchangeRateOption) {
+        this.showEditOptions = showEditOptions;
+        showExchangeRate = showExchangeRateOption;
         invalidateOptionsMenu();
+    }
+
+    @Override
+    public void addArticle(@NonNull PurchaseDetailsArticleItemViewModel item) {
+        detailsFragment.getArticlesRecyclerAdapter().addItem(item);
+    }
+
+    @Override
+    public void clearArticles() {
+        detailsFragment.getArticlesRecyclerAdapter().clearItems();
+    }
+
+    @Override
+    public boolean isArticlesEmpty() {
+        return detailsFragment.getArticlesRecyclerAdapter().getItemCount() == 0;
+    }
+
+    @Override
+    public void notifyArticlesChanged() {
+        detailsFragment.getArticlesRecyclerAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void addIdentities(@NonNull List<PurchaseDetailsIdentityItemViewModel> items) {
+        detailsFragment.getIdentitiesRecyclerAdapter().addItems(items);
+    }
+
+    @Override
+    public void clearIdentities() {
+        detailsFragment.getIdentitiesRecyclerAdapter().clearItems();
+    }
+
+    @Override
+    public void notifyIdentitiesChanged() {
+        detailsFragment.getIdentitiesRecyclerAdapter().notifyDataSetChanged();
     }
 }

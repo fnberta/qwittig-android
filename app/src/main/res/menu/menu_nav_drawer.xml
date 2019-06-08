@@ -21,16 +21,16 @@
             android:title="@string/title_activity_finance"
             />
         <item
-            android:id="@+id/nav_tasks"
+            android:id="@+id/nav_assignments"
             android:icon="@drawable/ic_nav_assignment"
-            android:title="@string/title_activity_tasks"
-            android:visible="false"
+            android:title="@string/title_activity_assignments"
+            android:visible="true"
             />
         <item
             android:id="@+id/nav_stats"
             android:icon="@drawable/ic_nav_assessment"
             android:title="@string/title_activity_stats"
-            android:visible="false"
+            android:visible="true"
             />
     </group>
 

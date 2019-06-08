@@ -11,7 +11,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
+import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
 
 /**
  * Handles fragments as tabs in a {@link ViewPager}.
@@ -36,31 +36,26 @@ public class HomeTabsAdapter extends TabsAdapter {
     /**
      * Adds an additional fragment to the adapter.
      *
-     * @param fragment the fragment to add
+     * @param fragment the fragment to addItemAtPosition
      * @param title    the title of the fragment to be displayed in the tab
      */
     public void addFragment(@NonNull Fragment fragment, @NonNull String title) {
-        mFragments.add(fragment);
-        mFragmentTitles.add(title);
+        fragments.add(fragment);
+        fragmentTitles.add(title);
         notifyDataSetChanged();
     }
 
     public void removeFragment(@NonNull Fragment fragment) {
-        final int pos = mFragments.indexOf(fragment);
-        mFragments.remove(pos);
-        mFragmentTitles.remove(pos);
+        final int pos = fragments.indexOf(fragment);
+        fragments.remove(pos);
+        fragmentTitles.remove(pos);
         notifyDataSetChanged();
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return super.getItemId(position);
     }
 
     @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     public int getItemPosition(Object object) {
-        if (!mFragments.contains(object)) {
+        if (!fragments.contains(object)) {
             return POSITION_NONE;
         }
 

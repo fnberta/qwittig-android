@@ -5,14 +5,13 @@
 package ch.giantific.qwittig.presentation.settings.general;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.BaseDialogFragment;
 
 /**
  * Provides a dialog that asks the user if he really wants to delete his/her account.
@@ -38,11 +37,9 @@ public class DeleteAccountDialogFragment extends BaseDialogFragment<DeleteAccoun
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder.setMessage(R.string.dialog_account_delete_message)
-                .setPositiveButton(R.string.dialog_positive_delete, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        mActivity.onDeleteAccountSelected();
-                        dismiss();
-                    }
+                .setPositiveButton(R.string.dialog_positive_delete, (dialog, id) -> {
+                    activity.onDeleteAccountSelected();
+                    dismiss();
                 })
                 .setNegativeButton(android.R.string.no, null);
         return dialogBuilder.create();

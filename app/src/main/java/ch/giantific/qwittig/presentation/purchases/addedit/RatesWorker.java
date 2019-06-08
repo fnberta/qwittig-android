@@ -12,8 +12,8 @@ import android.text.TextUtils;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.rest.exchangerates.ExchangeRates;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
@@ -29,7 +29,7 @@ public class RatesWorker extends BaseWorker<Float, RatesWorkerListener> {
     private static final String KEY_BASE_CURRENCY = "BASE_CURRENCY";
     private static final String KEY_CURRENCY = "CURRENCY";
     @Inject
-    PurchaseRepository mPurchaseRepo;
+    PurchaseRepository purchaseRepo;
 
     public RatesWorker() {
         // empty default constructor
@@ -71,7 +71,7 @@ public class RatesWorker extends BaseWorker<Float, RatesWorkerListener> {
         final String baseCurrency = args.getString(KEY_BASE_CURRENCY, "");
         final String currency = args.getString(KEY_CURRENCY, "");
         if (!TextUtils.isEmpty(baseCurrency) && !TextUtils.isEmpty(currency)) {
-            return mPurchaseRepo.getExchangeRate(baseCurrency, currency).toObservable();
+            return purchaseRepo.getExchangeRate(baseCurrency, currency).toObservable();
         }
 
         return null;
@@ -79,11 +79,11 @@ public class RatesWorker extends BaseWorker<Float, RatesWorkerListener> {
 
     @Override
     protected void onError() {
-        mActivity.onWorkerError(WORKER_TAG);
+        activity.onWorkerError(WORKER_TAG);
     }
 
     @Override
     protected void setStream(@NonNull Observable<Float> observable) {
-        mActivity.setRateFetchStream(observable.toSingle(), WORKER_TAG);
+        activity.setRateFetchStream(observable.toSingle(), WORKER_TAG);
     }
 }

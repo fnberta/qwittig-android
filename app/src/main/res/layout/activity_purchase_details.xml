@@ -12,7 +12,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel"
             />
     </data>
 
@@ -61,7 +61,7 @@
                             style="@style/TextAppearance.AppCompat.Headline"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@{viewModel.purchaseStore}"
+                            android:text="@{viewModel.store}"
                             tools:text="Denner"
                             />
 
@@ -69,7 +69,7 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@{viewModel.purchaseDate}"
+                            android:text="@{viewModel.date}"
                             tools:text="27.10.14"
                             />
                     </LinearLayout>

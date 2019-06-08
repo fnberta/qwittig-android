@@ -5,42 +5,52 @@
 package ch.giantific.qwittig.presentation.purchases.addedit;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditRecyclerAdapter.ArticleIdentitiesRow;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.BasePurchaseAddEditItemViewModel.ViewType;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 
 /**
- * Displays the interface where the user can add a new purchase by setting store, date, users
+ * Displays the interface where the user can addItemAtPosition a new purchase by setting store, date, users
  * involved and the different items.
- * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditViewModel, S extends BaseRecyclerViewFragment.ActivityListener<U>>
-        extends BaseRecyclerViewFragment<U, T, S> {
+public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditContract.Presenter, S extends BaseFragment.ActivityListener<U>>
+        extends BaseFragment<U, T, S> {
 
-    private FragmentPurchaseAddEditBinding mBinding;
+    @Inject
+    PurchaseAddEditViewModel viewModel;
+    private FragmentPurchaseAddEditBinding binding;
+    private PurchaseAddEditRecyclerAdapter recyclerAdapter;
+
+    public PurchaseAddEditRecyclerAdapter getRecyclerAdapter() {
+        return recyclerAdapter;
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBinding = FragmentPurchaseAddEditBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentPurchaseAddEditBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        setupRecyclerView();
         final ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 0, ItemTouchHelper.END) {
             @Override
@@ -51,29 +61,42 @@ public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditVi
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                mViewModel.onItemDismiss(viewHolder.getAdapterPosition());
+                presenter.onArticleDismiss(viewHolder.getAdapterPosition());
             }
 
             @Override
             public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 final int position = viewHolder.getAdapterPosition();
-                if (mViewModel.getItemViewType(position) != Type.ITEM) {
+                if (viewModel.getItemAtPosition(position).getViewType() != ViewType.ARTICLE) {
                     return 0;
                 }
 
                 return super.getSwipeDirs(recyclerView, viewHolder);
             }
         });
-        touchHelper.attachToRecyclerView(mBinding.rvPurchaseAddEdit);
+        touchHelper.attachToRecyclerView(binding.rvPurchaseAddEdit);
+    }
+
+    private void setupRecyclerView() {
+        binding.rvPurchaseAddEdit.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvPurchaseAddEdit.setHasFixedSize(true);
+        recyclerAdapter = new PurchaseAddEditRecyclerAdapter(presenter, viewModel);
+        binding.rvPurchaseAddEdit.setAdapter(recyclerAdapter);
     }
 
     @Override
-    protected RecyclerView getRecyclerView() {
-        return mBinding.rvPurchaseAddEdit;
+    protected View getSnackbarView() {
+        return binding.rvPurchaseAddEdit;
     }
 
-    @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchaseAddEditRecyclerAdapter(mViewModel);
+    public void scrollToPosition(int position) {
+        binding.rvPurchaseAddEdit.scrollToPosition(position);
+    }
+
+    public void notifyItemIdentityChanged(int position,
+                                          @NonNull PurchaseAddEditArticleIdentityItemViewModel identityViewModel) {
+        final ArticleIdentitiesRow row =
+                (ArticleIdentitiesRow) binding.rvPurchaseAddEdit.findViewHolderForAdapterPosition(position);
+        row.notifyItemChanged(identityViewModel);
     }
 }

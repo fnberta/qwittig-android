@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="@string/no_stats_data"
-        android:visibility="@{!viewModel.dataEmpty ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
+        android:visibility="@{!viewModel.empty ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
         />
 
 </layout>

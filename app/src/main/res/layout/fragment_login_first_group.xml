@@ -13,7 +13,12 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.login.LoginFirstGroupViewModel"
+            type="ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupContract.Presenter"
             />
     </data>
 
@@ -22,7 +27,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:transitionGroup="true"
-        tools:context=".presentation.login.LoginProfileViewModel"
+        tools:context=".presentation.login.profile.LoginProfileContract"
         tools:targetApi="lollipop"
         >
 
@@ -51,8 +56,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_group_name"
                     android:inputType="textCapSentences"
-                    android:onTextChanged="@{viewModel::onGroupNameChanged}"
-                    android:text="@{viewModel.groupName}"
+                    android:text="@={viewModel.groupName}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -63,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginStart="@dimen/key_line_1"
-                android:onItemSelected="@{viewModel::onGroupCurrencySelected}"
+                android:onItemSelected="@{presenter::onGroupCurrencySelected}"
                 android:selection="@{viewModel.selectedGroupCurrency}"
                 />
 
@@ -99,7 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="@dimen/normal_space"
-            android:onClick="@{viewModel::onFabDoneClick}"
+            android:onClick="@{presenter::onDoneClick}"
             android:src="@drawable/ic_arrow_forward_black_24dp"
             />
 

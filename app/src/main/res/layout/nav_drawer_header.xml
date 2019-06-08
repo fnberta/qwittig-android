@@ -15,6 +15,11 @@
             name="viewModel"
             type="ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModel"
             />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.navdrawer.NavDrawerContract.Presenter"
+            />
     </data>
 
     <FrameLayout
@@ -27,7 +32,7 @@
             android:layout_height="match_parent"
             android:contentDescription="@string/user_avatar"
             android:scaleType="centerCrop"
-            app:backdrop="@{viewModel.identityAvatar}"
+            app:backdrop="@{viewModel.avatar}"
             tools:src="@drawable/ic_account_box_black_144dp"
             />
 
@@ -47,8 +52,8 @@
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginTop="@dimen/navdrawer_status_bar_plus_normal_space"
                 android:contentDescription="@string/user_avatar"
-                android:onClick="@{viewModel::onAvatarClick}"
-                app:avatarRipple="@{viewModel.identityAvatar}"
+                android:onClick="@{presenter::onAvatarClick}"
+                app:avatarRipple="@{viewModel.avatar}"
                 app:fallback="@{@drawable/ic_account_circle_black_80dp}"
                 tools:src="@drawable/ic_account_circle_black_80dp"
                 />
@@ -59,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginStart="@dimen/key_line_1"
-                android:text="@{viewModel.identityNickname}"
+                android:text="@{viewModel.nickname}"
                 tools:text="beeeezn"
                 />
 
@@ -69,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginStart="@dimen/key_line_1"
-                android:onItemSelected="@{viewModel::onIdentitySelected}"
+                android:onItemSelected="@{presenter::onIdentitySelected}"
                 android:selection="@{viewModel.selectedIdentity}"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 />

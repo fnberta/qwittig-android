@@ -6,16 +6,11 @@ package ch.giantific.qwittig.utils;
 
 import android.support.annotation.NonNull;
 
-import com.parse.ParseConfig;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Currency;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Provides useful static utility methods related to the handling of money.
@@ -24,9 +19,8 @@ public class MoneyUtils {
 
     // TODO: replace with currency dependent value
     public static final double MIN_DIFF = 0.01;
-    public static final String[] SUPPORTED_CURRENCIES = new String[]{"CHF", "EUR", "USD", "GBP"};
-    private static final int EXCHANGE_RATE_FRACTION_DIGITS = 6;
-    private static final int CONVERTED_PRICE_FRACTION_DIGITS = 4;
+    public static final int EXCHANGE_RATE_FRACTION_DIGITS = 6;
+    public static final int CONVERTED_PRICE_FRACTION_DIGITS = 4;
 
     private MoneyUtils() {
         // class cannot be instantiated
@@ -54,8 +48,8 @@ public class MoneyUtils {
             moneyFormatter = NumberFormat.getInstance();
             moneyFormatter.setRoundingMode(RoundingMode.HALF_UP);
             final int fractionDigits = withDecimals
-                    ? Currency.getInstance(currencyCode).getDefaultFractionDigits()
-                    : 0;
+                                       ? Currency.getInstance(currencyCode).getDefaultFractionDigits()
+                                       : 0;
             moneyFormatter.setMinimumFractionDigits(fractionDigits);
             moneyFormatter.setMaximumFractionDigits(fractionDigits);
         }
@@ -91,6 +85,25 @@ public class MoneyUtils {
         } catch (NumberFormatException e) {
             try {
                 return parser.parse(price).doubleValue();
+            } catch (ParseException e1) {
+                return 0;
+            }
+        }
+    }
+
+    /**
+     * Returns a parsed double using the provided {@link NumberFormat} instance.
+     *
+     * @param price        the price string to parse
+     * @param numberFormat the number formatter to parse the string
+     * @return a parsed double
+     */
+    public static double parsePrice(@NonNull String price, @NonNull NumberFormat numberFormat) {
+        try {
+            return Double.parseDouble(price);
+        } catch (NumberFormatException e) {
+            try {
+                return numberFormat.parse(price).doubleValue();
             } catch (ParseException e1) {
                 return 0;
             }
@@ -138,40 +151,5 @@ public class MoneyUtils {
      */
     private static BigDecimal roundToFractionDigits(double number, int fractionDigits) {
         return new BigDecimal(number).setScale(fractionDigits, RoundingMode.HALF_UP);
-    }
-
-    /**
-     * Returns the currently supported currencies as
-     * {@link ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency} objects with a name and currency code.
-     * Reads the information from {@link ParseConfig}.
-     *
-     * @return the currently supported currencies
-     */
-    @NonNull
-    public static List<ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency> getSupportedCurrencies() {
-        final List<String> displayNames = new ArrayList<>(SUPPORTED_CURRENCIES.length);
-        for (String currencyCode : SUPPORTED_CURRENCIES) {
-            displayNames.add(getCurrencyDisplayName(currencyCode));
-        }
-
-        final List<ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency> currencies =
-                new ArrayList<>(SUPPORTED_CURRENCIES.length);
-        for (int i = 0; i < SUPPORTED_CURRENCIES.length; i++) {
-            currencies.add(new ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency(displayNames.get(i),
-                    SUPPORTED_CURRENCIES[i]));
-        }
-
-        return currencies;
-    }
-
-    /**
-     * Returns the display name for currency code.
-     *
-     * @param currencyCode the currency code to get the display name for
-     * @return the display name for currency code
-     */
-    private static String getCurrencyDisplayName(@NonNull String currencyCode) {
-        final Currency currency = Currency.getInstance(currencyCode);
-        return currency.getDisplayName(Locale.getDefault());
     }
 }

@@ -10,9 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentPurchaseShowReceiptBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel;
 
 
 /**
@@ -20,9 +23,13 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSub
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetailsSubcomponent, PurchaseDetailsViewModel, BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
+public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetailsSubcomponent,
+        PurchaseDetailsContract.Presenter,
+        BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
 
-    private FragmentPurchaseShowReceiptBinding mBinding;
+    @Inject
+    PurchaseDetailsViewModel viewModel;
+    private FragmentPurchaseShowReceiptBinding binding;
 
     public PurchaseDetailsReceiptFragment() {
         // required empty constructor
@@ -31,15 +38,15 @@ public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetails
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentPurchaseShowReceiptBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentPurchaseShowReceiptBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mBinding.setViewModel(mViewModel);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -49,6 +56,6 @@ public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetails
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.ivReceipt;
+        return binding.ivReceipt;
     }
 }

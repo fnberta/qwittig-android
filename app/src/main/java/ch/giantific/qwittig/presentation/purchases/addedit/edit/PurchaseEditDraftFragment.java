@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditComponent;
 
@@ -21,7 +22,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditCompon
  * <p/>
  * Subclass of {@link PurchaseAddFragment}.
  */
-public class PurchaseEditDraftFragment extends BasePurchaseAddEditFragment<PurchaseEditComponent, PurchaseEditDraftViewModel, BasePurchaseAddEditFragment.ActivityListener<PurchaseEditComponent>> {
+public class PurchaseEditDraftFragment extends BasePurchaseAddEditFragment<PurchaseEditComponent, PurchaseAddEditContract.EditDraftPresenter, BasePurchaseAddEditFragment.ActivityListener<PurchaseEditComponent>> {
 
     public PurchaseEditDraftFragment() {
         // required empty constructor
@@ -48,10 +49,10 @@ public class PurchaseEditDraftFragment extends BasePurchaseAddEditFragment<Purch
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_purchase_edit_save_changes_draft:
-                mViewModel.onSaveAsDraftMenuClick();
+                presenter.onSaveAsDraftMenuClick();
                 return true;
             case R.id.action_purchase_edit_draft_delete:
-                mViewModel.onDeleteDraftMenuClick();
+                presenter.onDeleteDraftMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

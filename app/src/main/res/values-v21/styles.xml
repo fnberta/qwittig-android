@@ -18,8 +18,20 @@
         <item name="android:windowEnterTransition">@transition/explode_main</item>
     </style>
 
+    <style name="AppTheme.DrawStatusBar.SlideTop" parent="AppTheme.DrawStatusBar">
+        <item name="android:windowEnterTransition">@transition/slide_main_top</item>
+    </style>
+
+    <style name="AppTheme.DrawStatusBar.SlideBottom" parent="AppTheme.DrawStatusBar">
+        <item name="android:windowEnterTransition">@transition/slide_main_bottom</item>
+    </style>
+
     <style name="AppTheme.SlideBottom" parent="AppTheme">
         <item name="android:windowEnterTransition">@transition/slide_main_bottom</item>
+    </style>
+
+    <style name="AppTheme.SlideTop" parent="AppTheme">
+        <item name="android:windowEnterTransition">@transition/slide_main_top</item>
     </style>
 
     <style name="AppTheme.SlideEnd" parent="AppTheme">

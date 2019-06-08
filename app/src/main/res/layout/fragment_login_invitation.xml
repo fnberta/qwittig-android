@@ -13,7 +13,12 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.login.LoginInvitationViewModel"
+            type="ch.giantific.qwittig.presentation.login.invitation.LoginInvitationViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.login.invitation.LoginInvitationContract.Presenter"
             />
     </data>
 
@@ -26,7 +31,7 @@
         android:layout_marginTop="@dimen/normal_space"
         android:orientation="vertical"
         android:transitionGroup="true"
-        tools:context=".presentation.login.LoginInvitationFragment"
+        tools:context=".presentation.login.invitation.LoginInvitationFragment"
         tools:targetApi="lollipop"
         >
 
@@ -62,7 +67,7 @@
                 android:id="@+id/bt_login_invitation_decline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{viewModel::onDeclineClick}"
+                android:onClick="@{presenter::onDeclineClick}"
                 android:text="@string/invite_accept_no"
                 />
 
@@ -70,7 +75,7 @@
                 android:id="@+id/bt_login_invitation_accept"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{viewModel::onAcceptClick}"
+                android:onClick="@{presenter::onAcceptClick}"
                 android:text="@string/invite_accept_yes"
                 />
         </LinearLayout>

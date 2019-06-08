@@ -15,32 +15,232 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel"
             />
     </data>
 
-    <FrameLayout
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="@dimen/small_space"
         android:transitionGroup="true"
         tools:targetApi="lollipop"
         >
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_purchase_details"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="@dimen/small_space"
-            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
-            />
+            >
 
-        <include
-            layout="@layout/include_progress"
-            app:viewModel="@{viewModel}"
-            />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+                >
 
-    </FrameLayout>
+                <TextView
+                    android:id="@+id/tv_purchase_details_header_users"
+                    style="@style/SubHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/subheader_height"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:clickable="false"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/key_line_1"
+                    android:paddingStart="@dimen/key_line_1"
+                    android:text="@string/header_users"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/ll_purchase_details_identities"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@id/tv_purchase_details_header_users"
+                    android:orientation="horizontal"
+                    >
+
+                    <ImageView
+                        android:id="@+id/iv_purchase_details_users"
+                        android:layout_width="@dimen/icon_size"
+                        android:layout_height="@dimen/icon_size"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                        android:layout_marginStart="@dimen/key_line_1"
+                        android:contentDescription="@string/hint_users"
+                        android:src="@drawable/ic_group_black_24dp"
+                        />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_purchase_details_identities"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:paddingEnd="@dimen/key_line_1"
+                        tools:listitem="@layout/row_purchase_details_identity"
+                        />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_purchase_details_items"
+                    style="@style/SubHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/subheader_height"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/ll_purchase_details_identities"
+                    android:clickable="false"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/key_line_1"
+                    android:paddingStart="@dimen/key_line_1"
+                    android:text="@string/header_articles"
+                    />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_purchase_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/tv_purchase_details_items"
+                    />
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@id/rv_purchase_details"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_2"
+                    android:layout_marginTop="@dimen/small_space"
+                    android:background="?android:attr/listDivider"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_total_text"
+                    style="@style/TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/divider"
+                    android:layout_marginStart="@dimen/key_line_2"
+                    android:layout_marginTop="@dimen/normal_space"
+                    android:text="@string/purchase_total"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_total_value"
+                    style="@style/TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@id/divider"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginTop="@dimen/normal_space"
+                    android:text="@{viewModel.total}"
+                    tools:text="124.50 CHF"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_total_value_foreign"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@id/tv_total_value"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginTop="2dp"
+                    android:text="@{viewModel.totalForeign}"
+                    android:visibility="@{viewModel.totalForeign.equals(viewModel.total) ? View.GONE : View.VISIBLE}"
+                    tools:text="1.34 GBP"
+                    tools:visibility="visible"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_my_share_text"
+                    style="@style/TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@id/tv_total_value_foreign"
+                    android:layout_marginStart="@dimen/key_line_2"
+                    android:layout_marginTop="@dimen/min_space"
+                    android:text="@string/purchase_my_share"
+                    android:textColor="?android:textColorSecondary"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_my_share_value"
+                    style="@style/TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@id/tv_total_value_foreign"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginTop="@dimen/min_space"
+                    android:text="@{viewModel.myShare}"
+                    android:textColor="?android:textColorSecondary"
+                    tools:text="124.50 CHF"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_my_share_value_foreign"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@id/tv_my_share_value"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginTop="2dp"
+                    android:text="@{viewModel.myShareForeign}"
+                    android:textColor="?android:textColorSecondary"
+                    android:visibility="@{viewModel.myShareForeign.equals(viewModel.myShare) ? View.GONE : View.VISIBLE}"
+                    tools:text="1.34 GBP"
+                    tools:visibility="visible"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_purchase_details_header_note"
+                    style="@style/SubHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/subheader_height"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/tv_my_share_value_foreign"
+                    android:clickable="false"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/key_line_1"
+                    android:paddingStart="@dimen/key_line_1"
+                    android:text="@string/header_note"
+                    android:visibility="@{viewModel.noteAvailable ? View.VISIBLE : View.GONE}"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_purchase_details_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/tv_purchase_details_header_note"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:text="@{viewModel.note}"
+                    android:visibility="@{viewModel.noteAvailable ? View.VISIBLE : View.GONE}"
+                    tools:text="Dies ist eine Notiz"
+                    />
+
+            </RelativeLayout>
+
+            <include
+                layout="@layout/include_progress"
+                app:viewModel="@{viewModel}"
+                />
+
+        </FrameLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
 
 </layout>
 

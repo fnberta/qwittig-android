@@ -6,47 +6,61 @@ package ch.giantific.qwittig.presentation.purchases.details;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentPurchaseDetailsBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.details.viewmodels.PurchaseDetailsViewModel;
 
 
 /**
  * Displays all items of a purchase, the users involved the total price and the share of the
  * current user. The store and date of the purchase are displayed in the hosting activity.
- * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
  *
  * @see PurchaseDetailsActivity
  */
-public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDetailsSubcomponent, PurchaseDetailsViewModel, BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
+public class PurchaseDetailsFragment extends BaseFragment<PurchaseDetailsSubcomponent,
+        PurchaseDetailsContract.Presenter,
+        BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
 
-    private FragmentPurchaseDetailsBinding mBinding;
+    @Inject
+    PurchaseDetailsViewModel viewModel;
+    private FragmentPurchaseDetailsBinding binding;
+    private PurchaseDetailsRecyclerAdapter articlesRecyclerAdapter;
+    private PurchaseDetailsIdentitiesRecyclerAdapter identitiesRecyclerAdapter;
 
     public PurchaseDetailsFragment() {
         // required empty constructor
     }
 
+    public PurchaseDetailsRecyclerAdapter getArticlesRecyclerAdapter() {
+        return articlesRecyclerAdapter;
+    }
+
+    public PurchaseDetailsIdentitiesRecyclerAdapter getIdentitiesRecyclerAdapter() {
+        return identitiesRecyclerAdapter;
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentPurchaseDetailsBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentPurchaseDetailsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        setupArticleRecyclerView();
+        setupIdentitiesRecyclerView();
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -54,13 +68,23 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
         component.inject(this);
     }
 
-    @Override
-    protected RecyclerView getRecyclerView() {
-        return mBinding.rvPurchaseDetails;
+    private void setupArticleRecyclerView() {
+        binding.rvPurchaseDetails.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvPurchaseDetails.setHasFixedSize(true);
+        articlesRecyclerAdapter = new PurchaseDetailsRecyclerAdapter();
+        binding.rvPurchaseDetails.setAdapter(articlesRecyclerAdapter);
+    }
+
+    private void setupIdentitiesRecyclerView() {
+        binding.rvPurchaseDetailsIdentities.setHasFixedSize(true);
+        binding.rvPurchaseDetailsIdentities.setLayoutManager(new LinearLayoutManager(getActivity(),
+                LinearLayoutManager.HORIZONTAL, false));
+        identitiesRecyclerAdapter = new PurchaseDetailsIdentitiesRecyclerAdapter();
+        binding.rvPurchaseDetailsIdentities.setAdapter(identitiesRecyclerAdapter);
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchaseDetailsRecyclerAdapter(mViewModel);
+    protected View getSnackbarView() {
+        return binding.rvPurchaseDetails;
     }
 }

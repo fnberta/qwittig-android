@@ -22,16 +22,20 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivitySettingsProfileBinding;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.delegates.GoogleApiClientDelegate;
+import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.ProfileAction;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
+import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.EmailReAuthenticateDialogFragment;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
+import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
+import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
 import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileComponent;
-import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileViewModelModule;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import rx.Single;
 
@@ -47,18 +51,26 @@ import rx.Single;
  * @see android.support.design.widget.CollapsingToolbarLayout
  */
 public class SettingsProfileActivity extends BaseActivity<SettingsProfileComponent> implements
+        SettingsProfileFragment.ActivityListener,
         DiscardChangesDialogFragment.DialogInteractionListener,
-        UnlinkThirdPartyWorkerListener {
+        GoogleUserWorkerListener, EmailUserWorkerListener, FacebookUserWorkerListener,
+        EmailReAuthenticateDialogFragment.DialogInteractionListener,
+        GoogleApiClientDelegate.GoogleLoginCallback {
 
     @Inject
-    SettingsProfileViewModel mProfileViewModel;
+    SettingsProfileContract.Presenter presenter;
+    @Inject
+    SettingsProfileViewModel viewModel;
+    @Inject
+    GoogleApiClientDelegate googleApiDelegate;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final ActivitySettingsProfileBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_settings_profile);
-        binding.setViewModel(mProfileViewModel);
+        binding.setPresenter(presenter);
+        binding.setViewModel(viewModel);
 
         supportPostponeEnterTransition();
 
@@ -72,21 +84,31 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
                     .add(R.id.container, new SettingsProfileFragment())
                     .commit();
         }
+
+        googleApiDelegate.createGoogleApiClient();
     }
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerSettingsProfileComponent.builder()
+        component = DaggerSettingsProfileComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .settingsProfileViewModelModule(new SettingsProfileViewModelModule(savedInstanceState))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
+                .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, null))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mProfileViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(SettingsProfileViewModel.TAG, viewModel);
     }
 
     @Override
@@ -94,7 +116,7 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                mProfileViewModel.onExitClick();
+                presenter.onExitClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -103,35 +125,60 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
 
     @Override
     public void onBackPressed() {
-        mProfileViewModel.onExitClick();
+        presenter.onExitClick();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        googleApiDelegate.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_PICK:
+            case Navigator.RC_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
-                        @Override
-                        public void onAvatarSaved(@NonNull String path) {
-                            mProfileViewModel.onNewAvatarTaken(path);
-                        }
-                    });
+                    AvatarUtils.saveImageLocal(this, imageUri, path -> presenter.onNewAvatarTaken(path));
                 }
         }
     }
 
     @Override
-    public void setUnlinkActionStream(@NonNull Single<User> single, @NonNull String workerTag,
-                                      @ProfileAction int action) {
-        mProfileViewModel.setUnlinkActionStream(single, workerTag, action);
+    public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
+        presenter.onValidEmailAndPasswordEntered(email, password);
+    }
+
+    @Override
+    public void loginWithGoogle() {
+        googleApiDelegate.loginWithGoogle();
+    }
+
+    @Override
+    public void onGoogleLoginSuccessful(@NonNull String idToken) {
+        presenter.onGoogleLoginSuccessful(idToken);
+    }
+
+    @Override
+    public void onGoogleLoginFailed() {
+        presenter.onGoogleLoginFailed();
+    }
+
+    @Override
+    public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
+        presenter.setGoogleUserStream(single, workerTag);
+    }
+
+    @Override
+    public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
+        presenter.setFacebookUserStream(single, workerTag);
+    }
+
+    @Override
+    public void setEmailUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
+        presenter.setEmailUserStream(single, workerTag);
     }
 
     @Override
     public void onDiscardChangesSelected() {
-        mProfileViewModel.onDiscardChangesSelected();
+        presenter.onDiscardChangesSelected();
     }
 }

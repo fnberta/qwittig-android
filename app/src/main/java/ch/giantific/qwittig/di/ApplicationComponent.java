@@ -6,16 +6,22 @@ package ch.giantific.qwittig.di;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.app.NotificationManagerCompat;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.storage.FirebaseStorage;
 
 import javax.inject.Singleton;
 
 import ch.giantific.qwittig.Qwittig;
-import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.data.rest.ReceiptOcr;
+import ch.giantific.qwittig.data.rest.dynamiclinks.DynamicLink;
+import ch.giantific.qwittig.data.rest.userdata.UserDataDeletion;
+import ch.giantific.qwittig.data.rest.exchangerates.ExchangeRates;
+import ch.giantific.qwittig.data.rest.stats.Stats;
 import dagger.Component;
 
 /**
@@ -24,20 +30,32 @@ import dagger.Component;
  * @see {@link Qwittig}
  */
 @Singleton
-@Component(modules = {ApplicationModule.class, RestServiceModule.class})
+@Component(modules = {ApplicationModule.class, FirebaseModule.class, RestServiceModule.class})
 public interface ApplicationComponent {
 
     Application getApplication();
 
     SharedPreferences getSharedPreferences();
 
-    LocalBroadcastManager getLocalBroadcastManager();
-
-    ReceiptOcr getReceiptOcr();
+    NotificationManagerCompat getNotificationManagerCompat();
 
     ExchangeRates getExchangeRates();
 
-    GcmNetworkManager getGcmNetworkManager();
+    UserDataDeletion getDeleteUserData();
 
-    RxBus<Object> getEventBus();
+    Stats providesStats();
+
+    DynamicLink providesDynamicLink();
+
+    FirebaseAuth getFirebaseAuth();
+
+    FirebaseDatabase getFirebaseDatabase();
+
+    FirebaseStorage getFirebaseStorage();
+
+    FirebaseMessaging getFirebaseMessaging();
+
+    FirebaseRemoteConfig getFirebaseRemoteConfig();
+
+    FirebaseJobDispatcher providesJobDispatcher();
 }

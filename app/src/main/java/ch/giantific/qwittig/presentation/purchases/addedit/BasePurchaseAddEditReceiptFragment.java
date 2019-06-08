@@ -13,18 +13,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseShowReceiptBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
 
 /**
  * Shows the receipt image taken by the user when adding a new purchase.
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAddEditViewModel> extends BaseFragment<T, S, BaseFragment.ActivityListener<T>> {
+public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAddEditContract.Presenter> extends BaseFragment<T, S, BaseFragment.ActivityListener<T>> {
 
-    private FragmentPurchaseShowReceiptBinding mBinding;
+    @Inject
+    PurchaseAddEditViewModel viewModel;
+    private FragmentPurchaseShowReceiptBinding binding;
 
     public BasePurchaseAddEditReceiptFragment() {
         // required empty constructor
@@ -40,15 +45,15 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentPurchaseShowReceiptBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentPurchaseShowReceiptBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mBinding.setViewModel(mViewModel);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -56,7 +61,7 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
         menu.clear();
         inflater.inflate(R.menu.menu_purchase_edit_receipt_fragment, menu);
 
-        if (mViewModel.isReceiptImageAvailable()) {
+        if (viewModel.isReceiptAvailable()) {
             menu.findItem(R.id.action_purchase_edit_receipt_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_edit_receipt_delete).setVisible(true);
         } else {
@@ -70,10 +75,10 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
             case R.id.action_purchase_edit_receipt_add:
                 // fall through
             case R.id.action_purchase_edit_receipt_edit:
-                mViewModel.onAddEditReceiptImageMenuClick();
+                presenter.onAddEditReceiptImageMenuClick();
                 return true;
             case R.id.action_purchase_edit_receipt_delete:
-                mViewModel.onDeleteReceiptMenuClick();
+                presenter.onDeleteReceiptMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -82,6 +87,6 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.ivReceipt;
+        return binding.ivReceipt;
     }
 }

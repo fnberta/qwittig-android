@@ -14,18 +14,17 @@
         <import type="android.view.View"/>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompDebtItemModel"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel"
             />
     </data>
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/min_space"
         android:layout_marginEnd="@dimen/small_space"
         android:layout_marginStart="@dimen/small_space"
-        android:layout_marginTop="@dimen/min_space"
+        android:layout_marginTop="@dimen/small_space"
         card_view:cardBackgroundColor="@color/red_light"
         card_view:cardCornerRadius="@dimen/card_corner_radius"
         card_view:cardElevation="@dimen/card_elevation"
@@ -42,20 +41,15 @@
                 android:layout_height="@dimen/compensation_avatar_height"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                app:itemModel="@{itemModel}"
-                />
-
-            <include
-                layout="@layout/include_card_top_progress"
-                app:itemModel="@{itemModel}"
+                app:viewModel="@{viewModel}"
                 />
 
             <include
                 layout="@layout/include_compensation_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/iv_avatar"
-                app:itemModel="@{itemModel}"
+                android:layout_toEndOf="@id/iv_comp_avatar"
+                app:viewModel="@{viewModel}"
                 />
 
             <!--<Button-->
@@ -63,10 +57,10 @@
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_below="@id/ll_header"-->
-            <!--android:layout_toEndOf="@id/iv_avatar"-->
-            <!--android:text="@{@string/button_remind_paid(itemModel.compUsername)}"-->
+            <!--android:layout_toEndOf="@id/iv_comp_avatar"-->
+            <!--android:text="@{@string/button_remind_paid(viewModel.compUsername)}"-->
             <!--android:textColor="?attr/colorAccent"-->
-            <!--android:visibility="@{itemModel.userPending ? View.GONE : View.VISIBLE}"-->
+            <!--android:visibility="@{viewModel.userPending ? View.GONE : View.VISIBLE}"-->
             <!--/>-->
 
         </RelativeLayout>

@@ -33,7 +33,7 @@
 
     <!-- Toolbar -->
     <dimen name="toolbar_height_x2">112dp</dimen>
-    <dimen name="toolbar_task_add">168dp</dimen>
+    <dimen name="toolbar_assignment_add">168dp</dimen>
     <dimen name="toolbar_height_x4">224dp</dimen>
     <dimen name="toolbar_height_x5">280dp</dimen>
 
@@ -67,9 +67,12 @@
     <!-- Charts -->
     <dimen name="pc_multiple_size">345dp</dimen>
 
-    <!-- add/edit -->
+    <!-- addItemAtPosition/edit -->
     <dimen name="my_share_neg_margin">-8dp</dimen>
     <dimen name="camera_bottom_height">88dp</dimen>
     <dimen name="tut_camera_receipt_height">300dp</dimen>
+
+    <!-- facebook -->
+    <dimen name="fb_login_top_bottom_padding">12dp</dimen>
 
 </resources>

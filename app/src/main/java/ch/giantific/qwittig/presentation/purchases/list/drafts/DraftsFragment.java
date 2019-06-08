@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -17,25 +18,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomeDraftsBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseSortedListFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.DraftsViewModel;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.viewmodels.items.DraftItemViewModel;
 
 /**
  * Displays the currently open drafts of the current user in an {@link RecyclerView list.
  * <p/>
  * Long-click on a draft will start selection mode, allowing the user to select more drafts and
  * deleting them via the contextual {@link ActionBar}.
- * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, DraftsViewModel, DraftsFragment.ActivityListener>
-        implements ActionMode.Callback, DraftsViewModel.ViewListener {
+public class DraftsFragment extends BaseSortedListFragment<HomeSubcomponent,
+        DraftsContract.Presenter,
+        DraftsFragment.ActivityListener,
+        DraftItemViewModel>
+        implements ActionMode.Callback, DraftsContract.ViewListener {
 
-    private FragmentHomeDraftsBinding mBinding;
-    private ActionMode mActionMode;
+    @Inject
+    DraftsViewModel viewModel;
+    private FragmentHomeDraftsBinding binding;
+    private ActionMode actionMode;
 
     public DraftsFragment() {
         // required empty constructor
@@ -44,18 +53,17 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentHomeDraftsBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentHomeDraftsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mViewModel.onReadyForSelectionMode();
-        mBinding.setViewModel(mViewModel);
+        presenter.attachView(this);
+        binding.setPresenter(presenter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -64,13 +72,21 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
     }
 
     @Override
-    protected RecyclerView getRecyclerView() {
-        return mBinding.rvDrafts;
+    protected BaseSortedListRecyclerAdapter<DraftItemViewModel, DraftsContract.Presenter,
+            ? extends RecyclerView.ViewHolder> getRecyclerAdapter() {
+        return new DraftsRecyclerAdapter(presenter);
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new DraftsRecyclerAdapter(mViewModel);
+    protected void setupRecyclerView() {
+        binding.rvDrafts.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvDrafts.setHasFixedSize(true);
+        binding.rvDrafts.setAdapter(recyclerAdapter);
+    }
+
+    @Override
+    protected View getSnackbarView() {
+        return binding.rvDrafts;
     }
 
     @Override
@@ -89,7 +105,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_draft_delete:
-                mViewModel.onDeleteSelectedDraftsClick();
+                presenter.onDeleteSelectedDraftsClick();
                 return true;
             default:
                 return false;
@@ -98,25 +114,40 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-        mViewModel.onSelectionModeEnded();
+        presenter.onSelectionModeEnded();
     }
 
     @Override
     public void startSelectionMode() {
-        mActionMode = mActivity.startActionMode();
+        actionMode = activity.startActionMode();
     }
 
     @Override
     public void stopSelectionMode() {
-        mActionMode.finish();
+        actionMode.finish();
     }
 
     @Override
     public void setSelectionModeTitle(@StringRes int title, int draftsSelected) {
-        mActionMode.setTitle(getString(title, draftsSelected));
+        actionMode.setTitle(getString(title, draftsSelected));
     }
 
-    public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener<HomeSubcomponent> {
+    @Override
+    public int getItemCount() {
+        return recyclerAdapter.getItemCount();
+    }
+
+    @Override
+    public void notifyItemChanged(int position) {
+        recyclerAdapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public void scrollToItemPosition(int position) {
+        binding.rvDrafts.post(() -> binding.rvDrafts.scrollToPosition(position));
+    }
+
+    public interface ActivityListener extends BaseFragment.ActivityListener<HomeSubcomponent> {
         ActionMode startActionMode();
     }
 }

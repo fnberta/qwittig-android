@@ -11,17 +11,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditContract;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
 
 /**
- * Displays the interface where the user can add a new purchase by setting store, date, users
+ * Displays the interface where the user can addItemAtPosition a new purchase by setting store, date, users
  * involved and the different items.
  * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
+ * Subclass of {@link BasePurchaseAddEditFragment}.
  */
-public class PurchaseAddOcrFragment extends BasePurchaseAddEditFragment<PurchaseAddComponent, PurchaseAddOcrViewModel, BasePurchaseAddEditFragment.ActivityListener<PurchaseAddComponent>> {
+public class PurchaseAddOcrFragment extends BasePurchaseAddEditFragment<PurchaseAddComponent,
+        PurchaseAddEditContract.AddOcrPresenter,
+        BasePurchaseAddEditFragment.ActivityListener<PurchaseAddComponent>> {
 
     public PurchaseAddOcrFragment() {
         // required empty constructor
@@ -49,7 +51,7 @@ public class PurchaseAddOcrFragment extends BasePurchaseAddEditFragment<Purchase
         int id = item.getItemId();
         switch (id) {
             case R.id.action_purchase_save_draft:
-                mViewModel.onSaveAsDraftMenuClick();
+                presenter.onSaveAsDraftMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

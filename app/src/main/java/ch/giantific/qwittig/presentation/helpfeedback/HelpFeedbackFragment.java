@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,18 +20,17 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHelpFeedbackBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackComponent;
 
 /**
  * Displays help and feedback items in a {@link RecyclerView} list.
  */
-public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackComponent, HelpFeedbackViewModel, BaseRecyclerViewFragment.ActivityListener<HelpFeedbackComponent>>
-        implements HelpFeedbackViewModel.ViewListener {
+public class HelpFeedbackFragment extends BaseFragment<HelpFeedbackComponent, HelpFeedbackContract.Presenter, BaseFragment.ActivityListener<HelpFeedbackComponent>>
+        implements HelpFeedbackContract.ViewListener {
 
     private static final int RC_INVITE = 0;
-    private FragmentHelpFeedbackBinding mBinding;
+    private FragmentHelpFeedbackBinding binding;
 
     public HelpFeedbackFragment() {
         // required empty constructor
@@ -39,15 +39,23 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentHelpFeedbackBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentHelpFeedbackBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
+        setupRecyclerView();
+        presenter.attachView(this);
+    }
+
+    private void setupRecyclerView() {
+        binding.rvHelpFeedback.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvHelpFeedback.setHasFixedSize(true);
+        final HelpFeedbackRecyclerAdapter adapter = new HelpFeedbackRecyclerAdapter(presenter);
+        binding.rvHelpFeedback.setAdapter(adapter);
     }
 
     @Override
@@ -56,13 +64,8 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
     }
 
     @Override
-    protected RecyclerView getRecyclerView() {
-        return mBinding.rvHelpFeedback;
-    }
-
-    @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new HelpFeedbackRecyclerAdapter(mViewModel);
+    protected View getSnackbarView() {
+        return binding.rvHelpFeedback;
     }
 
     @Override

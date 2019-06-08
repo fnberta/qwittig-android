@@ -4,74 +4,77 @@
 
 package ch.giantific.qwittig.presentation.purchases.list;
 
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
+import android.text.TextUtils;
 
-import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.BR;
 
 /**
- * Defines an observable view model for the home screen.
+ * Provides an implementation of the {@link HomeContract}.
  */
-public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
-        JoinGroupDialogFragment.DialogInteractionListener,
-        JoinGroupWorkerListener, OcrWorkerListener {
+public class HomeViewModel extends BaseObservable
+        implements Parcelable {
 
-    void afterLogin();
+    public static final Creator<HomeViewModel> CREATOR = new Creator<HomeViewModel>() {
+        @Override
+        public HomeViewModel createFromParcel(Parcel in) {
+            return new HomeViewModel(in);
+        }
 
-    @Bindable
-    boolean isOcrProcessing();
+        @Override
+        public HomeViewModel[] newArray(int size) {
+            return new HomeViewModel[size];
+        }
+    };
+    public static final String TAG = HomeViewModel.class.getCanonicalName();
+    private boolean draftsAvailable;
+    private String ocrPurchaseId;
 
-    @Bindable
-    boolean isAnimStop();
-
-    void startProgress();
-
-    void stopProgress(boolean animate);
-
-    @Bindable
-    boolean isDraftsAvailable();
-
-    void setDraftsAvailable(boolean available);
-
-    void checkDrafts();
-
-    boolean updateDraftsAvailable();
-
-    void handleInvitation(@NonNull String identityId, @NonNull String groupName,
-                          @NonNull String inviterNickname);
-
-    void onReceiptImageTaken(@NonNull byte[] receipt);
-
-    void onReceiptImageDiscarded();
-
-    void onReceiptImageFailed();
-
-    void onOcrPurchaseReady(@NonNull String ocrPurchaseId);
-
-    void onOcrPurchaseFailed();
-
-    FabMenuClickListener getFabMenuClickListener();
-
-    /**
-     * Defines the interaction with the attached view.
-     */
-    interface ViewListener extends ViewModel.ViewListener {
-        void showGroupJoinDialog(@NonNull String groupName, @NonNull String inviterNickname);
-
-        void loadJoinGroupWorker(@NonNull String identityId);
-
-        void showProgressDialog(@StringRes int message);
-
-        void hideProgressDialog();
-
-        void startQueryAllService();
-
-        void captureImage();
-
-        void loadOcrWorker(@NonNull byte[] receipt);
-
-        void toggleDraftTab(boolean draftsAvailable);
+    public HomeViewModel() {
     }
+
+    private HomeViewModel(Parcel in) {
+        draftsAvailable = in.readByte() != 0;
+        ocrPurchaseId = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (draftsAvailable ? 1 : 0));
+        dest.writeString(ocrPurchaseId);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Bindable
+    public boolean isDraftsAvailable() {
+        return draftsAvailable;
+    }
+
+    public void setDraftsAvailable(boolean available) {
+        draftsAvailable = available;
+        notifyPropertyChanged(BR.draftsAvailable);
+    }
+
+    public String getOcrPurchaseId() {
+        return ocrPurchaseId;
+    }
+
+    public void setOcrPurchaseId(@NonNull String ocrPurchaseId) {
+        this.ocrPurchaseId = ocrPurchaseId;
+        notifyPropertyChanged(BR.ocrAvailable);
+    }
+
+    @Bindable
+    public boolean isOcrAvailable() {
+        return !TextUtils.isEmpty(ocrPurchaseId);
+    }
+
 }

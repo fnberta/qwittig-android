@@ -7,7 +7,7 @@ package ch.giantific.qwittig.presentation.stats.widgets;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.Description;
 
 /**
  * Provides a pie char with sensible default settings already set.
@@ -19,15 +19,11 @@ public class PieChart extends com.github.mikephil.charting.charts.PieChart {
     public static final int ANIMATION_Y_TIME = 1000;
 
     public PieChart(Context context) {
-        super(context);
-
-        setDefaultValues();
+        this(context, null);
     }
 
     public PieChart(Context context, AttributeSet attrs) {
-        super(context, attrs);
-
-        setDefaultValues();
+        this(context, attrs, 0);
     }
 
     public PieChart(Context context, AttributeSet attrs, int defStyle) {
@@ -38,12 +34,12 @@ public class PieChart extends com.github.mikephil.charting.charts.PieChart {
 
     private void setDefaultValues() {
         setNoDataText("");
-        setHoleRadius(35f);
-        setTransparentCircleRadius(40f);
-        setDescription("");
-        setCenterTextSize(20f);
+        setDrawHoleEnabled(false);
+        setDrawCenterText(false);
+        final Description desc = new Description();
+        desc.setText("");
+        setDescription(desc);
 
-        final Legend legend = getLegend();
-        legend.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
+        getLegend().setEnabled(false);
     }
 }

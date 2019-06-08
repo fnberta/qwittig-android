@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Patterns;
 
 import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.fraction.Fraction;
@@ -39,8 +40,7 @@ public class Utils {
      * @return whether the email address is valid or not
      */
     public static boolean isEmailValid(@NonNull String email) {
-        String pattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
-        return !TextUtils.isEmpty(email) && email.matches(pattern);
+        return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     /**
@@ -50,8 +50,7 @@ public class Utils {
      * @return whether the password is valid or not
      */
     public static boolean isPasswordValid(@NonNull String password) {
-        // TODO: add real validation
-        return !TextUtils.isEmpty(password);
+        return !TextUtils.isEmpty(password) && password.length() >= 6;
     }
 
     /**
@@ -214,5 +213,9 @@ public class Utils {
             }
         }
         return true;
+    }
+
+    public static boolean isHttpsUrl(@Nullable String url) {
+        return url != null && url.length() > 7 && url.substring(0, 8).equalsIgnoreCase("https://");
     }
 }

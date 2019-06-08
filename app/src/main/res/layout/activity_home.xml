@@ -16,6 +16,11 @@
             name="viewModel"
             type="ch.giantific.qwittig.presentation.purchases.list.HomeViewModel"
             />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.purchases.list.HomeContract.Presenter"
+            />
     </data>
 
     <android.support.v4.widget.DrawerLayout
@@ -69,10 +74,9 @@
                 android:id="@+id/fab_menu"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fabMenuClickListener="@{viewModel.fabMenuClickListener}"
+                android:fabMenuClickListener="@{presenter.fabMenuClickListener}"
                 android:gravity="bottom|end"
-                app:animStop="@{viewModel.animStop}"
-                app:progress="@{viewModel.ocrProcessing}"
+                app:complete="@{viewModel.ocrAvailable}"
                 />
 
         </android.support.design.widget.CoordinatorLayout>

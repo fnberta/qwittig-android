@@ -14,7 +14,12 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.login.LoginEmailViewModel"
+            type="ch.giantific.qwittig.presentation.login.email.LoginEmailViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.login.email.LoginEmailContract.Presenter"
             />
     </data>
 
@@ -23,7 +28,7 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:transitionGroup="true"
-        tools:context=".presentation.login.LoginEmailFragment"
+        tools:context=".presentation.login.email.LoginEmailFragment"
         tools:targetApi="lollipop"
         >
 
@@ -44,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/small_space"
                 android:layout_marginTop="@dimen/small_space"
-                android:error="@{!viewModel.validate ? null : viewModel.emailComplete ? null : @string/error_email}"
+                android:error="@{!viewModel.validate ? null : viewModel.emailValid ? null : @string/error_email}"
                 android:transitionGroup="true"
                 >
 
@@ -55,7 +60,7 @@
                     android:hint="@string/hint_email"
                     android:imeOptions="actionNext"
                     android:inputType="textEmailAddress"
-                    android:onTextChanged="@{viewModel::onEmailChanged}"
+                    android:text="@={viewModel.email}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -65,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/small_space"
-                android:error="@{!viewModel.validate ? null : viewModel.passwordComplete ? null : @string/error_password}"
+                android:error="@{!viewModel.validate ? null : viewModel.passwordValid ? null : @string/error_password}"
                 android:transitionGroup="true"
                 >
 
@@ -75,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password"
                     android:inputType="textPassword"
-                    android:onTextChanged="@{viewModel::onPasswordChanged}"
+                    android:text="@={viewModel.password}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -84,6 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/small_space"
+                android:error="@{!viewModel.validate ? null : viewModel.passwordEqual ? null : @string/error_password_match}"
                 android:transitionGroup="true"
                 android:visibility="@{viewModel.signUp ? View.VISIBLE : View.GONE}"
                 >
@@ -94,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password_repeat"
                     android:inputType="textPassword"
-                    android:onTextChanged="@{viewModel::onPasswordRepeatChanged}"
+                    android:text="@={viewModel.passwordRepeat}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -111,7 +117,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:onClick="@{viewModel::onLoginClick}"
+                    android:onClick="@{presenter::onLoginClick}"
                     android:text="@string/login_button_log_in"
                     tools:ignore="ButtonStyle"
                     />
@@ -122,7 +128,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:onClick="@{viewModel::onSignUpClick}"
+                    android:onClick="@{presenter::onSignUpClick}"
                     android:text="@string/login_button_sign_up"
                     tools:ignore="ButtonStyle"
                     />
@@ -135,7 +141,7 @@
                 android:layout_height="@dimen/touch_target_min"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_vertical"
-                android:onClick="@{viewModel::onResetPasswordClick}"
+                android:onClick="@{presenter::onResetPasswordClick}"
                 android:text="@string/login_text_forgot_credentials"
                 />
 

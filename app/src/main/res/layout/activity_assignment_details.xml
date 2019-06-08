@@ -1,0 +1,124 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.assignments.details.viewmodels.AssignmentDetailsViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.assignments.details.AssignmentDetailsContract.Presenter"
+            />
+    </data>
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".presentation.assignments.details.AssignmentDetailsActivity"
+        tools:targetApi="lollipop"
+        >
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <FrameLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/toolbar_height_x4"
+                android:transitionGroup="true"
+                tools:ignore="MergeRootFrame"
+                />
+
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/appbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:transitionGroup="true"
+                >
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/toolbar_height_x4"
+                    android:gravity="bottom"
+                    android:minHeight="?attr/actionBarSize"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    app:contentInsetStart="@dimen/key_line_2"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                        >
+
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Display1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/normal_space"
+                            android:maxLines="2"
+                            android:text="@{viewModel.title}"
+                            tools:text="Abfall rausbringen"
+                            />
+
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            app:timeFrame="@{viewModel.timeFrame}"
+                            tools:text="Täglich"
+                            />
+
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="2"
+                            android:text="@{viewModel.identitiesText}"
+                            tools:text="Ich - vera - lexli - sturzi"
+                            />
+
+                    </LinearLayout>
+
+                </android.support.v7.widget.Toolbar>
+            </android.support.design.widget.AppBarLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginTop="@dimen/fab_margin_toolbar_x4"
+                android:onClick="@{presenter::onDoneClick}"
+                android:src="@drawable/ic_done_black_24dp"
+                android:visibility="@{viewModel.responsible ? View.VISIBLE : View.GONE}"
+                tools:visibility="visible"
+                />
+
+        </FrameLayout>
+
+        <include layout="@layout/include_nav_drawer"/>
+
+    </android.support.v4.widget.DrawerLayout>
+</layout>

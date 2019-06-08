@@ -1,73 +1,83 @@
-/*
- * Copyright (c) 2016 Fabio Berta
- */
-
 package ch.giantific.qwittig.presentation.settings.general;
 
-import android.support.annotation.IntDef;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.List;
 
-import ch.giantific.qwittig.presentation.common.fragments.LeaveGroupDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.domain.models.Identity;
 
 /**
- * Defines an observable view model for the main settings screen.
+ * Created by fabio on 09.10.16.
  */
-public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListener>,
-        LeaveGroupDialogFragment.DialogInteractionListener,
-        LogoutWorkerListener,
-        DeleteAccountDialogFragment.DialogInteractionListener {
 
-    void onPreferencesLoaded();
+public class SettingsViewModel implements Parcelable {
 
-    void onGroupSelected(@NonNull String identityId);
+    public static final String TAG = SettingsViewModel.class.getCanonicalName();
+    public static final Creator<SettingsViewModel> CREATOR = new Creator<SettingsViewModel>() {
+        @Override
+        public SettingsViewModel createFromParcel(Parcel in) {
+            return new SettingsViewModel(in);
+        }
 
-    void onGroupNameChanged(@NonNull String newName);
+        @Override
+        public SettingsViewModel[] newArray(int size) {
+            return new SettingsViewModel[size];
+        }
+    };
+    private final ArrayList<String> identityIds;
+    private final ArrayList<String> groupNames;
+    private String currentIdentityId;
 
-    void onLeaveGroupClick();
-
-    void onGroupAdded(@NonNull String groupName);
-
-    void onLogoutMenuClick();
-
-    void onDeleteAccountMenuClick();
-
-    @IntDef({Result.LOGOUT, Result.GROUP_SELECTED, Result.GROUPS_CHANGED})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface Result {
-        int LOGOUT = 2;
-        int GROUP_SELECTED = 3;
-        int GROUPS_CHANGED = 4;
+    public SettingsViewModel() {
+        identityIds = new ArrayList<>();
+        groupNames = new ArrayList<>();
     }
 
-    /**
-     * Defines the interaction with the attached view.
-     */
-    interface ViewListener extends ViewModel.ViewListener {
+    private SettingsViewModel(Parcel in) {
+        identityIds = in.createStringArrayList();
+        groupNames = in.createStringArrayList();
+        currentIdentityId = in.readString();
+    }
 
-        void setupGroupSelection(@NonNull CharSequence[] entries, @NonNull CharSequence[] values,
-                                 @NonNull String selectedValue);
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringList(identityIds);
+        dest.writeStringList(groupNames);
+        dest.writeString(currentIdentityId);
+    }
 
-        void setCurrentGroupTitle(@NonNull String title);
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-        void setChangeGroupNameText(@NonNull String text);
+    public void setIdentityIdsGroupNames(@NonNull List<Identity> identities) {
+        identityIds.clear();
+        groupNames.clear();
+        for (Identity identity : identities) {
+            final String identityId = identity.getId();
+            identityIds.add(identityId);
+            final String groupName = identity.getGroupName();
+            groupNames.add(groupName);
+        }
+    }
 
-        void setLeaveGroupTitle(@StringRes int message, @NonNull String groupName);
+    public ArrayList<String> getIdentityIds() {
+        return identityIds;
+    }
 
-        void loadLogoutWorker(boolean deleteAccount);
+    public ArrayList<String> getGroupNames() {
+        return groupNames;
+    }
 
-        void showLeaveGroupDialog(@StringRes int message);
+    public String getCurrentIdentityId() {
+        return currentIdentityId;
+    }
 
-        void showDeleteAccountDialog();
-
-        void showProgressDialog(@StringRes int message);
-
-        void hideProgressDialog();
-
-        void setScreenResult(int result);
+    public void setCurrentIdentityId(String currentIdentityId) {
+        this.currentIdentityId = currentIdentityId;
     }
 }

@@ -11,30 +11,32 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowHelpFeedbackBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItem;
-import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackHeader;
-import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItemModel;
-import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItemModel.Type;
+import ch.giantific.qwittig.presentation.common.listadapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.BaseHelpFeedbackItemViewModel;
+import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.BaseHelpFeedbackItemViewModel.ViewType;
+import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.HelpFeedbackHeaderViewModel;
+import ch.giantific.qwittig.presentation.helpfeedback.viewmodels.items.HelpFeedbackItemViewModel;
 
 /**
  * Handles the display of help and feedback items.
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
+public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter {
 
-    private final HelpFeedbackViewModel mViewModel;
+    private final HelpFeedbackContract.Presenter presenter;
+    private final BaseHelpFeedbackItemViewModel[] items;
 
     /**
      * Constructs a new {@link HelpFeedbackRecyclerAdapter}.
      *
-     * @param viewModel the view model of the main view
+     * @param presenter the view model of the main view
      */
-    public HelpFeedbackRecyclerAdapter(@NonNull HelpFeedbackViewModel viewModel) {
+    public HelpFeedbackRecyclerAdapter(@NonNull HelpFeedbackContract.Presenter presenter) {
+        super();
 
-        mViewModel = viewModel;
+        this.presenter = presenter;
+        this.items = presenter.getHelpFeedbackItems();
     }
 
     @NonNull
@@ -42,43 +44,44 @@ public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case Type.HELP_FEEDBACK: {
+            case ViewType.HELP_FEEDBACK: {
                 final RowHelpFeedbackBinding binding =
                         RowHelpFeedbackBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 final RowGenericHeaderBinding binding =
                         RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
             default:
-                return super.onCreateViewHolder(parent, viewType);
+                throw new RuntimeException("There is no type that matches the type " + viewType +
+                        ", make sure your using types correctly!");
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final HelpFeedbackItemModel item = mViewModel.getItemAtPosition(position);
-
+        final BaseHelpFeedbackItemViewModel viewModel = items[position];
         int viewType = getItemViewType(position);
         switch (viewType) {
-            case Type.HELP_FEEDBACK: {
-                final BindingRow<RowHelpFeedbackBinding> row = (BindingRow<RowHelpFeedbackBinding>) viewHolder;
+            case ViewType.HELP_FEEDBACK: {
+                final BindingRow<RowHelpFeedbackBinding> row =
+                        (BindingRow<RowHelpFeedbackBinding>) viewHolder;
                 final RowHelpFeedbackBinding binding = row.getBinding();
 
-                binding.setItemModel((HelpFeedbackItem) item);
-                binding.setViewModel(mViewModel);
+                binding.setViewModel((HelpFeedbackItemViewModel) viewModel);
+                binding.setPresenter(presenter);
                 binding.executePendingBindings();
                 break;
             }
-            case Type.HEADER: {
+            case ViewType.HEADER: {
                 final BindingRow<RowGenericHeaderBinding> headerRow =
                         (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                binding.setItemModel((HelpFeedbackHeader) item);
+                binding.setViewModel((HelpFeedbackHeaderViewModel) viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -87,11 +90,11 @@ public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemAtPosition(position).getType();
+        return items[position].getViewType();
     }
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return items.length;
     }
 }

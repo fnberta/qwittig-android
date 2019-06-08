@@ -15,23 +15,22 @@
         <import type="android.view.View"/>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompCreditItemModel"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel"
             />
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidViewModel"
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidContract.Presenter"
             />
     </data>
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/min_space"
         android:layout_marginEnd="@dimen/small_space"
         android:layout_marginStart="@dimen/small_space"
-        android:layout_marginTop="@dimen/min_space"
+        android:layout_marginTop="@dimen/small_space"
         card_view:cardBackgroundColor="@color/green_light"
         card_view:cardCornerRadius="@dimen/card_corner_radius"
         card_view:cardElevation="@dimen/card_elevation"
@@ -48,20 +47,15 @@
                 android:layout_height="@dimen/compensation_avatar_height"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                app:itemModel="@{itemModel}"
-                />
-
-            <include
-                layout="@layout/include_card_top_progress"
-                app:itemModel="@{itemModel}"
+                app:viewModel="@{viewModel}"
                 />
 
             <include
                 layout="@layout/include_compensation_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/iv_avatar"
-                app:itemModel="@{itemModel}"
+                android:layout_toEndOf="@id/iv_comp_avatar"
+                app:viewModel="@{viewModel}"
                 />
 
             <Button
@@ -70,8 +64,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/ll_header"
-                android:layout_toEndOf="@id/iv_avatar"
-                android:onClick="@{() -> viewModel.onConfirmButtonClick(itemModel)}"
+                android:layout_toEndOf="@id/iv_comp_avatar"
+                android:onClick="@{() -> presenter.onConfirmButtonClick(viewModel)}"
                 android:text="@string/comp_unpaid_button_confirm"
                 android:textColor="?attr/colorPrimary"
                 />
@@ -83,9 +77,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/ll_header"
                 android:layout_toEndOf="@id/bt_comp_unpaid_confirm"
-                android:onClick="@{() -> viewModel.onRemindButtonClick(itemModel)}"
-                android:text="@{@string/button_remind(itemModel.compUsername)}"
-                android:visibility="@{itemModel.userPending ? View.GONE : View.VISIBLE}"
+                android:onClick="@{() -> presenter.onRemindButtonClick(viewModel)}"
+                android:text="@{@string/button_remind(viewModel.nickname)}"
                 tools:text="Remind Lexli to pay"
                 />
 

@@ -13,7 +13,8 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
+import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
@@ -21,7 +22,9 @@ import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivi
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseEditComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditComponent;
-import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditViewModelModule;
+import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditPresenterModule;
+import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.rxwrapper.android.RxAndroidViews;
 
 /**
  * Hosts {@link PurchaseAddFragment} or {@link PurchaseEditDraftFragment} that handle the
@@ -46,21 +49,35 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        final String editPurchaseId = getIntent().getStringExtra(Navigator.INTENT_PURCHASE_ID);
-        mComponent = DaggerPurchaseEditComponent.builder()
+        final String editPurchaseId = getIntent().getStringExtra(Navigator.EXTRA_PURCHASE_ID);
+        component = DaggerPurchaseEditComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .purchaseEditViewModelModule(new PurchaseEditViewModelModule(savedInstanceState, editPurchaseId))
+                .purchaseEditPresenterModule(new PurchaseEditPresenterModule(editPurchaseId))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
 
-        final boolean draft = isDraft();
-        mAddEditPurchaseViewModel = draft ? mComponent.getEditDraftViewModel() : mComponent.getEditViewModel();
-        mAddEditPurchaseViewModel.attachView(this);
+        presenter = isDraft() ? component.getEditDraftPresenter() : component.getEditPresenter();
+        presenter.attachView(this);
     }
 
     private boolean isDraft() {
-        return getIntent().getBooleanExtra(Navigator.INTENT_PURCHASE_EDIT_DRAFT, false);
+        return getIntent().getBooleanExtra(Navigator.EXTRA_PURCHASE_EDIT_DRAFT, false);
+    }
+
+    @Override
+    protected void handleEnterTransition(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            if (Utils.isRunningLollipopAndHigher()) {
+                subscriptions.add(RxAndroidViews.observeTransition(getWindow().getEnterTransition())
+                        .subscribe(transitionSubject));
+            } else {
+                dispatchFakeEnterTransitionEnd();
+            }
+        } else {
+            dispatchFakeEnterTransitionEnd();
+        }
     }
 
     @NonNull
@@ -69,6 +86,7 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
         return isDraft() ? new PurchaseEditDraftFragment() : new PurchaseEditFragment();
     }
 
+    @NonNull
     @Override
     protected BasePurchaseAddEditReceiptFragment getReceiptFragment() {
         return isDraft() ? new PurchaseEditDraftReceiptFragment() : new PurchaseEditReceiptFragment();
@@ -76,6 +94,6 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
 
     @Override
     public void onDiscardChangesSelected() {
-        mAddEditPurchaseViewModel.onDiscardChangesSelected();
+        presenter.onDiscardChangesSelected();
     }
 }

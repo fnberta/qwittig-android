@@ -5,20 +5,17 @@
 package ch.giantific.qwittig.presentation.login.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
+import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.login.LoginAccountsFragment;
-import ch.giantific.qwittig.presentation.login.LoginAccountsViewModel;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
+import ch.giantific.qwittig.presentation.common.di.SimplePresentersModule;
 import ch.giantific.qwittig.presentation.login.LoginActivity;
-import ch.giantific.qwittig.presentation.login.LoginEmailFragment;
-import ch.giantific.qwittig.presentation.login.LoginEmailViewModel;
-import ch.giantific.qwittig.presentation.login.LoginFirstGroupFragment;
-import ch.giantific.qwittig.presentation.login.LoginFirstGroupViewModel;
-import ch.giantific.qwittig.presentation.login.LoginInvitationFragment;
-import ch.giantific.qwittig.presentation.login.LoginInvitationViewModel;
-import ch.giantific.qwittig.presentation.login.LoginProfileFragment;
-import ch.giantific.qwittig.presentation.login.LoginProfileViewModel;
+import ch.giantific.qwittig.presentation.login.accounts.LoginAccountsFragment;
+import ch.giantific.qwittig.presentation.login.email.LoginEmailFragment;
+import ch.giantific.qwittig.presentation.login.firstgroup.LoginFirstGroupFragment;
+import ch.giantific.qwittig.presentation.login.invitation.LoginInvitationFragment;
+import ch.giantific.qwittig.presentation.login.profile.LoginProfileFragment;
 import dagger.Component;
 
 /**
@@ -26,9 +23,8 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {NavigatorModule.class, RepositoriesModule.class, LoginAccountsViewModelModule.class,
-                LoginEmailViewModelModule.class, LoginInvitationViewModelModule.class,
-                LoginProfileViewModelModule.class, LoginFirstGroupViewModelModule.class})
+        modules = {SimplePresentersModule.class, PersistentViewModelsModule.class,
+                NavigatorModule.class, GoogleApiClientDelegateModule.class})
 public interface LoginComponent {
 
     void inject(LoginActivity loginActivity);
@@ -42,14 +38,4 @@ public interface LoginComponent {
     void inject(LoginProfileFragment loginProfileFragment);
 
     void inject(LoginFirstGroupFragment loginFirstGroupFragment);
-
-    LoginAccountsViewModel getLoginAccountsViewModel();
-
-    LoginEmailViewModel getLoginEmailViewModel();
-
-    LoginInvitationViewModel getLoginInvitationViewModel();
-
-    LoginProfileViewModel getLoginProfileViewModel();
-
-    LoginFirstGroupViewModel getLoginFirstGroupViewModel();
 }

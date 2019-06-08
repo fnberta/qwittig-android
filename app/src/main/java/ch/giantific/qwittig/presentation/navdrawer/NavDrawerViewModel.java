@@ -4,65 +4,56 @@
 
 package ch.giantific.qwittig.presentation.navdrawer;
 
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
-import android.view.View;
-import android.widget.AdapterView;
 
-import java.util.List;
+import javax.inject.Inject;
 
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 
 /**
- * Defines an observable view model for the navigation drawer.
+ * Provides an implementation of the {@link NavDrawerContract}.
  */
-public interface NavDrawerViewModel extends ViewModel<NavDrawerViewModel.ViewListener> {
+@PerActivity
+public class NavDrawerViewModel extends BaseObservable {
 
-    void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction);
+    private String nickname;
+    private String avatar;
+    private int selectedIdentity;
+
+    @Inject
+    public NavDrawerViewModel() {
+    }
 
     @Bindable
-    String getIdentityNickname();
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(@NonNull String nickname) {
+        this.nickname = nickname;
+        notifyPropertyChanged(BR.nickname);
+    }
 
     @Bindable
-    String getIdentityAvatar();
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(@NonNull String avatar) {
+        this.avatar = avatar;
+        notifyPropertyChanged(BR.avatar);
+    }
 
     @Bindable
-    int getSelectedIdentity();
+    public int getSelectedIdentity() {
+        return selectedIdentity;
+    }
 
-    List<Identity> getIdentities();
-
-    boolean isUserLoggedIn();
-
-    void onLoginSuccessful();
-
-    void onLogout();
-
-    void onProfileUpdated();
-
-    /**
-     * Updates the group quick switch with the most recent values.
-     */
-    void onIdentitiesChanged();
-
-    /**
-     * Sets the group quick switch to the appropriate new selection. Called when the user changes
-     * his group in the settings screen.
-     */
-    void onIdentitySwitched();
-
-    void onIdentitySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
-
-    void onAvatarClick(View view);
-
-    /**
-     * Defines the interaction with the attached view.
-     */
-    interface ViewListener extends ViewModel.ViewListener {
-
-        void startQueryAllService();
-
-        void setupScreenAfterLogin();
+    public void setSelectedIdentity(int selectedIdentity) {
+        this.selectedIdentity = selectedIdentity;
+        notifyPropertyChanged(BR.selectedIdentity);
     }
 }

@@ -11,14 +11,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
-import android.view.View;
 import android.widget.Button;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.DialogCompensationConfirmAmountBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.BaseDialogFragment;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
@@ -35,10 +34,11 @@ public class CompConfirmAmountDialogFragment extends BaseDialogFragment<CompConf
     private static final String KEY_AMOUNT = "AMOUNT";
     private static final String KEY_DEBTOR_NICKNAME = "DEBTOR_NICKNAME";
     private static final String KEY_CURRENCY = "CURRENCY";
-    private DialogCompensationConfirmAmountBinding mBinding;
-    private double mAmount;
-    private String mDebtorNickname;
-    private String mCurrency;
+
+    private DialogCompensationConfirmAmountBinding binding;
+    private double amount;
+    private String debtorNickname;
+    private String currency;
 
     /**
      * Shows a new instance of {@link CompConfirmAmountDialogFragment}.
@@ -78,9 +78,9 @@ public class CompConfirmAmountDialogFragment extends BaseDialogFragment<CompConf
 
         Bundle args = getArguments();
         if (args != null) {
-            mAmount = args.getDouble(KEY_AMOUNT);
-            mDebtorNickname = args.getString(KEY_DEBTOR_NICKNAME);
-            mCurrency = args.getString(KEY_CURRENCY);
+            amount = args.getDouble(KEY_AMOUNT);
+            debtorNickname = args.getString(KEY_DEBTOR_NICKNAME);
+            currency = args.getString(KEY_CURRENCY);
         }
     }
 
@@ -88,16 +88,17 @@ public class CompConfirmAmountDialogFragment extends BaseDialogFragment<CompConf
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final FragmentActivity activity = getActivity();
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
-        mBinding = DialogCompensationConfirmAmountBinding.inflate(activity.getLayoutInflater());
-        final String amountNoSymbol = MoneyUtils.getMoneyFormatter(mCurrency, false, true).format(mAmount);
-        mBinding.etDialogCompConfirmAmount.setText(amountNoSymbol);
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity,
+                R.style.Theme_AppCompat_Light_Dialog_Alert_PrimaryAsAccent);
+        binding = DialogCompensationConfirmAmountBinding.inflate(activity.getLayoutInflater());
+        final String amountNoSymbol = MoneyUtils.getMoneyFormatter(currency, false, true).format(amount);
+        binding.etDialogCompConfirmAmount.setText(amountNoSymbol);
 
-        final String amountSymbol = MoneyUtils.getMoneyFormatter(mCurrency, true, true).format(mAmount);
+        final String amountSymbol = MoneyUtils.getMoneyFormatter(currency, true, true).format(amount);
         dialogBuilder
                 .setTitle(R.string.dialog_compensation_confirm_amount_title)
-                .setMessage(getString(R.string.dialog_compensation_confirm_amount_message, mDebtorNickname, amountSymbol))
-                .setView(mBinding.getRoot())
+                .setMessage(getString(R.string.dialog_compensation_confirm_amount_message, debtorNickname, amountSymbol))
+                .setView(binding.getRoot())
                 .setPositiveButton(R.string.dialog_positive_confirm, null)
                 .setNegativeButton(android.R.string.no, null);
 
@@ -116,22 +117,19 @@ public class CompConfirmAmountDialogFragment extends BaseDialogFragment<CompConf
         // Override View onClickListener because we only want the dialog to close when a valid
         // amount address was entered. Default behavior is to always call dismiss().
         final Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-        positiveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String amountString = mBinding.etDialogCompConfirmAmount.getText().toString();
-                final double amount = MoneyUtils.parsePrice(amountString);
-                if (amount > 0) {
-                    if (amount > (mAmount * 2)) {
-                        mBinding.tilDialogCompConfirmAmount.setError(getString(R.string.error_valid_amount_too_big));
-                    } else {
-                        mBinding.tilDialogCompConfirmAmount.setErrorEnabled(false);
-                        mActivity.onAmountConfirmed(amount);
-                        dismiss();
-                    }
+        positiveButton.setOnClickListener(v -> {
+            final String amountString = binding.etDialogCompConfirmAmount.getText().toString();
+            final double amount1 = MoneyUtils.parsePrice(amountString);
+            if (amount1 > 0) {
+                if (amount1 > (CompConfirmAmountDialogFragment.this.amount * 2)) {
+                    binding.tilDialogCompConfirmAmount.setError(getString(R.string.error_valid_amount_too_big));
                 } else {
-                    mBinding.tilDialogCompConfirmAmount.setError(getString(R.string.error_valid_amount));
+                    binding.tilDialogCompConfirmAmount.setErrorEnabled(false);
+                    activity.onAmountConfirmed(amount1);
+                    dismiss();
                 }
+            } else {
+                binding.tilDialogCompConfirmAmount.setError(getString(R.string.error_valid_amount));
             }
         });
     }

@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.FragmentOrcRatingDetailsBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 import ch.giantific.qwittig.presentation.purchases.ocrrating.di.OcrRatingComponent;
 
 /**
@@ -19,9 +19,9 @@ import ch.giantific.qwittig.presentation.purchases.ocrrating.di.OcrRatingCompone
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class OcrRatingDetailsFragment extends BaseFragment<OcrRatingComponent, OcrRatingViewModel, BaseFragment.ActivityListener<OcrRatingComponent>> {
+public class OcrRatingDetailsFragment extends BaseFragment<OcrRatingComponent, OcrRatingContract.Presenter, BaseFragment.ActivityListener<OcrRatingComponent>> {
 
-    private FragmentOrcRatingDetailsBinding mBinding;
+    private FragmentOrcRatingDetailsBinding binding;
 
     public OcrRatingDetailsFragment() {
         // required empty constructor
@@ -30,15 +30,15 @@ public class OcrRatingDetailsFragment extends BaseFragment<OcrRatingComponent, O
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentOrcRatingDetailsBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentOrcRatingDetailsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mBinding.setViewModel(mViewModel);
+        binding.setPresenter(presenter);
     }
 
     @Override
@@ -48,6 +48,6 @@ public class OcrRatingDetailsFragment extends BaseFragment<OcrRatingComponent, O
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.svOcrRatingDetailsMain;
+        return binding.svOcrRatingDetailsMain;
     }
 }

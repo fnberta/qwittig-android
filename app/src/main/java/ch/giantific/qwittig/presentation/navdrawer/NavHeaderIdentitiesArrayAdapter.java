@@ -13,10 +13,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.List;
+
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
 
 
 /**
@@ -24,7 +24,7 @@ import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
  * <p/>
  * Subclass of {@link ArrayAdapter}.
  */
-public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> implements SpinnerInteraction {
+public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> {
 
     private static final int VIEW_RESOURCE = R.layout.spinner_item_nav;
     private static final int VIEW_RESOURCE_DROPDOWN = android.R.layout.simple_spinner_dropdown_item;
@@ -32,34 +32,32 @@ public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> impl
     /**
      * Constructs a new {@link NavHeaderIdentitiesArrayAdapter}.
      *
-     * @param context   the context to use in the adapter
-     * @param viewModel the view model of the view hosting the spinner
+     * @param context    the context to use in the adapter
+     * @param identities the list of identities
      */
     public NavHeaderIdentitiesArrayAdapter(@NonNull Context context,
-                                           @NonNull NavDrawerViewModel viewModel) {
-        super(context, VIEW_RESOURCE, viewModel.getIdentities());
+                                           @NonNull List<Identity> identities) {
+        super(context, VIEW_RESOURCE, identities);
     }
 
-    @Nullable
+    @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, false);
     }
 
-    @Nullable
     @Override
     public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, true);
     }
 
-    @Nullable
     private View getCustomView(int position, @Nullable View convertView, @NonNull ViewGroup parent,
                                boolean isDropDown) {
         final GroupRow groupRow;
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(isDropDown
-                    ? VIEW_RESOURCE_DROPDOWN
-                    : VIEW_RESOURCE, parent, false);
+                                                                           ? VIEW_RESOURCE_DROPDOWN
+                                                                           : VIEW_RESOURCE, parent, false);
             groupRow = new GroupRow(convertView);
 
             convertView.setTag(groupRow);
@@ -67,8 +65,10 @@ public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> impl
             groupRow = (GroupRow) convertView.getTag();
         }
 
-        final Group group = getItem(position).getGroup();
-        groupRow.setGroup(group.getName());
+        final Identity identity = getItem(position);
+        if (identity != null) {
+            groupRow.setGroup(identity.getGroupName());
+        }
 
         return convertView;
     }
@@ -85,7 +85,7 @@ public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> impl
          *
          * @param view the inflated view
          */
-        public GroupRow(@NonNull View view) {
+        GroupRow(@NonNull View view) {
             mTextViewGroup = (TextView) view.findViewById(android.R.id.text1);
         }
 

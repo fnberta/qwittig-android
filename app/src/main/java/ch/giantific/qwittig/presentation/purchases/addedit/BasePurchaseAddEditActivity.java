@@ -5,19 +5,17 @@
 package ch.giantific.qwittig.presentation.purchases.addedit;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
-import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,22 +28,29 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
-import ch.giantific.qwittig.presentation.camera.CameraActivity;
+import ch.giantific.qwittig.presentation.camera.CameraContract.CameraResult;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
+import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.dialogs.DatePickerDialogFragment;
+import ch.giantific.qwittig.presentation.common.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.TabsAdapter;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.DiscardPurchaseDialogFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.ExchangeRateDialogFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.dialogs.NoteDialogFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.viewmodels.items.PurchaseAddEditArticleIdentityItemViewModel;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.rxwrapper.android.RxAndroidViews;
+import ch.giantific.qwittig.utils.rxwrapper.android.transitions.TransitionEvent;
+import rx.Observable;
 import rx.Single;
+import rx.subjects.ReplaySubject;
 
 /**
  * Hosts {@link PurchaseAddFragment} that handles the creation of a new purchase.
@@ -54,102 +59,66 @@ import rx.Single;
  */
 public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> implements
         BasePurchaseAddEditFragment.ActivityListener<T>,
-        PurchaseAddEditViewModel.ViewListener,
+        PurchaseAddEditContract.ViewListener,
         RatesWorkerListener, DatePickerDialog.OnDateSetListener,
         NoteDialogFragment.DialogInteractionListener,
         ExchangeRateDialogFragment.DialogInteractionListener,
         DiscardPurchaseDialogFragment.DialogInteractionListener {
 
-    public static final String INTENT_OCR_PURCHASE_ID = "INTENT_OCR_PURCHASE_ID";
-    private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 12;
-    protected PurchaseAddEditViewModel mAddEditPurchaseViewModel;
+    private static final String STATE_ADD_EDIT_FRAGMENT = "STATE_ADD_EDIT_FRAGMENT";
+    private static final int RC_CAPTURE_IMAGES = 12;
+    protected final ReplaySubject<TransitionEvent> transitionSubject = ReplaySubject.create();
+    protected PurchaseAddEditContract.Presenter presenter;
     @Inject
-    protected Navigator mNavigator;
-    private ActivityPurchaseAddEditBinding mBinding;
-
-    @Override
-    protected void handleLocalBroadcast(Intent intent, int dataType) {
-        super.handleLocalBroadcast(intent, dataType);
-
-        switch (dataType) {
-            case LocalBroadcast.DataType.OCR_PURCHASE_UPDATED: {
-                final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-                if (successful) {
-                    mAddEditPurchaseViewModel.loadData();
-                }
-                break;
-            }
-        }
-    }
+    protected PurchaseAddEditViewModel viewModel;
+    @Inject
+    protected Navigator navigator;
+    private ActivityPurchaseAddEditBinding binding;
+    private BasePurchaseAddEditFragment addEditFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_add_edit);
-        mBinding.setViewModel(mAddEditPurchaseViewModel);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_add_edit);
+        binding.setPresenter(presenter);
 
-        setupTabs();
-
-        if (savedInstanceState == null) {
-            if (Utils.isRunningLollipopAndHigher()) {
-                addActivityTransitionListener();
-            } else {
-                showFab();
-            }
-        } else {
-            showFab();
-        }
-
+        setupTabs(savedInstanceState);
+        handleEnterTransition(savedInstanceState);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mAddEditPurchaseViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void addActivityTransitionListener() {
-        final Transition enter = getWindow().getEnterTransition();
-        enter.addListener(new TransitionListenerAdapter() {
-            @Override
-            public void onTransitionEnd(@NonNull Transition transition) {
-                super.onTransitionEnd(transition);
-                transition.removeListener(this);
-
-                showFab();
-            }
-        });
-    }
-
-    protected final void showFab() {
-        if (ViewCompat.isLaidOut(mBinding.fabPurchaseSave)) {
-            mBinding.fabPurchaseSave.show();
-        } else {
-            mBinding.fabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(@NonNull View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    v.removeOnLayoutChangeListener(this);
-                    mBinding.fabPurchaseSave.show();
-                }
-            });
-        }
-    }
-
-    private void setupTabs() {
+    private void setupTabs(@Nullable Bundle savedInstanceState) {
         final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
-        tabsAdapter.addInitialFragment(getPurchaseAddEditFragment(), getString(R.string.tab_details_purchase));
+        addEditFragment = savedInstanceState == null
+                          ? getPurchaseAddEditFragment()
+                          : (BasePurchaseAddEditFragment) getSupportFragmentManager().getFragment(savedInstanceState, STATE_ADD_EDIT_FRAGMENT);
+        tabsAdapter.addInitialFragment(addEditFragment, getString(R.string.tab_details_purchase));
         tabsAdapter.addInitialFragment(getReceiptFragment(), getString(R.string.tab_details_receipt));
-        mBinding.viewpager.setAdapter(tabsAdapter);
+        binding.viewpager.setAdapter(tabsAdapter);
     }
+
+    protected abstract void handleEnterTransition(@Nullable Bundle savedInstanceState);
 
     @NonNull
     protected abstract BasePurchaseAddEditFragment getPurchaseAddEditFragment();
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(PurchaseAddEditViewModel.TAG, viewModel);
+        getSupportFragmentManager().putFragment(outState, STATE_ADD_EDIT_FRAGMENT, addEditFragment);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu_purchase_add_edit, menu);
 
-        if (mAddEditPurchaseViewModel.isNoteAvailable()) {
+        if (viewModel.isNoteAvailable()) {
             menu.findItem(R.id.action_purchase_add_edit_note_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_add_edit_note_add).setVisible(false);
         }
@@ -162,12 +131,12 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         final int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                mAddEditPurchaseViewModel.onExitClick();
+                presenter.onExitClick();
                 return true;
             case R.id.action_purchase_add_edit_note_edit:
                 // fall through
             case R.id.action_purchase_add_edit_note_add:
-                mAddEditPurchaseViewModel.onAddEditNoteMenuClick();
+                presenter.onAddEditNoteMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -179,14 +148,14 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_CAPTURE:
+            case Navigator.RC_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        final String imagePath = data.getStringExtra(CameraActivity.INTENT_EXTRA_IMAGE_PATH);
-                        mAddEditPurchaseViewModel.onReceiptImageTaken(imagePath);
+                        final String imagePath = data.getStringExtra(Navigator.EXTRA_GENERIC_STRING);
+                        presenter.onReceiptImageTaken(imagePath);
                         break;
-                    case CameraActivity.RESULT_ERROR:
-                        mAddEditPurchaseViewModel.onReceiptImageTakeFailed();
+                    case CameraResult.ERROR:
+                        presenter.onReceiptImageTakeFailed();
                         break;
                 }
                 break;
@@ -198,15 +167,15 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
+            case RC_CAPTURE_IMAGES:
                 if (Utils.verifyPermissions(grantResults)) {
-                    mNavigator.startCamera();
+                    navigator.startCamera();
                 } else {
                     showMessageWithAction(R.string.snackbar_permission_storage_denied,
                             new MessageAction(R.string.snackbar_action_open_settings) {
                                 @Override
                                 public void onClick(View v) {
-                                    mNavigator.startSystemSettings();
+                                    navigator.startSystemSettings();
                                 }
                             });
                 }
@@ -218,18 +187,33 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     @Override
     public void onBackPressed() {
         if (!getSupportFragmentManager().popBackStackImmediate()) {
-            mAddEditPurchaseViewModel.onExitClick();
+            presenter.onExitClick();
         }
     }
 
     @Override
+    public Observable<TransitionEvent> getEnterTransition() {
+        return transitionSubject.asObservable();
+    }
+
+    protected void dispatchFakeEnterTransitionEnd() {
+        transitionSubject.onNext(TransitionEvent.createEmptyEnd());
+        transitionSubject.onCompleted();
+    }
+
+    @Override
+    public Single<FloatingActionButton> showFab() {
+        return RxAndroidViews.getFabVisibilityChange(binding.fabPurchaseSave);
+    }
+
+    @Override
     public void onDiscardPurchaseSelected() {
-        mAddEditPurchaseViewModel.onDiscardChangesSelected();
+        presenter.onDiscardChangesSelected();
     }
 
     @Override
     public void onSaveAsDraftSelected() {
-        mAddEditPurchaseViewModel.onSaveAsDraftMenuClick();
+        presenter.onSaveAsDraftMenuClick();
     }
 
     @Override
@@ -245,7 +229,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         final Date date = DateUtils.parseDateFromPicker(year, monthOfYear, dayOfMonth);
-        mAddEditPurchaseViewModel.onDateSet(date);
+        presenter.onDateSet(date);
     }
 
     @Override
@@ -255,7 +239,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
 
     @Override
     public void onExchangeRateManuallySet(double exchangeRate) {
-        mAddEditPurchaseViewModel.onExchangeRateManuallySet(exchangeRate);
+        presenter.onExchangeRateManuallySet(exchangeRate);
     }
 
     @Override
@@ -268,6 +252,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         DiscardChangesDialogFragment.display(getSupportFragmentManager());
     }
 
+    @NonNull
     protected abstract BasePurchaseAddEditReceiptFragment getReceiptFragment();
 
     @Override
@@ -277,12 +262,12 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
 
     @Override
     public void onNoteSet(@NonNull String note) {
-        mAddEditPurchaseViewModel.onNoteSet(note);
+        presenter.onNoteSet(note);
     }
 
     @Override
     public void onDeleteNote() {
-        mAddEditPurchaseViewModel.onDeleteNote();
+        presenter.onDeleteNote();
     }
 
     @Override
@@ -293,7 +278,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         }
 
         if (permissionsAreGranted()) {
-            mNavigator.startCamera();
+            navigator.startCamera();
         }
     }
 
@@ -301,16 +286,11 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         int hasCameraPerm = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                    PERMISSIONS_REQUEST_CAPTURE_IMAGES);
+                    RC_CAPTURE_IMAGES);
             return false;
         }
 
         return true;
-    }
-
-    @Override
-    public void showPurchaseItems() {
-        getSupportFragmentManager().popBackStack();
     }
 
     @Override
@@ -319,8 +299,34 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     }
 
     @Override
+    public void scrollToPosition(int position) {
+        addEditFragment.scrollToPosition(position);
+    }
+
+    @Override
+    public void notifyItemAdded(int position) {
+        addEditFragment.getRecyclerAdapter().notifyItemInserted(position);
+    }
+
+    @Override
+    public void notifyItemIdentityChanged(int position,
+                                          @NonNull PurchaseAddEditArticleIdentityItemViewModel identityViewModel) {
+        addEditFragment.notifyItemIdentityChanged(position, identityViewModel);
+    }
+
+    @Override
+    public void notifyItemRemoved(int position) {
+        addEditFragment.getRecyclerAdapter().notifyItemRemoved(position);
+    }
+
+    @Override
+    public void notifyItemRangeRemoved(int start, int end) {
+        addEditFragment.getRecyclerAdapter().notifyItemRangeRemoved(start, end);
+    }
+
+    @Override
     public void setRateFetchStream(@NonNull Single<Float> single,
                                    @NonNull String workerTag) {
-        mAddEditPurchaseViewModel.setRateFetchStream(single, workerTag);
+        presenter.setRateFetchStream(single, workerTag);
     }
 }

@@ -6,6 +6,7 @@ package ch.giantific.qwittig.presentation.finance.unpaid;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +14,15 @@ import android.view.ViewGroup;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.data.services.ParseQueryService;
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsUnpaidBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseSortedListFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
 import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
+import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.CompsUnpaidViewModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel;
 
 /**
  * Displays all currently open unpaid compensations in the group in card based {@link RecyclerView}
@@ -25,12 +30,17 @@ import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
  * <p/>
  * Allows the user to create a new settlement if there are no open unpaid compensations.
  * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
+ * Subclass of {@link BaseFragment}.
  */
-public class CompsUnpaidFragment extends BaseRecyclerViewFragment<FinanceSubcomponent, CompsUnpaidViewModel, BaseRecyclerViewFragment.ActivityListener<FinanceSubcomponent>>
-    implements CompsUnpaidViewModel.ViewListener {
+public class CompsUnpaidFragment extends BaseSortedListFragment<FinanceSubcomponent,
+        CompsUnpaidContract.Presenter,
+        BaseSortedListFragment.ActivityListener<FinanceSubcomponent>,
+        CompUnpaidItemViewModel>
+        implements CompsUnpaidContract.ViewListener {
 
-    private FragmentFinanceCompensationsUnpaidBinding mBinding;
+    @Inject
+    CompsUnpaidViewModel viewModel;
+    private FragmentFinanceCompensationsUnpaidBinding binding;
 
     public CompsUnpaidFragment() {
         // Required empty public constructor
@@ -39,17 +49,17 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<FinanceSubcomp
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentFinanceCompensationsUnpaidBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentFinanceCompensationsUnpaidBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        setupRecyclerView();
+        presenter.attachView(this);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -58,31 +68,33 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<FinanceSubcomp
     }
 
     @Override
-    protected RecyclerView getRecyclerView() {
-        return mBinding.srlRv.rvBase;
+    protected BaseSortedListRecyclerAdapter<CompUnpaidItemViewModel, CompsUnpaidContract.Presenter, ? extends RecyclerView.ViewHolder> getRecyclerAdapter() {
+        return new CompsUnpaidRecyclerAdapter(presenter);
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new CompsUnpaidRecyclerAdapter(mViewModel);
+    protected void setupRecyclerView() {
+        binding.rvPb.rvBase.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvPb.rvBase.setHasFixedSize(true);
+        binding.rvPb.rvBase.setAdapter(recyclerAdapter);
     }
 
     @Override
-    public void startUpdateCompensationsUnpaidService() {
-        ParseQueryService.startUpdateIdentities(getActivity());
-        ParseQueryService.startUpdateCompensationsUnpaid(getActivity());
+    protected View getSnackbarView() {
+        return binding.rvPb.rvBase;
     }
 
     @Override
-    public void loadCompensationRemindWorker(@NonNull String compensationId) {
-        CompRemindWorker.attach(getFragmentManager(), compensationId);
-    }
-
-    @Override
-    public void showCompensationAmountConfirmDialog(@NonNull BigFraction amount,
-                                                    @NonNull String debtorNickname,
-                                                    @NonNull String currency) {
+    public void showConfirmAmountDialog(@NonNull BigFraction amount,
+                                        @NonNull String debtorNickname,
+                                        @NonNull String currency) {
         CompConfirmAmountDialogFragment.display(getFragmentManager(), amount,
                 debtorNickname, currency);
+    }
+
+    @Override
+    public CompUnpaidItemViewModel getItemForId(@NonNull String id) {
+        final int pos = getItemPositionForId(id);
+        return recyclerAdapter.getItemAtPosition(pos);
     }
 }

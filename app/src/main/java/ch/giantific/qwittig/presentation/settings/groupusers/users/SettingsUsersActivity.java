@@ -21,30 +21,31 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupViewModelModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
-import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersViewModelModule;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import rx.Single;
 
 /**
- * Hosts {@link SettingsUsersFragment} that allows the user to add users to his/her current
+ * Hosts {@link SettingsUsersFragment} that allows the user to addItemAtPosition users to his/her current
  * group.
- * <p>
+ * <p/>
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersComponent>
-        implements AddUserWorkerListener,
-        NicknamePromptDialogFragment.DialogInteractionListener {
+        implements NicknamePromptDialogFragment.DialogInteractionListener,
+        InvitationLinkWorkerListener {
 
     @Inject
-    SettingsUsersViewModel mUsersViewModel;
+    SettingsUsersContract.Presenter presenter;
+    @Inject
+    SettingsUsersViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,6 +57,8 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
             actionBar.setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
         }
 
+        supportPostponeEnterTransition();
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new SettingsUsersFragment())
@@ -65,18 +68,24 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerSettingsGroupUsersComponent.builder()
+        component = DaggerSettingsGroupUsersComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .settingsAddGroupViewModelModule(new SettingsAddGroupViewModelModule(savedInstanceState))
-                .settingsUsersViewModelModule(new SettingsUsersViewModelModule(savedInstanceState))
+                .persistentViewModelsModule(new PersistentViewModelsModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mUsersViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(SettingsUsersViewModel.TAG, viewModel);
     }
 
     @Override
@@ -96,26 +105,21 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Navigator.INTENT_REQUEST_IMAGE_PICK:
+            case Navigator.RC_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
-                        @Override
-                        public void onAvatarSaved(@NonNull String path) {
-                            mUsersViewModel.onNewAvatarTaken(path);
-                        }
-                    });
+                    AvatarUtils.saveImageLocal(this, imageUri, path -> presenter.onNewAvatarTaken(path));
                 }
         }
     }
 
     @Override
-    public void setAddUserStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
-        mUsersViewModel.setAddUserStream(single, workerTag);
+    public void onValidNicknameEntered(@NonNull String nickname, int position) {
+        presenter.onValidNicknameEntered(nickname, position);
     }
 
     @Override
-    public void onValidNicknameEntered(@NonNull String nickname, int position) {
-        mUsersViewModel.onValidNicknameEntered(nickname, position);
+    public void setInvitationLinkStream(@NonNull Single<String> single, @NonNull String workerTag) {
+        presenter.setInvitationLinkStream(single, workerTag);
     }
 }

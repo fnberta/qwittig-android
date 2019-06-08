@@ -13,7 +13,11 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.login.LoginAccountsViewModel"/>
+            type="ch.giantific.qwittig.presentation.login.accounts.LoginAccountsViewModel"/>
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.login.accounts.LoginAccountsContract.Presenter"/>
     </data>
 
     <FrameLayout
@@ -21,7 +25,7 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:transitionGroup="true"
-        tools:context=".presentation.login.LoginEmailFragment"
+        tools:context=".presentation.login.email.LoginEmailFragment"
         tools:targetApi="lollipop"
         >
 
@@ -36,21 +40,12 @@
             android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
             >
 
-            <Button
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/bt_login_accounts_facebook"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/com_facebook_button_background"
-                android:drawablePadding="@dimen/com_facebook_share_button_compound_drawable_padding"
-                android:drawableStart="@drawable/com_facebook_button_icon"
-                android:onClick="@{viewModel::onLoginFacebookClick}"
-                android:paddingBottom="@dimen/com_facebook_share_button_padding_bottom"
-                android:paddingEnd="@dimen/com_facebook_share_button_padding_right"
-                android:paddingStart="@dimen/com_facebook_share_button_padding_left"
-                android:paddingTop="@dimen/com_facebook_share_button_padding_top"
-                android:text="@string/com_facebook_loginview_log_in_button_long"
-                android:textColor="@color/com_facebook_share_button_text_color"
-                android:textSize="@dimen/com_facebook_share_button_text_size"
-                android:textStyle="bold"
+                android:paddingBottom="@dimen/fb_login_top_bottom_padding"
+                android:paddingTop="@dimen/fb_login_top_bottom_padding"
                 />
 
             <com.google.android.gms.common.SignInButton
@@ -58,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/small_space"
-                android:onClickListener="@{viewModel.loginGoogleClickListener}"
+                android:onClickListener="@{presenter.loginGoogleClickListener}"
                 app:buttonSize="wide"
                 app:colorScheme="auto"
                 />
@@ -75,7 +70,7 @@
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="@{viewModel::onUseEmailClick}"
+                android:onClick="@{presenter::onUseEmailClick}"
                 android:text="@string/login_button_email"
                 />
 

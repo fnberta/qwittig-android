@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2015 Fabio Berta
   -->
@@ -5,6 +6,7 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.settings.groupusers.identities.SettingsUsersFragment"
     >
 
     <data>
@@ -13,7 +15,12 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersViewModel"
+            type="ch.giantific.qwittig.presentation.settings.groupusers.users.viewmodels.SettingsUsersViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersContract.Presenter"
             />
     </data>
 
@@ -23,8 +30,6 @@
         android:clipToPadding="false"
         android:fillViewport="true"
         android:paddingBottom="@dimen/small_space"
-        android:transitionGroup="true"
-        tools:context=".presentation.settings.groupusers.users.SettingsUsersFragment"
         tools:targetApi="lollipop"
         >
 
@@ -80,8 +85,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_nickname"
                     android:inputType="textPersonName"
-                    android:onTextChanged="@{viewModel::onNicknameChanged}"
-                    android:text="@{viewModel.nickname}"
+                    android:text="@={viewModel.nickname}"
                     tools:text="Vera"
                     />
 
@@ -95,7 +99,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginStart="@dimen/key_line_1"
-                android:onClick="@{viewModel::onAddUserClick}"
+                android:onClick="@{presenter::onAddUserClick}"
                 android:src="@drawable/ic_person_add_black_24dp"
                 />
 
@@ -110,7 +114,7 @@
                 android:paddingEnd="@dimen/key_line_1"
                 android:paddingStart="@dimen/key_line_1"
                 android:text="@string/header_settings_users_existing"
-                android:visibility="@{viewModel.groupEmpty ? View.GONE : View.VISIBLE}"
+                android:visibility="@{viewModel.empty ? View.GONE : View.VISIBLE}"
                 />
 
             <TextView
@@ -123,7 +127,7 @@
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginStart="@dimen/key_line_1"
                 android:text="@string/desc_user_invite_existing"
-                android:visibility="@{viewModel.groupEmpty ? View.GONE : View.VISIBLE}"
+                android:visibility="@{viewModel.empty ? View.GONE : View.VISIBLE}"
                 />
 
             <android.support.v7.widget.RecyclerView
@@ -131,7 +135,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/tv_settings_users_desc_existing"
-                android:visibility="@{viewModel.groupEmpty ? View.GONE : View.VISIBLE}"
+                android:visibility="@{viewModel.empty ? View.GONE : View.VISIBLE}"
                 />
         </RelativeLayout>
 

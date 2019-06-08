@@ -4,24 +4,22 @@ package ch.giantific.qwittig.presentation.about;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.FragmentAboutBinding;
 import ch.giantific.qwittig.presentation.about.di.AboutComponent;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AboutFragment extends BaseRecyclerViewFragment<AboutComponent, AboutViewModel, BaseFragment.ActivityListener<AboutComponent>>
-        implements AboutViewModel.ViewListener {
+public class AboutFragment extends BaseFragment<AboutComponent, AboutContract.Presenter, BaseFragment.ActivityListener<AboutComponent>>
+        implements AboutContract.ViewListener {
 
-    private FragmentAboutBinding mBinding;
+    private FragmentAboutBinding binding;
 
     public AboutFragment() {
         // Required empty public constructor
@@ -30,15 +28,23 @@ public class AboutFragment extends BaseRecyclerViewFragment<AboutComponent, Abou
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentAboutBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentAboutBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
+        setupRecyclerView();
+        presenter.attachView(this);
+    }
+
+    private void setupRecyclerView() {
+        binding.rvAbout.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvAbout.setHasFixedSize(true);
+        final AboutRecyclerAdapter adapter = new AboutRecyclerAdapter(presenter);
+        binding.rvAbout.setAdapter(adapter);
     }
 
     @Override
@@ -47,12 +53,7 @@ public class AboutFragment extends BaseRecyclerViewFragment<AboutComponent, Abou
     }
 
     @Override
-    protected RecyclerView getRecyclerView() {
-        return mBinding.rvAbout;
-    }
-
-    @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new AboutRecyclerAdapter(mViewModel);
+    protected View getSnackbarView() {
+        return binding.rvAbout;
     }
 }

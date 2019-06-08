@@ -5,31 +5,27 @@
 package ch.giantific.qwittig.presentation.stats.di;
 
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.StatsRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
+import ch.giantific.qwittig.presentation.common.di.SimplePresentersModule;
 import ch.giantific.qwittig.presentation.stats.StatsActivity;
-import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesFragment;
-import ch.giantific.qwittig.presentation.stats.pie.stores.StatsStoresFragment;
-import ch.giantific.qwittig.presentation.stats.spending.StatsSpendingFragment;
+import ch.giantific.qwittig.presentation.stats.StatsBarFragment;
+import ch.giantific.qwittig.presentation.stats.StatsLoader;
+import ch.giantific.qwittig.presentation.stats.StatsPieFragment;
 import dagger.Subcomponent;
 
 /**
  * Provides the dependencies for the spending stats screen.
  */
 @PerActivity
-@Subcomponent(modules = {StatsSpendingViewModelModule.class, StatsCurrenciesViewModelModule.class,
-        StatsStoresViewModelModule.class})
+@Subcomponent(modules = {StatsLoaderModule.class, SimplePresentersModule.class,
+        PersistentViewModelsModule.class})
 public interface StatsSubcomponent {
 
     void inject(StatsActivity statsActivity);
 
-    void inject(StatsSpendingFragment statsSpendingFragment);
+    void inject(StatsBarFragment statsBarFragment);
 
-    void inject(StatsStoresFragment statsStoresFragment);
+    void inject(StatsPieFragment statsPieFragment);
 
-    void inject(StatsCurrenciesFragment statsCurrenciesFragment);
-
-    UserRepository getUserRepository();
-
-    StatsRepository getStatsRepository();
+    StatsLoader getStatsLoader();
 }

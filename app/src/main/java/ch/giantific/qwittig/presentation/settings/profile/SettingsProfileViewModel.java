@@ -4,120 +4,199 @@
 
 package ch.giantific.qwittig.presentation.settings.profile;
 
-import android.app.Activity;
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.support.annotation.IntDef;
+import android.databinding.Observable;
+import android.databinding.ObservableField;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.view.View;
+import android.text.TextUtils;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.util.Objects;
 
-import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.ProfileAction;
+import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.utils.Utils;
 
 /**
- * Defines a observable view model for profile settings screen.
+ * Provides an implementation of the {@link SettingsProfileContract}.
  */
-public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewModel.ViewListener>, UnlinkThirdPartyWorkerListener,
-        AvatarLoadListener,
-        DiscardChangesDialogFragment.DialogInteractionListener {
+public class SettingsProfileViewModel extends BaseObservable
+        implements Parcelable {
 
-    @Bindable
-    boolean isSaving();
+    public static final Creator<SettingsProfileViewModel> CREATOR = new Creator<SettingsProfileViewModel>() {
+        @Override
+        public SettingsProfileViewModel createFromParcel(Parcel in) {
+            return new SettingsProfileViewModel(in);
+        }
 
-    @Bindable
-    boolean isAnimStop();
+        @Override
+        public SettingsProfileViewModel[] newArray(int size) {
+            return new SettingsProfileViewModel[size];
+        }
+    };
+    public static final String TAG = SettingsProfileViewModel.class.getCanonicalName();
+    public final ObservableField<String> nickname = new ObservableField<>();
+    public final ObservableField<String> email = new ObservableField<>();
+    public final ObservableField<String> passwordRepeat = new ObservableField<>();
+    private boolean validate;
+    private String avatar;
+    private String password;
+    private boolean facebookUser;
+    private boolean googleUser;
+    private boolean unlinkSocialLogin;
 
-    void startSaving();
-
-    void stopSaving(boolean anim);
-
-    @Bindable
-    boolean isValidate();
-
-    void setValidate(boolean validate);
-
-    @Bindable
-    String getAvatar();
-
-    void setAvatar(@NonNull String avatarUrl);
-
-    @Bindable
-    String getNickname();
-
-    void setNickname(@NonNull String nickname);
-
-    @Bindable
-    String getEmail();
-
-    void setEmail(@NonNull String email);
-
-    @Bindable
-    boolean isNicknameComplete();
-
-    @Bindable
-    boolean isEmailValid();
-
-    @Bindable
-    boolean isPasswordValid();
-
-    @Bindable
-    boolean isPasswordEqual();
-
-    @Bindable
-    boolean isEmailAndPasswordVisible();
-
-    boolean showUnlinkFacebook();
-
-    boolean showUnlinkGoogle();
-
-    void onPickAvatarMenuClick();
-
-    void onNewAvatarTaken(@NonNull String avatar);
-
-    void onDeleteAvatarMenuClick();
-
-    void onUnlinkThirdPartyLoginMenuClick();
-
-    void onExitClick();
-
-    void onEmailChanged(CharSequence s, int start, int before, int count);
-
-    void onNicknameChanged(CharSequence s, int start, int before, int count);
-
-    void onPasswordChanged(CharSequence s, int start, int before, int count);
-
-    void onPasswordRepeatChanged(CharSequence s, int start, int before, int count);
-
-    void onFabSaveProfileClick(View view);
-
-    ProgressFinalAnimationListener getProgressFinalAnimationListener();
-
-    @IntDef({Activity.RESULT_OK, Activity.RESULT_CANCELED, Result.CHANGES_DISCARDED})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface Result {
-        int CHANGES_DISCARDED = 2;
+    public SettingsProfileViewModel() {
+        addChangedListeners();
     }
 
-    /**
-     * Defines the interaction with the attached view.
-     */
-    interface ViewListener extends ViewModel.ViewListener {
+    private SettingsProfileViewModel(Parcel in) {
+        nickname.set(in.readString());
+        email.set(in.readString());
+        password = in.readString();
+        passwordRepeat.set(in.readString());
+        validate = in.readByte() != 0;
+        avatar = in.readString();
+        facebookUser = in.readByte() != 0;
+        googleUser = in.readByte() != 0;
+        unlinkSocialLogin = in.readByte() != 0;
 
-        void startPostponedEnterTransition();
-
-        void loadUnlinkThirdPartyWorker(@ProfileAction int unlinkAction);
-
-        void showDiscardChangesDialog();
-
-        void showSetPasswordMessage(@StringRes int message);
-
-        void dismissSetPasswordMessage();
-
-        void reloadOptionsMenu();
+        addChangedListeners();
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(nickname.get());
+        dest.writeString(email.get());
+        dest.writeString(password);
+        dest.writeString(passwordRepeat.get());
+        dest.writeByte((byte) (validate ? 1 : 0));
+        dest.writeString(avatar);
+        dest.writeByte((byte) (facebookUser ? 1 : 0));
+        dest.writeByte((byte) (googleUser ? 1 : 0));
+        dest.writeByte((byte) (unlinkSocialLogin ? 1 : 0));
+    }
+
+    private void addChangedListeners() {
+        nickname.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.nicknameComplete);
+                }
+            }
+        });
+        email.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.emailValid);
+                }
+            }
+        });
+        passwordRepeat.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (validate) {
+                    notifyPropertyChanged(BR.passwordValid);
+                    notifyPropertyChanged(BR.passwordEqual);
+                }
+            }
+        });
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Bindable
+    public boolean isValidate() {
+        return validate;
+    }
+
+    public void setValidate(boolean validate) {
+        this.validate = validate;
+        notifyPropertyChanged(BR.validate);
+    }
+
+    public boolean isInputValid() {
+        setValidate(true);
+        return isEmailValid() && isPasswordValid() && isPasswordEqual() && isNicknameComplete();
+    }
+
+    @Bindable
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(@NonNull String avatarUrl) {
+        avatar = avatarUrl;
+        notifyPropertyChanged(BR.avatar);
+    }
+
+    @Bindable
+    public boolean isNicknameComplete() {
+        return !TextUtils.isEmpty(nickname.get());
+    }
+
+    @Bindable
+    public boolean isEmailValid() {
+        return Utils.isEmailValid(email.get());
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(@NonNull String password) {
+        this.password = password;
+        if (validate) {
+            notifyPropertyChanged(BR.passwordValid);
+            notifyPropertyChanged(BR.passwordEqual);
+        }
+    }
+
+    @Bindable
+    public boolean isPasswordValid() {
+        return TextUtils.isEmpty(password) || Utils.isPasswordValid(password);
+    }
+
+    @Bindable
+    public boolean isPasswordEqual() {
+        return Objects.equals(password, passwordRepeat.get());
+    }
+
+    public boolean isFacebookUser() {
+        return facebookUser;
+    }
+
+    public void setFacebookUser(boolean facebookUser) {
+        this.facebookUser = facebookUser;
+        notifyPropertyChanged(BR.emailAndPasswordVisible);
+    }
+
+    public boolean isGoogleUser() {
+        return googleUser;
+    }
+
+    public void setGoogleUser(boolean googleUser) {
+        this.googleUser = googleUser;
+        notifyPropertyChanged(BR.emailAndPasswordVisible);
+    }
+
+    public boolean isUnlinkSocialLogin() {
+        return unlinkSocialLogin;
+    }
+
+    public void setUnlinkSocialLogin(boolean unlinkSocialLogin) {
+        this.unlinkSocialLogin = unlinkSocialLogin;
+        notifyPropertyChanged(BR.emailAndPasswordVisible);
+    }
+
+    @Bindable
+    public boolean isEmailAndPasswordVisible() {
+        return !facebookUser && !googleUser || unlinkSocialLogin;
+    }
+
 }

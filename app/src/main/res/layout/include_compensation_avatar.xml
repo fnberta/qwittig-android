@@ -12,16 +12,16 @@
     <data>
 
         <variable
-            name="itemModel"
-            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompItemModel"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.viewmodels.items.CompUnpaidItemViewModel"
             />
     </data>
 
     <ImageView
-        android:id="@id/iv_avatar"
+        android:id="@+id/iv_comp_avatar"
         android:contentDescription="@string/user_avatar"
         android:scaleType="centerCrop"
-        app:avatarSquare="@{itemModel.compUserAvatar}"
+        app:avatarSquare="@{viewModel.avatar}"
         app:fallback="@{@drawable/ic_account_box_black_80dp}"
         tools:src="@drawable/ic_account_box_black_80dp"
         />

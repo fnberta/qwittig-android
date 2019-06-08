@@ -6,30 +6,34 @@ package ch.giantific.qwittig.presentation.purchases.list.purchases;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mugen.Mugen;
-import com.mugen.MugenCallbacks;
+import javax.inject.Inject;
 
-import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
-import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.common.BaseFragment;
+import ch.giantific.qwittig.presentation.common.BaseSortedListFragment;
+import ch.giantific.qwittig.presentation.common.listadapters.BaseSortedListRecyclerAdapter;
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.PurchasesViewModel;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.viewmodels.items.PurchaseItemViewModel;
 
 /**
  * Displays recent purchases in a {@link RecyclerView} list.
- * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent, PurchasesViewModel, BaseFragment.ActivityListener<HomeSubcomponent>>
-        implements PurchasesViewModel.ViewListener {
+public class PurchasesFragment extends BaseSortedListFragment<HomeSubcomponent,
+        PurchasesContract.Presenter,
+        BaseFragment.ActivityListener<HomeSubcomponent>,
+        PurchaseItemViewModel>
+        implements PurchasesContract.ViewListener {
 
-    private FragmentHomePurchasesBinding mBinding;
+    @Inject
+    PurchasesViewModel viewModel;
+    private FragmentHomePurchasesBinding binding;
 
     public PurchasesFragment() {
         // required empty constructor
@@ -38,33 +42,16 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentHomePurchasesBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentHomePurchasesBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
-        Mugen.with(mRecyclerView, new MugenCallbacks() {
-            @Override
-            public void onLoadMore() {
-                mViewModel.onLoadMore();
-            }
-
-            @Override
-            public boolean isLoading() {
-                return mViewModel.isLoadingMore();
-            }
-
-            @Override
-            public boolean hasLoadedAllItems() {
-                return false;
-            }
-        }).start();
+        presenter.attachView(this);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -73,22 +60,19 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
     }
 
     @Override
-    protected RecyclerView getRecyclerView() {
-        return mBinding.srlRv.rvBase;
+    protected BaseSortedListRecyclerAdapter<PurchaseItemViewModel, PurchasesContract.Presenter, ? extends RecyclerView.ViewHolder> getRecyclerAdapter() {
+        return new PurchasesRecyclerAdapter(presenter);
     }
 
     @Override
-    protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchasesRecyclerAdapter(mViewModel);
+    protected void setupRecyclerView() {
+        binding.rvPb.rvBase.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvPb.rvBase.setHasFixedSize(true);
+        binding.rvPb.rvBase.setAdapter(recyclerAdapter);
     }
 
     @Override
-    public void startUpdatePurchasesService() {
-        ParseQueryService.startUpdatePurchases(getActivity());
-    }
-
-    @Override
-    public void loadQueryMorePurchasesWorker(int skip) {
-        PurchasesQueryMoreWorker.attach(getFragmentManager(), skip);
+    protected View getSnackbarView() {
+        return binding.rvPb.rvBase;
     }
 }

@@ -14,7 +14,12 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.login.LoginProfileViewModel"
+            type="ch.giantific.qwittig.presentation.login.profile.LoginProfileViewModel"
+            />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.login.profile.LoginProfileContract.Presenter"
             />
     </data>
 
@@ -23,9 +28,9 @@
         android:layout_height="match_parent"
         android:layout_marginEnd="@dimen/key_line_1"
         android:layout_marginStart="@dimen/key_line_1"
-        android:transitionGroup="true"
         android:orientation="vertical"
-        tools:context=".presentation.login.LoginProfileViewModel"
+        android:transitionGroup="true"
+        tools:context=".presentation.login.profile.LoginProfileContract"
         tools:targetApi="lollipop"
         >
 
@@ -40,10 +45,10 @@
                 android:id="@+id/iv_login_profile_avatar"
                 android:layout_width="@dimen/avatar_size_3x"
                 android:layout_height="@dimen/avatar_size_3x"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/big_space"
                 android:contentDescription="@string/user_avatar"
-                android:layout_gravity="center_horizontal"
-                android:onClick="@{viewModel::onAvatarClick}"
+                android:onClick="@{presenter::onAvatarClick}"
                 app:avatar="@{viewModel.avatar}"
                 app:fallback="@{@drawable/ic_account_circle_black_80dp}"
                 tools:src="@drawable/ic_account_circle_black_80dp"
@@ -64,8 +69,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_nickname"
                     android:inputType="textPersonName"
-                    android:onTextChanged="@{viewModel::onNicknameChanged}"
-                    android:text="@{viewModel.nickname}"
+                    android:text="@={viewModel.nickname}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -76,9 +80,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/normal_space"
             android:layout_marginBottom="@dimen/normal_space"
-            android:onClick="@{viewModel::onFabDoneClick}"
+            android:layout_marginTop="@dimen/normal_space"
+            android:onClick="@{presenter::onDoneClick}"
             android:src="@drawable/ic_arrow_forward_black_24dp"
             />
 

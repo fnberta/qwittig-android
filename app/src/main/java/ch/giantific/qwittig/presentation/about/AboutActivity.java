@@ -11,16 +11,15 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.about.di.AboutComponent;
-import ch.giantific.qwittig.presentation.about.di.AboutViewModelModule;
 import ch.giantific.qwittig.presentation.about.di.DaggerAboutComponent;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.presenters.BasePresenter;
 
 public class AboutActivity extends BaseActivity<AboutComponent> {
 
     @Inject
-    AboutViewModel mAboutViewModel;
+    AboutContract.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,16 +35,15 @@ public class AboutActivity extends BaseActivity<AboutComponent> {
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerAboutComponent.builder()
+        component = DaggerAboutComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
-                .aboutViewModelModule(new AboutViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
-    protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mAboutViewModel});
+    protected List<BasePresenter> getPresenters() {
+        return Arrays.asList(new BasePresenter[]{presenter});
     }
 }

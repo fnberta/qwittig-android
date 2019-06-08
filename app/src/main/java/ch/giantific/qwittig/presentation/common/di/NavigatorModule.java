@@ -14,15 +14,15 @@ import dagger.Provides;
 @Module
 public class NavigatorModule {
 
-    private final FragmentActivity mActivity;
+    private final FragmentActivity activity;
 
     public NavigatorModule(@NonNull FragmentActivity activity) {
-        mActivity = activity;
+        this.activity = activity;
     }
 
     @PerActivity
     @Provides
     Navigator providesNavigator() {
-        return new Navigator(mActivity);
+        return new Navigator(activity);
     }
 }

@@ -32,10 +32,11 @@ public class BlurTransformation implements Transformation<Bitmap> {
 
     private static final int MAX_RADIUS = 25;
     private static final int DEFAULT_DOWN_SAMPLING = 1;
-    private final Context mContext;
-    private final BitmapPool mBitmapPool;
-    private final int mRadius;
-    private final int mSampling;
+
+    private final Context context;
+    private final BitmapPool bitmapPool;
+    private final int radius;
+    private final int sampling;
 
     public BlurTransformation(Context context) {
         this(context, Glide.get(context).getBitmapPool(), MAX_RADIUS, DEFAULT_DOWN_SAMPLING);
@@ -62,10 +63,10 @@ public class BlurTransformation implements Transformation<Bitmap> {
     }
 
     public BlurTransformation(Context context, BitmapPool pool, int radius, int sampling) {
-        mContext = context.getApplicationContext();
-        mBitmapPool = pool;
-        mRadius = radius;
-        mSampling = sampling;
+        this.context = context.getApplicationContext();
+        bitmapPool = pool;
+        this.radius = radius;
+        this.sampling = sampling;
     }
 
     @Override
@@ -74,38 +75,38 @@ public class BlurTransformation implements Transformation<Bitmap> {
 
         final int width = source.getWidth();
         final int height = source.getHeight();
-        final int scaledWidth = width / mSampling;
-        final int scaledHeight = height / mSampling;
+        final int scaledWidth = width / sampling;
+        final int scaledHeight = height / sampling;
 
-        Bitmap bitmap = mBitmapPool.get(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = bitmapPool.get(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
         if (bitmap == null) {
             bitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
         }
 
         final Canvas canvas = new Canvas(bitmap);
-        canvas.scale(1 / (float) mSampling, 1 / (float) mSampling);
+        canvas.scale(1 / (float) sampling, 1 / (float) sampling);
         final Paint paint = new Paint();
         paint.setFlags(Paint.FILTER_BITMAP_FLAG);
         canvas.drawBitmap(source, 0, 0, paint);
 
-        final RenderScript rs = RenderScript.create(mContext);
+        final RenderScript rs = RenderScript.create(context);
         final Allocation input = Allocation.createFromBitmap(rs, bitmap, Allocation.MipmapControl.MIPMAP_NONE,
                 Allocation.USAGE_SCRIPT);
         final Allocation output = Allocation.createTyped(rs, input.getType());
         final ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
 
         blur.setInput(input);
-        blur.setRadius(mRadius);
+        blur.setRadius(radius);
         blur.forEach(output);
         output.copyTo(bitmap);
 
         rs.destroy();
 
-        return BitmapResource.obtain(bitmap, mBitmapPool);
+        return BitmapResource.obtain(bitmap, bitmapPool);
     }
 
     @Override
     public String getId() {
-        return "BlurTransformation(radius=" + mRadius + ", sampling=" + mSampling + ")";
+        return "BlurTransformation(radius=" + radius + ", sampling=" + sampling + ")";
     }
 }

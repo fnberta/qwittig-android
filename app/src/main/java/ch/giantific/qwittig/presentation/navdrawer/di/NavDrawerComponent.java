@@ -5,27 +5,21 @@
 package ch.giantific.qwittig.presentation.navdrawer.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
+import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsPresenterModule;
+import ch.giantific.qwittig.presentation.assignments.details.di.AssignmentDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.assignments.list.di.AssignmentsSubcomponent;
+import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidViewModelModule;
-import ch.giantific.qwittig.presentation.finance.di.FinanceCompsUnpaidViewModelModule;
-import ch.giantific.qwittig.presentation.finance.di.FinanceHeaderViewModelModule;
+import ch.giantific.qwittig.presentation.common.di.PersistentViewModelsModule;
+import ch.giantific.qwittig.presentation.common.di.SimplePresentersModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidPresenterModule;
 import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsPresenterModule;
 import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
-import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsViewModelModule;
-import ch.giantific.qwittig.presentation.purchases.list.di.DraftsListViewModelModule;
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
-import ch.giantific.qwittig.presentation.purchases.list.di.HomeViewModelModule;
-import ch.giantific.qwittig.presentation.purchases.list.di.PurchasesListViewModelModule;
-import ch.giantific.qwittig.presentation.stats.di.StatsCurrenciesViewModelModule;
-import ch.giantific.qwittig.presentation.stats.di.StatsSpendingViewModelModule;
-import ch.giantific.qwittig.presentation.stats.di.StatsStoresViewModelModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsLoaderModule;
 import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
-import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsSubcomponent;
-import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsViewModelModule;
-import ch.giantific.qwittig.presentation.tasks.list.di.TasksListSubcomponent;
-import ch.giantific.qwittig.presentation.tasks.list.di.TasksListViewModelModule;
 import dagger.Component;
 
 /**
@@ -33,24 +27,23 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {NavDrawerViewModelModule.class, RepositoriesModule.class, NavigatorModule.class})
+        modules = {SimplePresentersModule.class, NavigatorModule.class})
 public interface NavDrawerComponent {
 
-    HomeSubcomponent plus(HomeViewModelModule homeViewModelModule,
-                          PurchasesListViewModelModule purchasesListViewModelModule,
-                          DraftsListViewModelModule draftsListViewModelModule);
+    HomeSubcomponent plus(PersistentViewModelsModule persistentViewModelsModule,
+                          GoogleApiClientDelegateModule googleApiClientDelegateModule);
 
-    FinanceSubcomponent plus(FinanceHeaderViewModelModule financeHeaderViewModelModule,
-                             FinanceCompsUnpaidViewModelModule compsUnpaidViewModelModule,
-                             FinanceCompsPaidViewModelModule compsPaidViewModelModule);
+    FinanceSubcomponent plus(FinanceCompsPaidPresenterModule compsPaidViewModelModule,
+                             PersistentViewModelsModule persistentViewModelsModule);
 
-    PurchaseDetailsSubcomponent plus(PurchaseDetailsViewModelModule purchaseDetailsViewModelModule);
+    PurchaseDetailsSubcomponent plus(PurchaseDetailsPresenterModule purchaseDetailsViewModelModule,
+                                     PersistentViewModelsModule persistentViewModelsModule);
 
-    TasksListSubcomponent plus(TasksListViewModelModule tasksListViewModelModule);
+    AssignmentsSubcomponent plus(PersistentViewModelsModule persistentViewModelsModule);
 
-    TaskDetailsSubcomponent plus(TaskDetailsViewModelModule taskDetailsViewModelModule);
+    AssignmentDetailsSubcomponent plus(AssignmentDetailsPresenterModule assignmentDetailsViewModelModule,
+                                       PersistentViewModelsModule persistentViewModelsModule);
 
-    StatsSubcomponent plus(StatsSpendingViewModelModule statsSpendingViewModelModule,
-                           StatsCurrenciesViewModelModule statsCurrenciesViewModelModule,
-                           StatsStoresViewModelModule statsStoresViewModelModule);
+    StatsSubcomponent plus(PersistentViewModelsModule persistentViewModelsModule,
+                           StatsLoaderModule statsLoaderModule);
 }

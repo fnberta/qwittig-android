@@ -14,6 +14,11 @@
             name="viewModel"
             type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingViewModel"
             />
+
+        <variable
+            name="presenter"
+            type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingContract.Presenter"
+            />
     </data>
 
     <ScrollView
@@ -75,7 +80,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{viewModel::onRatingNamesChanged}"
+                        android:rating="@={viewModel.ratingNames}"
                         />
 
                     <TextView
@@ -123,7 +128,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{viewModel::onRatingPricesChanged}"
+                        android:rating="@={viewModel.ratingPrices}"
                         />
 
                     <TextView
@@ -171,7 +176,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{viewModel::onRatingMissingChanged}"
+                        android:rating="@={viewModel.ratingMissing}"
                         />
 
                     <TextView
@@ -219,7 +224,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{viewModel::onRatingSpeedChanged}"
+                        android:rating="@={viewModel.ratingSpeed}"
                         />
 
                     <TextView
@@ -240,7 +245,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/normal_space"
                 android:layout_marginBottom="@dimen/normal_space"
-                android:onClick="@{viewModel::onFabDetailsDoneClick}"
+                android:onClick="@{presenter::onDetailsDoneClick}"
                 android:src="@drawable/ic_done_black_24dp"
                 />
 
